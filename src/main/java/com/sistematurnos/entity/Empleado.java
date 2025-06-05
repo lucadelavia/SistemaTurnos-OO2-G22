@@ -1,19 +1,28 @@
 package com.sistematurnos.entity;
 
-import java.util.Set;
-
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-@ToString
+@Getter @Setter
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 
-public class Empleado extends Usuario{
+@Entity
+@Table(name = "empleados")
+public class Empleado extends Usuario {
 
     private int cuil;
     private String matricula;
-    private Set<Especialidad> lstEspecialidades;
 
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "empleado_especialidad",
+            joinColumns = @JoinColumn(name = "empleado_id"),
+            inverseJoinColumns = @JoinColumn(name = "especialidad_id")
+    )
+    private Set<Especialidad> lstEspecialidades;
 }
