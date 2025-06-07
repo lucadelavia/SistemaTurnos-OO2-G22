@@ -27,9 +27,7 @@ public class Establecimiento {
     @Column(nullable = false, unique = true)
     private String cuit;
     
-    @Column(nullable = false)
-    private String direccion;
-    
+    private String direccion; 
     private String descripcion;
 
     @OneToMany(mappedBy = "establecimiento", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

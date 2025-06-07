@@ -8,7 +8,8 @@ import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter @Setter
+@Getter 
+@Setter
 @ToString
 @EqualsAndHashCode
 
@@ -22,6 +23,8 @@ public class Sucursal {
     private int id;
 
     private String direccion;
+    
+    @Column(nullable = false, unique = true)
     private String telefono;
 
     @Column(name = "horarioApertura")
@@ -51,4 +54,12 @@ public class Sucursal {
             inverseJoinColumns = @JoinColumn(name = "diasDeAtencion_id")
     )
     private Set<DiasDeAtencion> lstDiasDeAtencion;
+    
+    public Sucursal(String direccion, String telefono, LocalTime horaApertura, LocalTime horaCierre, int espacio) {
+        this.direccion = direccion;
+        this.telefono = telefono;
+        this.horaApertura = horaApertura;
+        this.horaCierre = horaCierre;
+        this.espacio = espacio;
+    }
 }

@@ -63,8 +63,7 @@ public class EstablecimientoService {
     }
 
     public void asociarSucursalAEstablecimiento(int idEst, int idSuc) {
-        Establecimiento est = establecimientoRepository.findById(idEst)
-            .orElseThrow(() -> new IllegalArgumentException("ERROR: no existe establecimiento con ID: " + idEst));
+    	Establecimiento est = traer(idEst);
 
         Sucursal suc = sucursalService.traer(idSuc);
 
@@ -79,8 +78,7 @@ public class EstablecimientoService {
     }
 
     public void removerSucursalDeEstablecimiento(int idEst, int idSuc) {
-        Establecimiento est = establecimientoRepository.findById(idEst)
-            .orElseThrow(() -> new IllegalArgumentException("ERROR: no existe establecimiento con ID: " + idEst));
+    	Establecimiento est = traer(idEst);
 
         Sucursal suc = sucursalService.traer(idSuc);
 
