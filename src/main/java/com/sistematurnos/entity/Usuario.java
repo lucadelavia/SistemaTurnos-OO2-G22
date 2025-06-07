@@ -32,4 +32,18 @@ public class Usuario {
 
     @Column(name = "fechaAlta")
     private LocalDateTime fechaAlta;
+
+    public Usuario(String nombre, String apellido, String email, String direccion,
+                   int dni, boolean estado, LocalDateTime fechaAlta) {
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.email = email;
+        this.direccion = direccion;
+        this.dni = dni;
+        this.estado = estado;
+        this.fechaAlta = fechaAlta;
+    }
+
+
+
 }

@@ -43,4 +43,17 @@ public class Turno {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "servicio_id", nullable = false)
     private Servicio servicio;
+
+    public Turno(LocalDateTime fechaHora, boolean estado, String codigo,
+                 Servicio servicio, Cliente cliente, Sucursal sucursal, Empleado empleado) {
+        this.fechaHora = fechaHora;
+        this.estado = estado;
+        this.codigo = codigo;
+        this.servicio = servicio;
+        this.cliente = cliente;
+        this.sucursal = sucursal;
+        this.empleado = empleado;
+    }
+
+
 }

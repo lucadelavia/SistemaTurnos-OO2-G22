@@ -19,4 +19,10 @@ public class DiasDeAtencion {
     private int id;
 
     private String nombre;
+
+    public DiasDeAtencion(String nombre) {
+        this.nombre = nombre;
+    }
+
+
 }
