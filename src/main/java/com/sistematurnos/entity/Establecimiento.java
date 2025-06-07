@@ -7,7 +7,8 @@ import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter @Setter
+@Getter 
+@Setter
 @ToString
 @EqualsAndHashCode
 
@@ -20,11 +21,24 @@ public class Establecimiento {
     @Column(name = "idestablecimiento")
     private int id;
 
+    @Column(nullable = false, unique = true)
     private String nombre;
+    
+    @Column(nullable = false, unique = true)
     private String cuit;
+    
+    @Column(nullable = false)
     private String direccion;
+    
     private String descripcion;
 
     @OneToMany(mappedBy = "establecimiento", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Sucursal> sucursales;
+    
+    public Establecimiento(String nombre, String cuit, String direccion, String descripcion) {
+        this.nombre = nombre;
+        this.cuit = cuit;
+        this.direccion = direccion;
+        this.descripcion = descripcion;
+    }
 }
