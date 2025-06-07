@@ -1,7 +1,7 @@
 package com.sistematurnos.service;
 
 import com.sistematurnos.entity.Cliente;
-import com.sistematurnos.repositories.IClienteRepository;
+import com.sistematurnos.repository.IClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,20 +17,18 @@ public class ClienteService {
     public Cliente altaCliente(String nombre, String apellido, String email, String direccion,
                                int dni, boolean estado, LocalDateTime fechaAlta, int nroCliente) {
 
-        Cliente c = new Cliente(nombre, apellido, email, direccion, dni, estado, fechaAlta, nroCliente);
-
-        if (clienteRepository.findById(c.getId()).isPresent()) {
-            throw new IllegalArgumentException("Este cliente ya existe.");
+        if (clienteRepository.findByDni(dni).isPresent()) {
+            throw new IllegalArgumentException("Ya existe un cliente con ese DNI.");
         }
 
-        return clienteRepository.save(c);
+        Cliente cliente = new Cliente(nombre, apellido, email, direccion, dni, estado, fechaAlta, nroCliente);
+        return clienteRepository.save(cliente);
     }
 
     public Cliente altaCliente(Cliente cliente) {
-        if (clienteRepository.findById(cliente.getId()).isPresent()) {
-            throw new IllegalArgumentException("Este cliente ya existe.");
+        if (clienteRepository.findByDni(cliente.getDni()).isPresent()) {
+            throw new IllegalArgumentException("Ya existe un cliente con ese DNI.");
         }
-
         return clienteRepository.save(cliente);
     }
 
@@ -45,7 +43,8 @@ public class ClienteService {
     }
 
     public Cliente modificarCliente(Cliente c) {
-        Cliente actual = obtenerClientePorId(c.getId());
+        Cliente actual = clienteRepository.findById(c.getId())
+                .orElseThrow(() -> new IllegalArgumentException("ERROR: No existe el cliente solicitado"));
 
         actual.setNombre(c.getNombre());
         actual.setApellido(c.getApellido());
@@ -55,7 +54,12 @@ public class ClienteService {
         actual.setEstado(c.isEstado());
         actual.setNroCliente(c.getNroCliente());
 
-        return clienteRepository.save(actual);
+        try {
+            return clienteRepository.save(actual);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("No se pudo guardar el cliente: " + e.getMessage());
+        }
     }
 
     public List<Cliente> traerClientes() {
@@ -70,5 +74,4 @@ public class ClienteService {
     public List<Cliente> findByNroClienteGreaterThan(int limite) {
         return clienteRepository.findByNroClienteGreaterThan(limite);
     }
-
 }

@@ -1,7 +1,7 @@
 package com.sistematurnos.service;
 
 import com.sistematurnos.entity.DiasDeAtencion;
-import com.sistematurnos.repositories.IDiasDeAtencionRepository;
+import com.sistematurnos.repository.IDiasDeAtencionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

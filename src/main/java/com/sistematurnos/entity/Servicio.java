@@ -22,4 +22,10 @@ public class Servicio {
     private String nombreServicio;
 
     private int duracion;
+
+    public Servicio(String nombreServicio, int duracion) {
+        this.nombreServicio = nombreServicio;
+        this.duracion = duracion;
+    }
+
 }

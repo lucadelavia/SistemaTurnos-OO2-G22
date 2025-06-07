@@ -25,7 +25,4 @@ public class Cliente extends Usuario {
         this.nroCliente = nroCliente;
     }
 
-
-
-
 }
