@@ -1,4 +1,4 @@
-package com.sistematurnos.repositories;
+package com.sistematurnos.repository;
 
 import com.sistematurnos.entity.Sucursal;
 import org.springframework.data.jpa.repository.JpaRepository;

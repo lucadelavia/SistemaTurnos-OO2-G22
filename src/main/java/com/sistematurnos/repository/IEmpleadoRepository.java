@@ -1,4 +1,4 @@
-package com.sistematurnos.repositories;
+package com.sistematurnos.repository;
 
 import java.io.Serializable;
 import java.util.List;

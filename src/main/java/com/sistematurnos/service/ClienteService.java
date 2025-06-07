@@ -1,7 +1,8 @@
 package com.sistematurnos.service;
 
 import com.sistematurnos.entity.Cliente;
-import com.sistematurnos.repositories.IClienteRepository;
+import com.sistematurnos.repository.IClienteRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

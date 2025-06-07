@@ -1,8 +1,11 @@
-package com.sistematurnos.services;
+package com.sistematurnos.service;
 
 import com.sistematurnos.entity.Establecimiento;
 import com.sistematurnos.entity.Sucursal;
-import com.sistematurnos.repositories.IEstablecimientoRepository;
+import com.sistematurnos.repository.IEstablecimientoRepository;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +21,10 @@ public class EstablecimientoService {
     public Establecimiento altaEstablecimiento(String nombre, String cuit, String direccion, String descripcion) {
         Establecimiento est = new Establecimiento(nombre, cuit, direccion, descripcion);
 
-        if (establecimientoRepository.findByNombreEstablecimiento(nombre).isPresent()) {
+        if (establecimientoRepository.findByNombre(nombre).isPresent()) {
             throw new IllegalArgumentException("ERROR: ya existe un establecimiento con el nombre: " + nombre);
         }
-        if (establecimientoRepository.findByCuitEstablecimiento(cuit).isPresent()) {
+        if (establecimientoRepository.findByCuit(cuit).isPresent()) {
             throw new IllegalArgumentException("ERROR: ya existe un establecimiento con el CUIT: " + cuit);
         }
         
@@ -29,10 +32,10 @@ public class EstablecimientoService {
     }
 
     public Establecimiento altaEstablecimiento(Establecimiento est) {
-        if (establecimientoRepository.findByNombreEstablecimiento(est.getNombre()).isPresent()) {
+        if (establecimientoRepository.findByNombre(est.getNombre()).isPresent()) {
             throw new IllegalArgumentException("ERROR: ya existe un establecimiento con el nombre: " + est.getNombre());
         }
-        if (establecimientoRepository.findByCuitEstablecimiento(est.getCuit()).isPresent()) {
+        if (establecimientoRepository.findByCuit(est.getCuit()).isPresent()) {
             throw new IllegalArgumentException("ERROR: ya existe un establecimiento con el CUIT: " + est.getCuit());
         }
 
@@ -61,10 +64,13 @@ public class EstablecimientoService {
         return establecimientoRepository.findById(idEstablecimiento)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: no existe establecimiento con ID: " + idEstablecimiento));
     }
+    
+    public List<Establecimiento> traerEstablecimientos() {
+        return establecimientoRepository.findAll();
+    }
 
     public void asociarSucursalAEstablecimiento(int idEst, int idSuc) {
     	Establecimiento est = traer(idEst);
-
         Sucursal suc = sucursalService.traer(idSuc);
 
         if (!est.getSucursales().contains(suc)) {
@@ -79,7 +85,6 @@ public class EstablecimientoService {
 
     public void removerSucursalDeEstablecimiento(int idEst, int idSuc) {
     	Establecimiento est = traer(idEst);
-
         Sucursal suc = sucursalService.traer(idSuc);
 
         if (!est.getSucursales().contains(suc)) {
@@ -87,7 +92,6 @@ public class EstablecimientoService {
         }
 
         est.getSucursales().remove(suc);
-
         suc.setEstablecimiento(null);
 
         establecimientoRepository.save(est);

@@ -1,13 +1,12 @@
-package com.sistematurnos.services;
+package com.sistematurnos.service;
 
 import com.sistematurnos.entity.Sucursal;
+import com.sistematurnos.repository.ISucursalRepository;
 import com.sistematurnos.entity.DiasDeAtencion;
 import com.sistematurnos.entity.Especialidad;
-import com.sistematurnos.repositories.ISucursalRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.sistematurnos.service.DiasDeAtencionService;
 
 import java.time.LocalTime;
 
