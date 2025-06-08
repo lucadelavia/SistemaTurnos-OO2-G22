@@ -1,20 +1,14 @@
 package com.sistematurnos.repository;
 
-import java.io.Serializable;
+import com.sistematurnos.entity.Especialidad;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+public interface IEspecialidadRepository extends JpaRepository<Especialidad, Integer> {
 
-import com.sistematurnos.entity.Especialidad;
+	Optional<Especialidad> findByNombre(String nombre);
 
-
-@Repository("especialidadRepository")
-public interface IEspecialidadRepository extends JpaRepository<Especialidad, Serializable> {
-
-	public Especialidad findById(int id);
-
-	public Especialidad findByNombre(String nombre);
+	List<Especialidad> findByNombreContainingIgnoreCase(String nombreParcial); // búsqueda parcial
 }

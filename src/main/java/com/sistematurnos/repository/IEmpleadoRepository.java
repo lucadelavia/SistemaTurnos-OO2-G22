@@ -1,26 +1,16 @@
 package com.sistematurnos.repository;
 
-import java.io.Serializable;
-import java.util.List;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
-
 import com.sistematurnos.entity.Empleado;
+import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+import java.util.Optional;
 
-@Repository("empleadoRepository")
-public interface IEmpleadoRepository extends JpaRepository<Empleado, Serializable> {
+public interface IEmpleadoRepository extends JpaRepository<Empleado, Integer> {
 
-	public Empleado findById(int id);
+	Optional<Empleado> findByDni(int dni);         // heredado de Usuario
+	Optional<Empleado> findByCuil(int cuil);
+	Optional<Empleado> findByMatricula(String matricula);
 
-	public Empleado findByDni(int dni);
-
-	public Empleado findByCuil(int cuil);
-
-	public List<Empleado> findByEspecialidad(String nombreEsp);
-
-	public Empleado findByMatricula(String matricula);
+	List<Empleado> findByLstEspecialidadesNombre(String nombre);
 }
