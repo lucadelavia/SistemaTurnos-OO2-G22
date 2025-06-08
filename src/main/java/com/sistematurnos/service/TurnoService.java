@@ -85,6 +85,11 @@ public class TurnoService {
         return turnoRepository.findByServicio_Id(idServicio);
     }
 
+    public Turno obtenerTurnoPorCodigo(String codigo) {
+        return turnoRepository.findByCodigo(codigo)
+                .orElseThrow(() -> new IllegalArgumentException("No existe un turno con ese código"));
+    }
+
     public List<Turno> traerTurnosPorFechaYSucursal(LocalDate fecha, int idSucursal) {
         LocalDateTime inicio = fecha.atStartOfDay();
         LocalDateTime fin = inicio.plusDays(1);

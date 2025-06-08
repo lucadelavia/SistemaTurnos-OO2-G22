@@ -20,13 +20,13 @@ public class EmpleadoService {
     private IEspecialidadRepository especialidadRepository;
 
     public Empleado altaEmpleado(String nombre, String apellido, String email, String direccion,
-                                 int dni, boolean estado, LocalDateTime fechaAlta, int cuil, String matricula) {
+                                 int dni, boolean estado, LocalDateTime fechaAlta, long cuil, String matricula) {
 
-        if (empleadoRepository.findByDni(dni) != null) {
+        if (empleadoRepository.findByDni(dni).isPresent()) {
             throw new IllegalArgumentException("ERROR: Ya existe un empleado con ese DNI");
         }
 
-        if (empleadoRepository.findByCuil(cuil) != null) {
+        if (empleadoRepository.findByCuil(cuil).isPresent()) {
             throw new IllegalArgumentException("ERROR: Ya existe un empleado con ese CUIL");
         }
 
@@ -35,11 +35,11 @@ public class EmpleadoService {
     }
 
     public Empleado altaEmpleado(Empleado empleado) {
-        if (empleadoRepository.findByDni(empleado.getDni()) != null) {
+        if (empleadoRepository.findByDni(empleado.getDni()).isPresent()) {
             throw new IllegalArgumentException("ERROR: Ya existe un empleado con ese DNI");
         }
 
-        if (empleadoRepository.findByCuil(empleado.getCuil()) != null) {
+        if (empleadoRepository.findByCuil(empleado.getCuil()).isPresent()) {
             throw new IllegalArgumentException("ERROR: Ya existe un empleado con ese CUIL");
         }
 
@@ -51,7 +51,7 @@ public class EmpleadoService {
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: No existe el empleado solicitado"));
     }
 
-    public Empleado obtenerEmpleadoPorCuil(int cuil) {
+    public Empleado obtenerEmpleadoPorCuil(long cuil) {
         return empleadoRepository.findByCuil(cuil)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: No existe el empleado solicitado"));
     }
@@ -73,8 +73,10 @@ public class EmpleadoService {
     }
 
     public void bajaEmpleado(int id) {
-        Empleado e = obtenerEmpleadoPorId(id);
-        empleadoRepository.delete(e);
+        Empleado empleado = empleadoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado"));
+        empleado.setEstado(false);
+        empleadoRepository.save(empleado);
     }
 
     public void asignarEspecialidad(int idEmpleado, Especialidad esp) {
@@ -100,6 +102,6 @@ public class EmpleadoService {
     }
 
     public List<Empleado> traerEmpleados() {
-        return empleadoRepository.findAll();
+        return empleadoRepository.findByEstadoTrue();
     }
 }

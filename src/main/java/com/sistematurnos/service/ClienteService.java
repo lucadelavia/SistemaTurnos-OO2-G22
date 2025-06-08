@@ -39,7 +39,8 @@ public class ClienteService {
 
     public void bajaCliente(int id) {
         Cliente cliente = obtenerClientePorId(id);
-        clienteRepository.delete(cliente);
+        cliente.setEstado(false);
+        clienteRepository.save(cliente);
     }
 
     public Cliente modificarCliente(Cliente c) {

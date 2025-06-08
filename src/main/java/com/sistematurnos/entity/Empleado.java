@@ -16,7 +16,7 @@ import java.util.Set;
 @Table(name = "empleados")
 public class Empleado extends Usuario {
 
-    private int cuil;
+    private long cuil;
     private String matricula;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -28,7 +28,7 @@ public class Empleado extends Usuario {
     private Set<Especialidad> lstEspecialidades;
 
     public Empleado(String nombre, String apellido, String email, String direccion,
-                    int dni, boolean estado, LocalDateTime fechaAlta, int cuil, String matricula) {
+                    int dni, boolean estado, LocalDateTime fechaAlta, long cuil, String matricula) {
         super(nombre, apellido, email, direccion, dni, estado, fechaAlta);
         this.cuil = cuil;
         this.matricula = matricula;
