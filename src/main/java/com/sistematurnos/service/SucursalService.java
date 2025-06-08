@@ -4,11 +4,11 @@ import com.sistematurnos.entity.Sucursal;
 import com.sistematurnos.repository.ISucursalRepository;
 import com.sistematurnos.entity.DiasDeAtencion;
 import com.sistematurnos.entity.Especialidad;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Service
 public class SucursalService {
@@ -57,10 +57,13 @@ public class SucursalService {
         return sucursalRepository.findById(idSucursal)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: no existe una sucursal con ID: " + idSucursal));
     }
+    
+    public List<Sucursal> traerSucursales() {
+        return sucursalRepository.findAll();
+    }
 
     public void asociarDiaDeAtencion(int idSucursal, int idDiasAtencion) {
         Sucursal suc = traer(idSucursal);
-        
         DiasDeAtencion dia = diasDeAtencionService.traer(idDiasAtencion);
 
         if (!suc.getLstDiasDeAtencion().contains(dia)) {
@@ -72,8 +75,7 @@ public class SucursalService {
     }
 
     public void removerDiaDeAtencion(int idSucursal, int idDiasAtencion) {
-    	Sucursal suc = traer(idSucursal);
-        
+    	Sucursal suc = traer(idSucursal);       
         DiasDeAtencion dia = diasDeAtencionService.traer(idDiasAtencion);
 
         if (suc.getLstDiasDeAtencion().contains(dia)) {
