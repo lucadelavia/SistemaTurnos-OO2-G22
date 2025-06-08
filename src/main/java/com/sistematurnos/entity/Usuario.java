@@ -47,12 +47,4 @@ public class Usuario {
         this.estado = estado;
         this.fechaAlta = fechaAlta;
     }
-    
-    public Usuario(String nombre, String apellido, String email, String direccion, int dni) {
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.email = email;
-        this.direccion = direccion;
-        this.dni = dni;
-    }
 }
