@@ -3,6 +3,7 @@ package com.sistematurnos.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -25,4 +26,13 @@ public class Empleado extends Usuario {
             inverseJoinColumns = @JoinColumn(name = "especialidad_id")
     )
     private Set<Especialidad> lstEspecialidades;
+
+    public Empleado(String nombre, String apellido, String email, String direccion,
+                    int dni, boolean estado, LocalDateTime fechaAlta, int cuil, String matricula) {
+        super(nombre, apellido, email, direccion, dni, estado, fechaAlta);
+        this.cuil = cuil;
+        this.matricula = matricula;
+    }
+
+
 }

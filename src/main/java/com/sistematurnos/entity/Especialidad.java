@@ -19,4 +19,9 @@ public class Especialidad {
     private int id;
 
     private String nombre;
+
+    public Especialidad(String nombre) {
+        this.nombre = nombre;
+    }
+
 }
