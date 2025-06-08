@@ -9,6 +9,6 @@ import java.util.List;
 public interface IDiasDeAtencionRepository extends JpaRepository<DiasDeAtencion, Integer> {
 
     Optional<DiasDeAtencion> findByNombre(String nombre);
-
+    boolean existsByNombre(String nombre);
     List<DiasDeAtencion> findByNombreContainingIgnoreCase(String parteNombre);
 }

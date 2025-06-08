@@ -32,6 +32,9 @@ public class Sucursal {
 
     private int espacio;
 
+    @Column(nullable = false)
+    private boolean estado = true;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idestablecimiento")
     private Establecimiento establecimiento;

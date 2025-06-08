@@ -2,6 +2,7 @@ package com.sistematurnos.service;
 
 import com.sistematurnos.entity.DiasDeAtencion;
 import com.sistematurnos.repository.IDiasDeAtencionRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,5 +40,15 @@ public class DiasDeAtencionService {
 
     public List<DiasDeAtencion> traerTodos() {
         return repository.findAll();
+    }
+
+    @PostConstruct
+    public void initDiasPorDefecto() {
+        List<String> dias = List.of("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo");
+        for (String dia : dias) {
+            if (!repository.existsByNombre(dia)) {
+                repository.save(new DiasDeAtencion(dia));
+            }
+        }
     }
 }

@@ -57,6 +57,16 @@ public class EmpleadoController {
         }
     }
 
+    @PostMapping("/con-especialidades")
+    public ResponseEntity<Empleado> crearEmpleadoConEspecialidades(@RequestBody Empleado empleado) {
+        try {
+            Empleado nuevo = empleadoService.altaEmpleadoConEspecialidades(empleado);
+            return ResponseEntity.ok(nuevo);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Empleado> modificarEmpleado(@PathVariable int id, @RequestBody Empleado empleado) {
         try {

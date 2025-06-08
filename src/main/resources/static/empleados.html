@@ -10,14 +10,15 @@
 </head>
 <body>
 
+<!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #800000;">
     <div class="container-fluid">
         <a class="navbar-brand" href="index.html">
             <img src="logo-unla.png" alt="UNLa" width="30" height="30" class="d-inline-block align-text-top" />
         </a>
         <div class="d-flex">
-            <a class="nav-link text-white" href="#"> Login </a>
-            <a class="nav-link text-white" href="#"> Información </a>
+            <a class="nav-link text-white" href="#">Login</a>
+            <a class="nav-link text-white" href="#">Información</a>
         </div>
     </div>
 </nav>
@@ -59,9 +60,15 @@
                         <label class="form-label">Matrícula (opcional)</label>
                         <input type="text" class="form-control" id="matricula" />
                     </div>
+                    <div class="col-md-8">
+                        <label class="form-label">Especialidades</label>
+                        <div id="especialidades-container" class="d-flex flex-wrap gap-2 border rounded p-2" style="min-height: 55px;">
+                            <!-- Checkboxes cargados dinámicamente -->
+                        </div>
+                    </div>
                 </div>
                 <div class="mt-4 text-end">
-                    <button type="submit" class="btn btn-success">Agregar Empleado</button>
+                    <button type="submit" class="btn btn-success">Guardar Empleado</button>
                 </div>
             </form>
         </div>
@@ -82,13 +89,14 @@
                     <th>DNI</th>
                     <th>CUIL</th>
                     <th>Matrícula</th>
+                    <th>Especialidades</th>
                     <th>Estado</th>
                     <th>Fecha Alta</th>
                     <th>Acciones</th>
                 </tr>
                 </thead>
                 <tbody id="empleados-tbody">
-                <!-- Empleados cargados por JS -->
+                <!-- Empleados cargados dinámicamente -->
                 </tbody>
             </table>
         </div>
@@ -96,7 +104,7 @@
 </main>
 
 <footer class="text-center text-white py-3" style="background-color: #4b0000;">
-    <small>&copy; 2025 UNLa Turnos. Proyecto académico - Universidad Nacional de Lanús</small>
+    <small>&copy; 2025 UNLa Turnos - Grupo 22 - OO2 - Universidad Nacional de Lanús</small>
 </footer>
 
 <script src="js/empleados.js"></script>

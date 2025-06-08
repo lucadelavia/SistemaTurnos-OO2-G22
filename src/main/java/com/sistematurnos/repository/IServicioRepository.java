@@ -12,4 +12,6 @@ public interface IServicioRepository extends JpaRepository<Servicio, Integer> {
 
 	List<Servicio> findByNombreServicioContainingIgnoreCase(String fragmento);
 
+	List<Servicio> findByEstadoTrue();
+
 }

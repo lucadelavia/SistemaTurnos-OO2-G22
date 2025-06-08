@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -57,6 +58,20 @@ public class TurnoController {
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/disponibilidad")
+    public ResponseEntity<List<LocalDateTime>> obtenerHorariosDisponibles(
+            @RequestParam int idSucursal,
+            @RequestParam int idServicio,
+            @RequestParam int idEmpleado,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
+        try {
+            List<LocalDateTime> disponibles = turnoService.obtenerHorariosDisponibles(idSucursal, idServicio, idEmpleado, fecha);
+            return ResponseEntity.ok(disponibles);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 

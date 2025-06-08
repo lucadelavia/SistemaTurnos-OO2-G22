@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -14,6 +16,16 @@ public class TurnoService {
 
     @Autowired
     private ITurnoRepository turnoRepository;
+
+    @Autowired
+    private SucursalService sucursalService;
+
+    @Autowired
+    private ServicioService servicioService;
+
+    @Autowired
+    private EmpleadoService empleadoService;
+
 
     public Turno altaTurno(LocalDateTime fechaHora, boolean estadoActivo, String codigo,
                            Servicio servicio, Cliente cliente, Empleado empleado, Sucursal sucursal) {
@@ -32,6 +44,56 @@ public class TurnoService {
         }
         return turnoRepository.save(turno);
     }
+
+    public List<LocalDateTime> obtenerHorariosDisponibles(int idSucursal, int idServicio, int idEmpleado, LocalDate fecha) {
+        Sucursal sucursal = sucursalService.traer(idSucursal);
+        Servicio servicio = servicioService.obtenerServicioPorId(idServicio);
+        Empleado empleado = empleadoService.obtenerEmpleadoPorId(idEmpleado);
+
+        if (sucursal == null || servicio == null || empleado == null) {
+            throw new IllegalArgumentException("Datos inválidos");
+        }
+
+        // Convertir el día a texto en español, ej: "lunes"
+        final String diaNombre = fecha.getDayOfWeek()
+                .getDisplayName(java.time.format.TextStyle.FULL, new java.util.Locale("es", "ES"))
+                .toLowerCase();
+
+        boolean esDiaDeAtencion = sucursal.getLstDiasDeAtencion().stream()
+                .anyMatch(d -> d.getNombre().equalsIgnoreCase(diaNombre));
+
+        if (!esDiaDeAtencion) {
+            return List.of(); // no hay turnos ese día
+        }
+
+        int duracion = servicio.getDuracion();
+        int capacidad = sucursal.getEspacio();
+
+        List<Turno> turnosDelDia = traerTurnosPorFechaYSucursal(fecha, idSucursal);
+
+        List<LocalDateTime> disponibles = new ArrayList<>();
+        LocalDateTime inicio = fecha.atTime(sucursal.getHoraApertura());
+        LocalDateTime fin = fecha.atTime(sucursal.getHoraCierre());
+
+        while (!inicio.plusMinutes(duracion).isAfter(fin)) {
+            LocalDateTime finalInicio = inicio;
+            int cantidadEnEstaFranja = (int) turnosDelDia.stream()
+                    .filter(t -> t.getFechaHora()
+                            .truncatedTo(ChronoUnit.MINUTES)
+                            .isEqual(finalInicio.truncatedTo(ChronoUnit.MINUTES)))
+                    .count();
+
+            if (cantidadEnEstaFranja < capacidad) {
+                disponibles.add(inicio);
+            }
+
+            inicio = inicio.plusMinutes(duracion);
+        }
+
+        return disponibles;
+    }
+
+
 
     public Turno obtenerTurnoPorId(int id) {
         return turnoRepository.findById(id)

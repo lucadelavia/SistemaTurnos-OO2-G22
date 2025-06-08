@@ -15,4 +15,7 @@ public interface ISucursalRepository extends JpaRepository<Sucursal, Integer> {
 
 	@Override
 	List<Sucursal> findAll();
+	List<Sucursal> findByEstadoTrue();
+
+
 }
