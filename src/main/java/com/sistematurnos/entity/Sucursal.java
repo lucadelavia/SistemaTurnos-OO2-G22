@@ -34,6 +34,9 @@ public class Sucursal {
     private LocalTime horaCierre;
 
     private int espacio;
+    
+    @Column(nullable = false)
+    private boolean estado = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idestablecimiento")
@@ -54,12 +57,4 @@ public class Sucursal {
             inverseJoinColumns = @JoinColumn(name = "diasDeAtencion_id")
     )
     private Set<DiasDeAtencion> lstDiasDeAtencion;
-    
-    public Sucursal(String direccion, String telefono, LocalTime horaApertura, LocalTime horaCierre, int espacio) {
-        this.direccion = direccion;
-        this.telefono = telefono;
-        this.horaApertura = horaApertura;
-        this.horaCierre = horaCierre;
-        this.espacio = espacio;
-    }
 }

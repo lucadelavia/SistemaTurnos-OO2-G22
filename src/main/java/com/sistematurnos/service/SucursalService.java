@@ -4,11 +4,14 @@ import com.sistematurnos.entity.Sucursal;
 import com.sistematurnos.repository.ISucursalRepository;
 import com.sistematurnos.entity.DiasDeAtencion;
 import com.sistematurnos.entity.Especialidad;
+import com.sistematurnos.repository.IEspecialidadRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class SucursalService {
@@ -18,38 +21,80 @@ public class SucursalService {
 
     @Autowired
     private DiasDeAtencionService diasDeAtencionService;
+    
+    @Autowired
+    private IEspecialidadRepository especialidadRepository;
 
     public Sucursal altaSucursal(String direccion, String telefono, LocalTime horaApertura, LocalTime horaCierre, int espacio) {
-        Sucursal suc = new Sucursal(direccion, telefono, horaApertura, horaCierre, espacio);
-    	
-    	if (sucursalRepository.findByTelefono(telefono).isPresent()) {
-            throw new IllegalArgumentException("ERROR: ya existe una sucursal con el telefono: " + telefono);
+        if (sucursalRepository.findAll().stream().anyMatch(s -> s.getDireccion().equalsIgnoreCase(direccion))) {
+            throw new IllegalArgumentException("ERROR: ya existe una sucursal con la direccion: " + direccion);
         }
         
+        Sucursal suc = new Sucursal();
+        suc.setDireccion(direccion);
+        suc.setTelefono(telefono);
+        suc.setHoraApertura(horaApertura);
+        suc.setHoraCierre(horaCierre);
+        suc.setEspacio(espacio);
+        suc.setEstado(true);
         return sucursalRepository.save(suc);
     }
 
     public Sucursal altaSucursal(Sucursal suc) {
-        if (sucursalRepository.findByTelefono(suc.getTelefono()).isPresent()) {
-            throw new IllegalArgumentException("ERROR: ya existe una sucursal con el telefono: " + suc.getTelefono());
+        if (sucursalRepository.findAll().stream().anyMatch(s -> s.getDireccion().equalsIgnoreCase(suc.getDireccion()))) {
+            throw new IllegalArgumentException("ERROR: ya existe una sucursal con la dirección: " + suc.getDireccion());
         }
+
+        suc.setEstado(true);
+
+        if (suc.getLstDiasDeAtencion() != null && !suc.getLstDiasDeAtencion().isEmpty()) {
+            Set<DiasDeAtencion> dias = suc.getLstDiasDeAtencion().stream()
+                    .map(d -> diasDeAtencionService.traer(d.getId()))
+                    .collect(Collectors.toSet());
+            suc.setLstDiasDeAtencion(dias);
+        }
+
+        if (suc.getLstEspecialidad() != null && !suc.getLstEspecialidad().isEmpty()) {
+            Set<Especialidad> especialidades = suc.getLstEspecialidad().stream()
+                    .map(e -> especialidadRepository.findById(e.getId())
+                            .orElseThrow(() -> new IllegalArgumentException("ERROR: no existe una especialidad con ID: " + e.getId())))
+                    .collect(Collectors.toSet());
+            suc.setLstEspecialidad(especialidades);
+        }
+
         return sucursalRepository.save(suc);
     }
 
+
     public void bajaSucursal(int id) {
-        Sucursal suc = sucursalRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("ERROR: no existe una sucursal con ID: " + id));
-        sucursalRepository.delete(suc);
+        Sucursal suc = traer(id);
+        suc.setEstado(false);
+        sucursalRepository.save(suc);
     }
 
     public Sucursal modificarSucursal(Sucursal suc) {
-        Sucursal actual = sucursalRepository.findById(suc.getId())
-        		.orElseThrow(() -> new IllegalArgumentException("ERROR: no existe sucursal con ID: " + suc.getId()));
-        
+        Sucursal actual = traer(suc.getId());
         actual.setDireccion(suc.getDireccion());
         actual.setTelefono(suc.getTelefono());
         actual.setHoraApertura(suc.getHoraApertura());
         actual.setHoraCierre(suc.getHoraCierre());
+        actual.setEspacio(suc.getEspacio());
+
+        if (suc.getLstDiasDeAtencion() != null) {
+            Set<DiasDeAtencion> dias = suc.getLstDiasDeAtencion().stream()
+                    .map(d -> diasDeAtencionService.traer(d.getId()))
+                    .collect(Collectors.toSet());
+            actual.setLstDiasDeAtencion(dias);
+        }
+
+        if (suc.getLstEspecialidad() != null) {
+            Set<Especialidad> especialidades = suc.getLstEspecialidad().stream()
+                    .map(e -> especialidadRepository.findById(e.getId())
+                            .orElseThrow(() -> new IllegalArgumentException("ERROR: no existe una especialidad con ID: " + e.getId())))
+                    .collect(Collectors.toSet());
+            actual.setLstEspecialidad(especialidades);
+        }
+
         return sucursalRepository.save(actual);
     }
 
@@ -59,7 +104,9 @@ public class SucursalService {
     }
     
     public List<Sucursal> traerSucursales() {
-        return sucursalRepository.findAll();
+    	return sucursalRepository.findAll().stream()
+                .filter(Sucursal::isEstado)
+                .toList();
     }
 
     public void asociarDiaDeAtencion(int idSucursal, int idDiasAtencion) {
