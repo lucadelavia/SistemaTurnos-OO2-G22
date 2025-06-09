@@ -15,39 +15,34 @@ public class UsuarioService {
     @Autowired
     private IUsuarioRepository usuarioRepository;
 
-    public Usuario altaUsuario(String nombre, String apellido, String email, String direccion, int dni, boolean estado, LocalDateTime fechaAlta){
-    	Usuario u = new Usuario(nombre, apellido, email, direccion, dni, true, LocalDateTime.now());
-    	
-    	if (usuarioRepository.findByDni(dni).isPresent()) {
-            throw new IllegalArgumentException("ERROR: Ya existe un usuario con ese DNI");
-        }
-
-        if (usuarioRepository.findByEmail(email).isPresent()) {
-            throw new IllegalArgumentException("ERROR: Ya existe un usuario con ese EMAIL");
-        }
-
-        return usuarioRepository.save(u);
-    }
-    
     public Usuario altaUsuario(Usuario u) {
         if (usuarioRepository.findByDni(u.getDni()).isPresent()) {
             throw new IllegalArgumentException("ERROR: Ya existe un usuario con ese DNI");
         }
-
         if (usuarioRepository.findByEmail(u.getEmail()).isPresent()) {
             throw new IllegalArgumentException("ERROR: Ya existe un usuario con ese EMAIL");
         }
+        return usuarioRepository.save(u);
+    }
 
+    public Usuario altaUsuario(String nombre, String apellido, String email, String direccion, int dni) {
+        if (usuarioRepository.findByDni(dni).isPresent()) {
+            throw new IllegalArgumentException("ERROR: Ya existe un usuario con ese DNI");
+        }
+        if (usuarioRepository.findByEmail(email).isPresent()) {
+            throw new IllegalArgumentException("ERROR: Ya existe un usuario con ese EMAIL");
+        }
+        Usuario u = new Usuario(nombre, apellido, email, direccion, dni, true, LocalDateTime.now());
         return usuarioRepository.save(u);
     }
 
     public void bajaUsuario(int id) {
-    	Usuario u = obtenerUsuarioPorId(id);
+        Usuario u = obtenerUsuarioPorId(id);
         usuarioRepository.delete(u);
     }
 
     public Usuario modificarUsuario(Usuario u) {
-    	Usuario actual = obtenerUsuarioPorId(u.getId());
+        Usuario actual = obtenerUsuarioPorId(u.getId());
         actual.setNombre(u.getNombre());
         actual.setApellido(u.getApellido());
         actual.setEmail(u.getEmail());
@@ -60,16 +55,16 @@ public class UsuarioService {
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: No existe un usuario con ese ID"));
     }
 
-    public Usuario obtenerUsuarioPorDNI(int dni) {
+    public Usuario obtenerUsuarioPorDni(int dni) {
         return usuarioRepository.findByDni(dni)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: No existe un usuario con ese DNI"));
     }
 
     public Usuario obtenerUsuarioPorEmail(String email) {
         return usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("ERROR: No existe un usuario con EMAIL"));
+                .orElseThrow(() -> new IllegalArgumentException("ERROR: No existe un usuario con ese EMAIL"));
     }
-    
+
     public List<Usuario> obtenerUsuariosPorFecha(LocalDate fecha, boolean estado) {
         List<Usuario> usuarios = usuarioRepository.findByFechaAltaBetweenAndEstado(
                 fecha.atStartOfDay(),
@@ -92,4 +87,4 @@ public class UsuarioService {
         }
         return usuarios;
     }
-}
+

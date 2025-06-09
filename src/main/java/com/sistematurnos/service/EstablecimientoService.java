@@ -3,11 +3,10 @@ package com.sistematurnos.service;
 import com.sistematurnos.entity.Establecimiento;
 import com.sistematurnos.entity.Sucursal;
 import com.sistematurnos.repository.IEstablecimientoRepository;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class EstablecimientoService {
@@ -27,7 +26,7 @@ public class EstablecimientoService {
         if (establecimientoRepository.findByCuit(cuit).isPresent()) {
             throw new IllegalArgumentException("ERROR: ya existe un establecimiento con el CUIT: " + cuit);
         }
-        
+
         return establecimientoRepository.save(est);
     }
 
@@ -64,36 +63,30 @@ public class EstablecimientoService {
         return establecimientoRepository.findById(idEstablecimiento)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: no existe establecimiento con ID: " + idEstablecimiento));
     }
-    
+
     public List<Establecimiento> traerEstablecimientos() {
         return establecimientoRepository.findAll();
     }
 
     public void asociarSucursalAEstablecimiento(int idEst, int idSuc) {
-    	Establecimiento est = traer(idEst);
+        Establecimiento est = traer(idEst);
         Sucursal suc = sucursalService.traer(idSuc);
-
         if (!est.getSucursales().contains(suc)) {
             est.getSucursales().add(suc);
         }
-
         suc.setEstablecimiento(est);
-
-        establecimientoRepository.save(est);   
-        sucursalService.guardar(suc);          
+        establecimientoRepository.save(est);
+        sucursalService.guardar(suc);
     }
 
     public void removerSucursalDeEstablecimiento(int idEst, int idSuc) {
-    	Establecimiento est = traer(idEst);
+        Establecimiento est = traer(idEst);
         Sucursal suc = sucursalService.traer(idSuc);
-
         if (!est.getSucursales().contains(suc)) {
             throw new IllegalStateException("La sucursal no pertenece a ese establecimiento");
         }
-
         est.getSucursales().remove(suc);
         suc.setEstablecimiento(null);
-
         establecimientoRepository.save(est);
         sucursalService.guardar(suc);
     }

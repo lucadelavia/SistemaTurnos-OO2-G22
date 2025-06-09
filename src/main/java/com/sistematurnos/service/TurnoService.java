@@ -1,14 +1,15 @@
 package com.sistematurnos.service;
 
 import com.sistematurnos.entity.*;
+import com.sistematurnos.exception.TurnoNoEncontradoException;
 import com.sistematurnos.repository.ITurnoRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 @Service
 public class TurnoService {
@@ -16,29 +17,69 @@ public class TurnoService {
     @Autowired
     private ITurnoRepository turnoRepository;
 
+    @Autowired
+    private SucursalService sucursalService;
+
+    @Autowired
+    private ServicioService servicioService;
+
+    @Autowired
+    private EmpleadoService empleadoService;
+
+    @Autowired
+    private ClienteService clienteService;
+
+    @Autowired
+    private EmailService emailService;
+
     public Turno altaTurno(LocalDateTime fechaHora, boolean estadoActivo, String codigo,
                            Servicio servicio, Cliente cliente, Empleado empleado, Sucursal sucursal) {
 
-        Turno t = new Turno(fechaHora, estadoActivo, codigo, servicio, cliente, sucursal, empleado);
-
-        if (turnoRepository.findById(t.getId()).isPresent()) {
-            throw new IllegalArgumentException("Este turno ya existe.");
-        }
-
-        return turnoRepository.save(t);
+        Turno turno = new Turno(fechaHora, estadoActivo, codigo, servicio, cliente, sucursal, empleado);
+        return altaTurno(turno);
     }
 
     public Turno altaTurno(Turno turno) {
-        if (turnoRepository.findById(turno.getId()).isPresent()) {
-            throw new IllegalArgumentException("Este turno ya existe.");
+        if (turnoRepository.findByCodigo(turno.getCodigo()).isPresent()) {
+            throw new TurnoNoEncontradoException("Ya existe un turno con el código: " + turno.getCodigo());
         }
 
-        return turnoRepository.save(turno);
+        Cliente clienteCompleto = clienteService.obtenerClientePorId(turno.getCliente().getId());
+        Servicio servicioCompleto = servicioService.obtenerServicioPorId(turno.getServicio().getId());
+        Empleado empleadoCompleto = empleadoService.obtenerEmpleadoPorId(turno.getEmpleado().getId());
+        Sucursal sucursalCompleta = sucursalService.traer(turno.getSucursal().getId());
+
+        turno.setCliente(clienteCompleto);
+        turno.setServicio(servicioCompleto);
+        turno.setEmpleado(empleadoCompleto);
+        turno.setSucursal(sucursalCompleta);
+
+        Turno nuevoTurno = turnoRepository.save(turno);
+
+        try {
+            if (clienteCompleto.getEmail() != null) {
+                Map<String, Object> variables = new HashMap<>();
+                variables.put("turno", nuevoTurno);
+
+                System.out.println("→ Enviando mail a: " + clienteCompleto.getEmail());
+
+                emailService.enviarEmailConHtml(
+                        clienteCompleto.getEmail(),
+                        "Confirmación de Turno - UNLa",
+                        "turnoConfirmado",
+                        variables
+                );
+            }
+        } catch (Exception e) {
+            System.err.println("Error al enviar email de confirmación: " + e.getMessage());
+        }
+
+        return nuevoTurno;
     }
 
     public Turno obtenerTurnoPorId(int id) {
-        return turnoRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("ERROR: No existe turno con ID: " + id));
+        return turnoRepository.findById(id)
+                .orElseThrow(() -> new TurnoNoEncontradoException("ERROR: No existe turno con ID: " + id));
     }
 
     public void bajaTurno(int id) {
@@ -46,7 +87,7 @@ public class TurnoService {
         turnoRepository.delete(t);
     }
 
-    public Turno modificarServicio(Turno turno) {
+    public Turno modificarTurno(Turno turno) {
         Turno actual = obtenerTurnoPorId(turno.getId());
 
         actual.setFechaHora(turno.getFechaHora());
@@ -54,76 +95,114 @@ public class TurnoService {
         actual.setCodigo(turno.getCodigo());
         actual.setServicio(turno.getServicio());
         actual.setCliente(turno.getCliente());
+        actual.setEmpleado(turno.getEmpleado());
+        actual.setSucursal(turno.getSucursal());
 
         return turnoRepository.save(actual);
     }
 
-    public List<Turno> obtenerTurnosPorSucursal(int idSucursal) {
-        List<Turno> turnos = turnoRepository.findBySucursalId(idSucursal);
-        if (turnos.isEmpty()) {
-            throw new IllegalArgumentException("ERROR: Esta sucursal no tiene turnos.");
+    public List<LocalDateTime> obtenerHorariosDisponibles(int idSucursal, int idServicio, int idEmpleado, LocalDate fecha) {
+        Sucursal sucursal = sucursalService.traer(idSucursal);
+        Servicio servicio = servicioService.obtenerServicioPorId(idServicio);
+        Empleado empleado = empleadoService.obtenerEmpleadoPorId(idEmpleado);
+
+        if (sucursal == null || servicio == null || empleado == null) {
+            throw new TurnoNoEncontradoException("Datos inválidos");
         }
-        return turnos;
+
+        final String diaNombre = fecha.getDayOfWeek()
+                .getDisplayName(java.time.format.TextStyle.FULL, new Locale("es", "ES"))
+                .toLowerCase();
+
+        boolean esDiaDeAtencion = sucursal.getLstDiasDeAtencion().stream()
+                .anyMatch(d -> d.getNombre().equalsIgnoreCase(diaNombre));
+
+        if (!esDiaDeAtencion) {
+            return List.of();
+        }
+
+        int duracion = servicio.getDuracion();
+        int capacidad = sucursal.getEspacio();
+
+        List<Turno> turnosDelDia = traerTurnosPorFechaYSucursal(fecha, idSucursal);
+
+        List<LocalDateTime> disponibles = new ArrayList<>();
+        LocalDateTime inicio = fecha.atTime(sucursal.getHoraApertura());
+        LocalDateTime fin = fecha.atTime(sucursal.getHoraCierre());
+
+        while (!inicio.plusMinutes(duracion).isAfter(fin)) {
+            LocalDateTime finalInicio = inicio;
+            int cantidadEnEstaFranja = (int) turnosDelDia.stream()
+                    .filter(t -> t.getFechaHora()
+                            .truncatedTo(ChronoUnit.MINUTES)
+                            .isEqual(finalInicio.truncatedTo(ChronoUnit.MINUTES)))
+                    .count();
+
+            if (cantidadEnEstaFranja < capacidad) {
+                disponibles.add(inicio);
+            }
+
+            inicio = inicio.plusMinutes(duracion);
+        }
+
+        return disponibles;
+    }
+
+    public List<Turno> obtenerTurnosPorSucursal(int idSucursal) {
+        return turnoRepository.findBySucursal_Id(idSucursal);
     }
 
     public List<Turno> obtenerTurnosPorFecha(LocalDate fecha, boolean estado) {
-        var inicio = fecha.atStartOfDay();
-        var fin = inicio.plusDays(1);
-        var turnos = turnoRepository.findByFechaHoraBetweenAndEstado(inicio, fin, estado);
-
-        if (turnos.isEmpty()) {
-            throw new IllegalArgumentException("ERROR: No hay turnos en esta fecha: " + fecha);
-        }
-
-        return turnos;
+        LocalDateTime inicio = fecha.atStartOfDay();
+        LocalDateTime fin = inicio.plusDays(1);
+        return turnoRepository.findByFechaHoraBetweenAndEstado(inicio, fin, estado);
     }
 
     public List<Turno> obtenerTurnosPorRangoFechas(LocalDate desde, LocalDate hasta) {
-        var inicio = desde.atStartOfDay();
-        var fin = hasta.plusDays(1).atStartOfDay();
-        var turnos = turnoRepository.findByFechaHoraBetween(inicio, fin);
-
-        if (turnos.isEmpty()) {
-            throw new IllegalArgumentException("ERROR: No hay turnos en este rango de fechas.");
-        }
-
-        return turnos;
+        LocalDateTime inicio = desde.atStartOfDay();
+        LocalDateTime fin = hasta.plusDays(1).atStartOfDay();
+        return turnoRepository.findByFechaHoraBetween(inicio, fin);
     }
 
     public List<Turno> obtenerTurnosPorCliente(int idCliente) {
-        return turnoRepository.findByClienteId(idCliente);
+        return turnoRepository.findByCliente_Id(idCliente);
     }
 
     public List<Turno> obtenerTurnosPorEmpleado(int idEmpleado) {
-        return turnoRepository.findByEmpleadoId(idEmpleado);
+        return turnoRepository.findByEmpleado_Id(idEmpleado);
     }
 
     public List<Turno> obtenerTurnosPorServicio(int idServicio) {
-        return turnoRepository.findByServicioId(idServicio);
+        return turnoRepository.findByServicio_Id(idServicio);
+    }
+
+    public Turno obtenerTurnoPorCodigo(String codigo) {
+        return turnoRepository.findByCodigo(codigo)
+                .orElseThrow(() -> new TurnoNoEncontradoException("No existe un turno con ese código: " + codigo));
     }
 
     public List<Turno> traerTurnosPorFechaYSucursal(LocalDate fecha, int idSucursal) {
-        var inicio = fecha.atStartOfDay();
-        var fin = inicio.plusDays(1);
-        return turnoRepository.findByFechaHoraBetweenAndSucursalId(inicio, fin, idSucursal);
+        LocalDateTime inicio = fecha.atStartOfDay();
+        LocalDateTime fin = inicio.plusDays(1);
+        return turnoRepository.findBySucursal_IdAndFechaHoraBetween(idSucursal, inicio, fin);
     }
 
     public List<Turno> traerTurnosPorFechaYServicio(LocalDate fecha, int idServicio) {
-        var inicio = fecha.atStartOfDay();
-        var fin = inicio.plusDays(1);
-        return turnoRepository.findByFechaHoraBetweenAndServicioId(inicio, fin, idServicio);
+        LocalDateTime inicio = fecha.atStartOfDay();
+        LocalDateTime fin = inicio.plusDays(1);
+        return turnoRepository.findByServicio_IdAndFechaHoraBetween(idServicio, inicio, fin);
     }
 
     public List<Turno> traerTurnosPorFechaYCliente(LocalDate fecha, int idCliente) {
-        var inicio = fecha.atStartOfDay();
-        var fin = inicio.plusDays(1);
-        return turnoRepository.findByFechaHoraBetweenAndClienteId(inicio, fin, idCliente);
+        LocalDateTime inicio = fecha.atStartOfDay();
+        LocalDateTime fin = inicio.plusDays(1);
+        return turnoRepository.findByCliente_IdAndFechaHoraBetween(idCliente, inicio, fin);
     }
 
     public List<Turno> traerTurnosPorFechaYEmpleado(LocalDate fecha, int idEmpleado) {
-        var inicio = fecha.atStartOfDay();
-        var fin = inicio.plusDays(1);
-        return turnoRepository.findByFechaHoraBetweenAndEmpleadoId(inicio, fin, idEmpleado);
+        LocalDateTime inicio = fecha.atStartOfDay();
+        LocalDateTime fin = inicio.plusDays(1);
+        return turnoRepository.findByEmpleado_IdAndFechaHoraBetween(idEmpleado, inicio, fin);
     }
 
     public List<Turno> traerTurnos() {

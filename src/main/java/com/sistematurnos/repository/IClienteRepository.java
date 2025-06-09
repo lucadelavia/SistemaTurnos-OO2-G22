@@ -11,4 +11,9 @@ public interface IClienteRepository extends JpaRepository<Cliente, Integer> {
     Optional<Cliente> findByNroCliente(int nroCliente);
 
     List<Cliente> findByNroClienteGreaterThan(int limite);
+
+    Optional<Cliente> findByDni(int dni);
+
+    List<Cliente> findByApellidoContainingIgnoreCase(String apellido); // útil para búsquedas parciales
 }
+

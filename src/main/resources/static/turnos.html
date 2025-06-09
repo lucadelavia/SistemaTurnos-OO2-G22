@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reservar Turno - UNLa Turnos</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #800000;">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="index.html">
+      <img src="logo-unla.png" alt="UNLa" width="30" height="30" class="d-inline-block align-text-top"/>
+    </a>
+    <div class="d-flex">
+      <a class="nav-link text-white" href="#">Login</a>
+      <a class="nav-link text-white" href="#">Información</a>
+    </div>
+  </div>
+</nav>
+
+<main class="container py-5">
+  <h1 class="mb-4 text-center text-granate">Reserva de Turno</h1>
+
+  <div class="card mb-5">
+    <div class="card-header bg-granate text-white">Nuevo Turno</div>
+    <div class="card-body">
+      <form id="reserva-form">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Sucursal</label>
+            <select id="sucursal" class="form-select" required></select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Servicio</label>
+            <select id="servicio" class="form-select" required></select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Empleado</label>
+            <select id="empleado" class="form-select" required></select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Cliente (ID)</label>
+            <input type="number" id="cliente" class="form-control" required/>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Fecha</label>
+            <input type="date" id="fecha" class="form-control" required/>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Horario Disponible</label>
+            <select id="horario" class="form-select" required></select>
+          </div>
+        </div>
+        <div class="mt-4 text-end">
+          <button type="submit" class="btn btn-success">Reservar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header bg-granate text-white">Turnos Reservados</div>
+    <div class="card-body table-responsive">
+      <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Fecha y Hora</th>
+          <th>Código</th>
+          <th>Cliente</th>
+          <th>Empleado</th>
+          <th>Sucursal</th>
+          <th>Servicio</th>
+        </tr>
+        </thead>
+        <tbody id="turnos-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<footer class="text-center text-white py-3" style="background-color: #4b0000;">
+  <small>&copy; 2025 UNLa Turnos. Proyecto académico - Universidad Nacional de Lanús</small>
+</footer>
+
+<script src="js/turnos.js"></script>
+</body>
+</html>

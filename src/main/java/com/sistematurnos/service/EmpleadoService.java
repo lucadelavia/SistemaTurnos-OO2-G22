@@ -2,6 +2,7 @@ package com.sistematurnos.service;
 
 import com.sistematurnos.entity.Empleado;
 import com.sistematurnos.entity.Especialidad;
+import com.sistematurnos.exception.EmpleadoNoEncontradoException;
 import com.sistematurnos.repository.IEmpleadoRepository;
 import com.sistematurnos.repository.IEspecialidadRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +26,11 @@ public class EmpleadoService {
                                  int dni, boolean estado, LocalDateTime fechaAlta, long cuil, String matricula) {
 
         if (empleadoRepository.findByDni(dni).isPresent()) {
-            throw new IllegalArgumentException("ERROR: Ya existe un empleado con ese DNI");
+            throw new EmpleadoNoEncontradoException("ERROR: Ya existe un empleado con ese DNI");
         }
 
         if (empleadoRepository.findByCuil(cuil).isPresent()) {
-            throw new IllegalArgumentException("ERROR: Ya existe un empleado con ese CUIL");
+            throw new EmpleadoNoEncontradoException("ERROR: Ya existe un empleado con ese CUIL");
         }
 
         Empleado e = new Empleado(nombre, apellido, email, direccion, dni, estado, fechaAlta, cuil, matricula);
@@ -38,11 +39,11 @@ public class EmpleadoService {
 
     public Empleado altaEmpleado(Empleado empleado) {
         if (empleadoRepository.findByDni(empleado.getDni()).isPresent()) {
-            throw new IllegalArgumentException("ERROR: Ya existe un empleado con ese DNI");
+            throw new EmpleadoNoEncontradoException("ERROR: Ya existe un empleado con ese DNI");
         }
 
         if (empleadoRepository.findByCuil(empleado.getCuil()).isPresent()) {
-            throw new IllegalArgumentException("ERROR: Ya existe un empleado con ese CUIL");
+            throw new EmpleadoNoEncontradoException("ERROR: Ya existe un empleado con ese CUIL");
         }
 
         return empleadoRepository.save(empleado);
@@ -55,7 +56,7 @@ public class EmpleadoService {
         if (empleado.getLstEspecialidades() != null && !empleado.getLstEspecialidades().isEmpty()) {
             Set<Especialidad> especialidadesExistentes = empleado.getLstEspecialidades().stream()
                     .map(espec -> especialidadRepository.findById(espec.getId())
-                            .orElseThrow(() -> new IllegalArgumentException("Especialidad no encontrada: " + espec.getId())))
+                            .orElseThrow(() -> new EmpleadoNoEncontradoException("Especialidad no encontrada: " + espec.getId())))
                     .collect(Collectors.toSet());
 
             empleado.setLstEspecialidades(especialidadesExistentes);
@@ -66,17 +67,17 @@ public class EmpleadoService {
 
     public Empleado obtenerEmpleadoPorId(int id) {
         return empleadoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("ERROR: No existe el empleado solicitado"));
+                .orElseThrow(() -> new EmpleadoNoEncontradoException("ERROR: No existe el empleado solicitado con ID " + id));
     }
 
     public Empleado obtenerEmpleadoPorCuil(long cuil) {
         return empleadoRepository.findByCuil(cuil)
-                .orElseThrow(() -> new IllegalArgumentException("ERROR: No existe el empleado solicitado"));
+                .orElseThrow(() -> new EmpleadoNoEncontradoException("ERROR: No existe el empleado solicitado con CUIL " + cuil));
     }
 
     public Empleado obtenerEmpleadoPorMatricula(String matricula) {
         return empleadoRepository.findByMatricula(matricula)
-                .orElseThrow(() -> new IllegalArgumentException("No existe un empleado con esa matrícula"));
+                .orElseThrow(() -> new EmpleadoNoEncontradoException("No existe un empleado con la matrícula: " + matricula));
     }
 
     public Empleado modificarEmpleado(Empleado e) {
@@ -92,7 +93,7 @@ public class EmpleadoService {
         if (e.getLstEspecialidades() != null) {
             Set<Especialidad> especialidadesActualizadas = e.getLstEspecialidades().stream()
                     .map(es -> especialidadRepository.findById(es.getId())
-                            .orElseThrow(() -> new IllegalArgumentException("Especialidad no encontrada: " + es.getId())))
+                            .orElseThrow(() -> new EmpleadoNoEncontradoException("Especialidad no encontrada: " + es.getId())))
                     .collect(Collectors.toSet());
             actual.setLstEspecialidades(especialidadesActualizadas);
         }
@@ -102,7 +103,7 @@ public class EmpleadoService {
 
     public void bajaEmpleado(int id) {
         Empleado empleado = empleadoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado"));
+                .orElseThrow(() -> new EmpleadoNoEncontradoException("Empleado no encontrado con ID " + id));
         empleado.setEstado(false);
         empleadoRepository.save(empleado);
     }
@@ -110,7 +111,7 @@ public class EmpleadoService {
     public void asignarEspecialidad(int idEmpleado, Especialidad esp) {
         Empleado e = obtenerEmpleadoPorId(idEmpleado);
         Especialidad especialidad = especialidadRepository.findById(esp.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Especialidad no encontrada"));
+                .orElseThrow(() -> new EmpleadoNoEncontradoException("Especialidad no encontrada"));
 
         if (!e.getLstEspecialidades().contains(especialidad)) {
             e.getLstEspecialidades().add(especialidad);
@@ -121,7 +122,7 @@ public class EmpleadoService {
     public void removerEspecialidad(int idEmpleado, Especialidad esp) {
         Empleado e = obtenerEmpleadoPorId(idEmpleado);
         Especialidad especialidad = especialidadRepository.findById(esp.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Especialidad no encontrada"));
+                .orElseThrow(() -> new EmpleadoNoEncontradoException("Especialidad no encontrada"));
 
         if (e.getLstEspecialidades().contains(especialidad)) {
             e.getLstEspecialidades().remove(especialidad);
