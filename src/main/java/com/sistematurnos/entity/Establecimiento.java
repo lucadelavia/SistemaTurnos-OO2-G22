@@ -28,7 +28,7 @@ public class Establecimiento {
     private String cuit;
     
     @Column(nullable = false)
-    private String direccion;
+    private String direccion; 
     
     private String descripcion;
 

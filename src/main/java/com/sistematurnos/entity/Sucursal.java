@@ -8,7 +8,8 @@ import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter @Setter
+@Getter 
+@Setter
 @ToString
 @EqualsAndHashCode
 
@@ -22,6 +23,8 @@ public class Sucursal {
     private int id;
 
     private String direccion;
+    
+    @Column(nullable = false, unique = true)
     private String telefono;
 
     @Column(name = "horarioApertura")
@@ -31,6 +34,9 @@ public class Sucursal {
     private LocalTime horaCierre;
 
     private int espacio;
+    
+    @Column(nullable = false)
+    private boolean estado = true;
 
     @Column(nullable = false)
     private boolean estado = true;

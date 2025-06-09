@@ -21,7 +21,6 @@ public class SucursalService {
 
     @Autowired
     private DiasDeAtencionService diasDeAtencionService;
-
     @Autowired
     private IEspecialidadRepository especialidadRepository;
 
@@ -42,6 +41,7 @@ public class SucursalService {
 
     public Sucursal altaSucursal(Sucursal suc) {
         // Validar dirección duplicada
+
         if (sucursalRepository.findAll().stream().anyMatch(s -> s.getDireccion().equalsIgnoreCase(suc.getDireccion()))) {
             throw new IllegalArgumentException("ERROR: ya existe una sucursal con la dirección: " + suc.getDireccion());
         }
@@ -65,6 +65,7 @@ public class SucursalService {
 
         return sucursalRepository.save(suc);
     }
+
 
     public void bajaSucursal(int id) {
         Sucursal suc = traer(id);
@@ -138,6 +139,7 @@ public class SucursalService {
     }
 
     public void removerEspecialidad(int idSucursal, Especialidad especialidad) {
+
         Sucursal suc = traer(idSucursal);
         if (suc.getLstEspecialidad().contains(especialidad)) {
             suc.getLstEspecialidad().remove(especialidad);

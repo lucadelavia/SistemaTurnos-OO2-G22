@@ -4,12 +4,14 @@ import com.sistematurnos.entity.Sucursal;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+
 import java.util.Optional;
 import java.util.List;
 
 public interface ISucursalRepository extends JpaRepository<Sucursal, Integer> {
 
 	Optional<Sucursal> findById(int id);
+
 
 	Optional<Sucursal> findByTelefono(String telefono);
 

@@ -19,12 +19,14 @@ public class EstablecimientoService {
 
     public Establecimiento altaEstablecimiento(String nombre, String cuit, String direccion, String descripcion) {
         Establecimiento est = new Establecimiento(nombre, cuit, direccion, descripcion);
+
         if (establecimientoRepository.findByNombre(nombre).isPresent()) {
             throw new IllegalArgumentException("ERROR: ya existe un establecimiento con el nombre: " + nombre);
         }
         if (establecimientoRepository.findByCuit(cuit).isPresent()) {
             throw new IllegalArgumentException("ERROR: ya existe un establecimiento con el CUIT: " + cuit);
         }
+
         return establecimientoRepository.save(est);
     }
 
@@ -35,6 +37,7 @@ public class EstablecimientoService {
         if (establecimientoRepository.findByCuit(est.getCuit()).isPresent()) {
             throw new IllegalArgumentException("ERROR: ya existe un establecimiento con el CUIT: " + est.getCuit());
         }
+
         return establecimientoRepository.save(est);
     }
 
@@ -47,10 +50,12 @@ public class EstablecimientoService {
     public Establecimiento modificarEstablecimiento(Establecimiento est) {
         Establecimiento actual = establecimientoRepository.findById(est.getId())
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: no existe establecimiento con ID: " + est.getId()));
+
         actual.setNombre(est.getNombre());
         actual.setCuit(est.getCuit());
         actual.setDireccion(est.getDireccion());
         actual.setDescripcion(est.getDescripcion());
+
         return establecimientoRepository.save(actual);
     }
 

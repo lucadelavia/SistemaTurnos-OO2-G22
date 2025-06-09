@@ -77,4 +77,4 @@ public class EstablecimientoController {
             return ResponseEntity.badRequest().build();
         }
     }
-}
+

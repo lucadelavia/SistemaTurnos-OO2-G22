@@ -24,4 +24,5 @@ public interface ITurnoRepository extends JpaRepository<Turno, Integer> {
     List<Turno> findByEmpleado_IdAndFechaHoraBetween(int idEmpleado, LocalDateTime inicio, LocalDateTime fin);
     List<Turno> findBySucursal_IdAndFechaHoraBetween(int idSucursal, LocalDateTime inicio, LocalDateTime fin);
     List<Turno> findByServicio_IdAndFechaHoraBetween(int idServicio, LocalDateTime inicio, LocalDateTime fin);
+
 }

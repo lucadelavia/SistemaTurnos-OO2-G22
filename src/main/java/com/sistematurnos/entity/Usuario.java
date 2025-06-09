@@ -6,7 +6,8 @@ import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter @Setter
+@Getter 
+@Setter
 @ToString
 @EqualsAndHashCode
 
@@ -22,7 +23,10 @@ public class Usuario {
 
     private String nombre;
     private String apellido;
+    
+    @Column(unique = true, nullable = false)
     private String email;
+    
     private String direccion;
 
     @Column(unique = true, nullable = false)
@@ -43,7 +47,4 @@ public class Usuario {
         this.estado = estado;
         this.fechaAlta = fechaAlta;
     }
-
-
-
 }
