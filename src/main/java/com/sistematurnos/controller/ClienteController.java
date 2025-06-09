@@ -1,6 +1,7 @@
 package com.sistematurnos.controller;
 
 import com.sistematurnos.entity.Cliente;
+import com.sistematurnos.exception.ClienteNoEncontradoException;
 import com.sistematurnos.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,22 +26,14 @@ public class ClienteController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Cliente> obtenerClientePorId(@PathVariable int id) {
-        try {
-            Cliente cliente = clienteService.obtenerClientePorId(id);
-            return ResponseEntity.ok(cliente);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+        Cliente cliente = clienteService.obtenerClientePorId(id);
+        return ResponseEntity.ok(cliente);
     }
 
     @GetMapping("/nroCliente/{nro}")
     public ResponseEntity<Cliente> obtenerPorNroCliente(@PathVariable int nro) {
-        try {
-            Cliente cliente = clienteService.traerClientePorNroCliente(nro);
-            return ResponseEntity.ok(cliente);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+        Cliente cliente = clienteService.traerClientePorNroCliente(nro);
+        return ResponseEntity.ok(cliente);
     }
 
     @GetMapping("/mayorNroCliente/{limite}")
@@ -50,34 +43,20 @@ public class ClienteController {
 
     @PostMapping
     public ResponseEntity<Cliente> crearCliente(@RequestBody Cliente cliente) {
-        try {
-            Cliente nuevo = clienteService.altaCliente(cliente);
-            return ResponseEntity.ok(nuevo);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+        Cliente nuevo = clienteService.altaCliente(cliente);
+        return ResponseEntity.ok(nuevo);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Cliente> modificarCliente(@PathVariable int id, @RequestBody Cliente cliente) {
-        try {
-            cliente.setId(id);
-            Cliente actualizado = clienteService.modificarCliente(cliente);
-            return ResponseEntity.ok(actualizado);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.internalServerError().build();
-        }
+        cliente.setId(id);
+        Cliente actualizado = clienteService.modificarCliente(cliente);
+        return ResponseEntity.ok(actualizado);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarCliente(@PathVariable int id) {
-        try {
-            clienteService.bajaCliente(id);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+        clienteService.bajaCliente(id);
+        return ResponseEntity.noContent().build();
     }
 }

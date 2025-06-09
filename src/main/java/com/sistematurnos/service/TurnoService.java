@@ -1,6 +1,7 @@
 package com.sistematurnos.service;
 
 import com.sistematurnos.entity.*;
+import com.sistematurnos.exception.TurnoNoEncontradoException;
 import com.sistematurnos.repository.ITurnoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,8 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class TurnoService {
@@ -26,23 +26,79 @@ public class TurnoService {
     @Autowired
     private EmpleadoService empleadoService;
 
+    @Autowired
+    private ClienteService clienteService;
+
+    @Autowired
+    private EmailService emailService;
 
     public Turno altaTurno(LocalDateTime fechaHora, boolean estadoActivo, String codigo,
                            Servicio servicio, Cliente cliente, Empleado empleado, Sucursal sucursal) {
 
-        if (turnoRepository.findByCodigo(codigo).isPresent()) {
-            throw new IllegalArgumentException("Ya existe un turno con el código: " + codigo);
-        }
-
-        Turno t = new Turno(fechaHora, estadoActivo, codigo, servicio, cliente, sucursal, empleado);
-        return turnoRepository.save(t);
+        Turno turno = new Turno(fechaHora, estadoActivo, codigo, servicio, cliente, sucursal, empleado);
+        return altaTurno(turno);
     }
 
     public Turno altaTurno(Turno turno) {
         if (turnoRepository.findByCodigo(turno.getCodigo()).isPresent()) {
-            throw new IllegalArgumentException("Ya existe un turno con el código: " + turno.getCodigo());
+            throw new TurnoNoEncontradoException("Ya existe un turno con el código: " + turno.getCodigo());
         }
-        return turnoRepository.save(turno);
+
+        Cliente clienteCompleto = clienteService.obtenerClientePorId(turno.getCliente().getId());
+        Servicio servicioCompleto = servicioService.obtenerServicioPorId(turno.getServicio().getId());
+        Empleado empleadoCompleto = empleadoService.obtenerEmpleadoPorId(turno.getEmpleado().getId());
+        Sucursal sucursalCompleta = sucursalService.traer(turno.getSucursal().getId());
+
+        turno.setCliente(clienteCompleto);
+        turno.setServicio(servicioCompleto);
+        turno.setEmpleado(empleadoCompleto);
+        turno.setSucursal(sucursalCompleta);
+
+        Turno nuevoTurno = turnoRepository.save(turno);
+
+        try {
+            if (clienteCompleto.getEmail() != null) {
+                Map<String, Object> variables = new HashMap<>();
+                variables.put("turno", nuevoTurno);
+
+                System.out.println("→ Enviando mail a: " + clienteCompleto.getEmail());
+
+                emailService.enviarEmailConHtml(
+                        clienteCompleto.getEmail(),
+                        "Confirmación de Turno - UNLa",
+                        "turnoConfirmado",
+                        variables
+                );
+            }
+        } catch (Exception e) {
+            System.err.println("Error al enviar email de confirmación: " + e.getMessage());
+        }
+
+        return nuevoTurno;
+    }
+
+    public Turno obtenerTurnoPorId(int id) {
+        return turnoRepository.findById(id)
+                .orElseThrow(() -> new TurnoNoEncontradoException("ERROR: No existe turno con ID: " + id));
+    }
+
+    public void bajaTurno(int id) {
+        Turno t = obtenerTurnoPorId(id);
+        turnoRepository.delete(t);
+    }
+
+    public Turno modificarTurno(Turno turno) {
+        Turno actual = obtenerTurnoPorId(turno.getId());
+
+        actual.setFechaHora(turno.getFechaHora());
+        actual.setEstado(turno.isEstado());
+        actual.setCodigo(turno.getCodigo());
+        actual.setServicio(turno.getServicio());
+        actual.setCliente(turno.getCliente());
+        actual.setEmpleado(turno.getEmpleado());
+        actual.setSucursal(turno.getSucursal());
+
+        return turnoRepository.save(actual);
     }
 
     public List<LocalDateTime> obtenerHorariosDisponibles(int idSucursal, int idServicio, int idEmpleado, LocalDate fecha) {
@@ -51,19 +107,18 @@ public class TurnoService {
         Empleado empleado = empleadoService.obtenerEmpleadoPorId(idEmpleado);
 
         if (sucursal == null || servicio == null || empleado == null) {
-            throw new IllegalArgumentException("Datos inválidos");
+            throw new TurnoNoEncontradoException("Datos inválidos");
         }
 
-        // Convertir el día a texto en español, ej: "lunes"
         final String diaNombre = fecha.getDayOfWeek()
-                .getDisplayName(java.time.format.TextStyle.FULL, new java.util.Locale("es", "ES"))
+                .getDisplayName(java.time.format.TextStyle.FULL, new Locale("es", "ES"))
                 .toLowerCase();
 
         boolean esDiaDeAtencion = sucursal.getLstDiasDeAtencion().stream()
                 .anyMatch(d -> d.getNombre().equalsIgnoreCase(diaNombre));
 
         if (!esDiaDeAtencion) {
-            return List.of(); // no hay turnos ese día
+            return List.of();
         }
 
         int duracion = servicio.getDuracion();
@@ -91,32 +146,6 @@ public class TurnoService {
         }
 
         return disponibles;
-    }
-
-
-
-    public Turno obtenerTurnoPorId(int id) {
-        return turnoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("ERROR: No existe turno con ID: " + id));
-    }
-
-    public void bajaTurno(int id) {
-        Turno t = obtenerTurnoPorId(id);
-        turnoRepository.delete(t);
-    }
-
-    public Turno modificarTurno(Turno turno) {
-        Turno actual = obtenerTurnoPorId(turno.getId());
-
-        actual.setFechaHora(turno.getFechaHora());
-        actual.setEstado(turno.isEstado());
-        actual.setCodigo(turno.getCodigo());
-        actual.setServicio(turno.getServicio());
-        actual.setCliente(turno.getCliente());
-        actual.setEmpleado(turno.getEmpleado());
-        actual.setSucursal(turno.getSucursal());
-
-        return turnoRepository.save(actual);
     }
 
     public List<Turno> obtenerTurnosPorSucursal(int idSucursal) {
@@ -149,7 +178,7 @@ public class TurnoService {
 
     public Turno obtenerTurnoPorCodigo(String codigo) {
         return turnoRepository.findByCodigo(codigo)
-                .orElseThrow(() -> new IllegalArgumentException("No existe un turno con ese código"));
+                .orElseThrow(() -> new TurnoNoEncontradoException("No existe un turno con ese código: " + codigo));
     }
 
     public List<Turno> traerTurnosPorFechaYSucursal(LocalDate fecha, int idSucursal) {

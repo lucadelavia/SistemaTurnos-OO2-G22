@@ -1,6 +1,8 @@
 package com.sistematurnos.service;
 
 import com.sistematurnos.entity.Cliente;
+import com.sistematurnos.exception.ClienteDuplicadoException;
+import com.sistematurnos.exception.ClienteNoEncontradoException;
 import com.sistematurnos.repository.IClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +20,7 @@ public class ClienteService {
                                int dni, boolean estado, LocalDateTime fechaAlta, int nroCliente) {
 
         if (clienteRepository.findByDni(dni).isPresent()) {
-            throw new IllegalArgumentException("Ya existe un cliente con ese DNI.");
+            throw new ClienteDuplicadoException("Ya existe un cliente con ese DNI.");
         }
 
         Cliente cliente = new Cliente(nombre, apellido, email, direccion, dni, estado, fechaAlta, nroCliente);
@@ -27,14 +29,14 @@ public class ClienteService {
 
     public Cliente altaCliente(Cliente cliente) {
         if (clienteRepository.findByDni(cliente.getDni()).isPresent()) {
-            throw new IllegalArgumentException("Ya existe un cliente con ese DNI.");
+            throw new ClienteDuplicadoException("Ya existe un cliente con ese DNI.");
         }
         return clienteRepository.save(cliente);
     }
 
     public Cliente obtenerClientePorId(int id) {
         return clienteRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("ERROR: No existe el cliente solicitado"));
+                .orElseThrow(() -> new ClienteNoEncontradoException("ERROR: No existe el cliente solicitado con ID " + id));
     }
 
     public void bajaCliente(int id) {
@@ -45,7 +47,7 @@ public class ClienteService {
 
     public Cliente modificarCliente(Cliente c) {
         Cliente actual = clienteRepository.findById(c.getId())
-                .orElseThrow(() -> new IllegalArgumentException("ERROR: No existe el cliente solicitado"));
+                .orElseThrow(() -> new ClienteNoEncontradoException("ERROR: No se encontró el cliente con ID " + c.getId()));
 
         actual.setNombre(c.getNombre());
         actual.setApellido(c.getApellido());
@@ -69,7 +71,7 @@ public class ClienteService {
 
     public Cliente traerClientePorNroCliente(int nroCliente) {
         return clienteRepository.findByNroCliente(nroCliente)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró cliente con nroCliente: " + nroCliente));
+                .orElseThrow(() -> new ClienteNoEncontradoException("No se encontró cliente con número " + nroCliente));
     }
 
     public List<Cliente> findByNroClienteGreaterThan(int limite) {
