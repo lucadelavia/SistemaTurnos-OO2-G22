@@ -1,0 +1,87 @@
+.bg-granate {
+  background-color: #800000;
+}
+
+/* Hero más grande para destacar el título */
+.hero {
+  background-color: #800000;
+  padding: 120px 0;
+}
+
+.hero h1 {
+  font-size: 3.5rem;
+}
+
+.hero p {
+  font-size: 1.25rem;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f5f5f5;
+}
+
+header {
+  background-color: #800000;
+}
+
+footer {
+  background-color: #4b0000;
+}
+
+.modulo-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 20px;
+  background-color: #f8f9fa;
+  border: 2px solid #800000;
+  border-radius: 15px;
+  color: #800000;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  height: 100%;
+  box-shadow: 0 4px 10px rgba(128, 0, 0, 0.1);
+}
+
+.modulo-card:hover {
+  background-color: #800000;
+  color: #ffffff;
+  transform: translateY(-5px);
+}
+
+.modulo-card .icono {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.btn-granate {
+  background-color: #800000;
+  color: #fff;
+}
+
+.btn-granate:hover {
+  background-color: #a00000;
+  color: #fff;
+}
+
+.text-granate {
+  color: #800000;
+}
+
+.bg-granate {
+  background-color: #800000;
+}
+
+/* Estructura para que el footer se pegue abajo */
+html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
