@@ -66,9 +66,6 @@ http://localhost:8080
 
 ---
 
-
----
-
 ## 📧 Configuración del envío de emails
 
 El sistema incluye una funcionalidad para enviar **emails de confirmación de turnos** al cliente, usando un servicio de mailing con plantilla HTML (`turnoConfirmado.html`).
