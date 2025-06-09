@@ -40,7 +40,8 @@ public class ServicioService {
 
     public void bajaServicio(int id) {
         Servicio servicio = obtenerServicioPorId(id);
-        servicioRepository.delete(servicio);
+        servicio.setEstado(false);
+        servicioRepository.save(servicio);
     }
 
     public Servicio modificarServicio(Servicio servicio) {
@@ -51,6 +52,8 @@ public class ServicioService {
     }
 
     public List<Servicio> traerServicios() {
-        return servicioRepository.findAll();
+        return servicioRepository.findByEstadoTrue();
     }
+
+
 }

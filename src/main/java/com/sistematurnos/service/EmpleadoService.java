@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class EmpleadoService {
@@ -20,13 +22,13 @@ public class EmpleadoService {
     private IEspecialidadRepository especialidadRepository;
 
     public Empleado altaEmpleado(String nombre, String apellido, String email, String direccion,
-                                 int dni, boolean estado, LocalDateTime fechaAlta, int cuil, String matricula) {
+                                 int dni, boolean estado, LocalDateTime fechaAlta, long cuil, String matricula) {
 
-        if (empleadoRepository.findByDni(dni) != null) {
+        if (empleadoRepository.findByDni(dni).isPresent()) {
             throw new IllegalArgumentException("ERROR: Ya existe un empleado con ese DNI");
         }
 
-        if (empleadoRepository.findByCuil(cuil) != null) {
+        if (empleadoRepository.findByCuil(cuil).isPresent()) {
             throw new IllegalArgumentException("ERROR: Ya existe un empleado con ese CUIL");
         }
 
@@ -35,12 +37,28 @@ public class EmpleadoService {
     }
 
     public Empleado altaEmpleado(Empleado empleado) {
-        if (empleadoRepository.findByDni(empleado.getDni()) != null) {
+        if (empleadoRepository.findByDni(empleado.getDni()).isPresent()) {
             throw new IllegalArgumentException("ERROR: Ya existe un empleado con ese DNI");
         }
 
-        if (empleadoRepository.findByCuil(empleado.getCuil()) != null) {
+        if (empleadoRepository.findByCuil(empleado.getCuil()).isPresent()) {
             throw new IllegalArgumentException("ERROR: Ya existe un empleado con ese CUIL");
+        }
+
+        return empleadoRepository.save(empleado);
+    }
+
+    public Empleado altaEmpleadoConEspecialidades(Empleado empleado) {
+        empleado.setEstado(true);
+        empleado.setFechaAlta(LocalDateTime.now());
+
+        if (empleado.getLstEspecialidades() != null && !empleado.getLstEspecialidades().isEmpty()) {
+            Set<Especialidad> especialidadesExistentes = empleado.getLstEspecialidades().stream()
+                    .map(espec -> especialidadRepository.findById(espec.getId())
+                            .orElseThrow(() -> new IllegalArgumentException("Especialidad no encontrada: " + espec.getId())))
+                    .collect(Collectors.toSet());
+
+            empleado.setLstEspecialidades(especialidadesExistentes);
         }
 
         return empleadoRepository.save(empleado);
@@ -51,7 +69,7 @@ public class EmpleadoService {
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: No existe el empleado solicitado"));
     }
 
-    public Empleado obtenerEmpleadoPorCuil(int cuil) {
+    public Empleado obtenerEmpleadoPorCuil(long cuil) {
         return empleadoRepository.findByCuil(cuil)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: No existe el empleado solicitado"));
     }
@@ -63,18 +81,30 @@ public class EmpleadoService {
 
     public Empleado modificarEmpleado(Empleado e) {
         Empleado actual = obtenerEmpleadoPorId(e.getId());
+
         actual.setNombre(e.getNombre());
         actual.setApellido(e.getApellido());
         actual.setEmail(e.getEmail());
         actual.setDireccion(e.getDireccion());
         actual.setCuil(e.getCuil());
         actual.setMatricula(e.getMatricula());
+
+        if (e.getLstEspecialidades() != null) {
+            Set<Especialidad> especialidadesActualizadas = e.getLstEspecialidades().stream()
+                    .map(es -> especialidadRepository.findById(es.getId())
+                            .orElseThrow(() -> new IllegalArgumentException("Especialidad no encontrada: " + es.getId())))
+                    .collect(Collectors.toSet());
+            actual.setLstEspecialidades(especialidadesActualizadas);
+        }
+
         return empleadoRepository.save(actual);
     }
 
     public void bajaEmpleado(int id) {
-        Empleado e = obtenerEmpleadoPorId(id);
-        empleadoRepository.delete(e);
+        Empleado empleado = empleadoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado"));
+        empleado.setEstado(false);
+        empleadoRepository.save(empleado);
     }
 
     public void asignarEspecialidad(int idEmpleado, Especialidad esp) {
@@ -100,6 +130,6 @@ public class EmpleadoService {
     }
 
     public List<Empleado> traerEmpleados() {
-        return empleadoRepository.findAll();
+        return empleadoRepository.findByEstadoTrue();
     }
 }
