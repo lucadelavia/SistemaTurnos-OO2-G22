@@ -8,7 +8,8 @@ import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter @Setter
+@Getter
+@Setter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 
@@ -28,11 +29,11 @@ public class Empleado extends Usuario {
     private Set<Especialidad> lstEspecialidades;
 
     public Empleado(String nombre, String apellido, String email, String direccion,
-                    int dni, boolean estado, LocalDateTime fechaAlta, long cuil, String matricula) {
-        super(nombre, apellido, email, direccion, dni, estado, fechaAlta);
+                    int dni, boolean estado, LocalDateTime fechaAlta,
+                    String password, RolUsuario rol,
+                    long cuil, String matricula) {
+        super(nombre, apellido, email, direccion, dni, estado, fechaAlta, password, rol);
         this.cuil = cuil;
         this.matricula = matricula;
     }
-
-
 }

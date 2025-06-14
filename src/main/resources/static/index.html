@@ -14,16 +14,17 @@
     <div class="container">
       <a class="navbar-brand d-flex align-items-center" href="#">
         <img src="logo-unla.png" alt="UNLa Logo" width="40" height="40" class="me-2" />
+        <span class="fw-bold text-white">UNLa Turnos</span>
       </a>
-      <div class="ms-auto">
-        <a href="login.html" class="nav-link text-white d-inline-block me-3">Login</a>
-        <a href="#info" class="nav-link text-white d-inline-block">Información</a>
+      <div class="ms-auto d-flex gap-2">
+        <a href="registro.html" class="btn btn-outline-light">Registrarse</a>
+        <a href="login.html" class="btn btn-light text-dark">Iniciar sesión</a>
       </div>
     </div>
   </nav>
 
   <main>
-    <header class="text-white text-center py-5 hero">
+    <header class="text-white text-center py-5 hero bg-rojo">
       <div class="container">
         <h1 class="display-4 fw-bold">UNLa Turnos</h1>
         <p class="lead">Sistema de gestión de turnos para clientes, empleados y servicios</p>
@@ -31,58 +32,49 @@
       </div>
     </header>
 
-    <section id="modulos" class="py-5 bg-white text-center">
+    <section id="info" class="py-5 bg-light text-center">
       <div class="container">
-        <h3 class="mb-4">Módulos disponibles</h3>
-        <div class="row g-4">
+        <h2 class="text-granate mb-4">¿Qué es UNLa Turnos?</h2>
+        <p class="lead">
+          Es una plataforma desarrollada para optimizar la gestión de turnos dentro de la Universidad Nacional de Lanús.
+          Permite a los usuarios reservar, administrar y coordinar servicios de forma rápida y eficiente.
+        </p>
+      </div>
+    </section>
+
+    <section class="py-5 bg-white">
+      <div class="container">
+        <h3 class="text-center mb-4 text-granate">Beneficios del sistema</h3>
+        <div class="row text-center">
           <div class="col-md-4">
-            <a href="clientes.html" class="modulo-card">
-              <i class="bi bi-people-fill icono"></i>
-              <span>Clientes</span>
-            </a>
+            <i class="bi bi-clock-history icono mb-2"></i>
+            <h5>Agilidad</h5>
+            <p>Reducción de tiempos de espera y mejor organización.</p>
           </div>
           <div class="col-md-4">
-            <a href="empleados.html" class="modulo-card">
-              <i class="bi bi-person-badge-fill icono"></i>
-              <span>Empleados</span>
-            </a>
+            <i class="bi bi-shield-lock-fill icono mb-2"></i>
+            <h5>Seguridad</h5>
+            <p>Acceso con credenciales seguras para cada tipo de usuario.</p>
           </div>
           <div class="col-md-4">
-            <a href="turnos.html" class="modulo-card">
-              <i class="bi bi-calendar-check-fill icono"></i>
-              <span>Turnos</span>
-            </a>
-          </div>
-          <div class="col-md-4">
-            <a href="establecimientos.html" class="modulo-card">
-              <i class="bi bi-building-fill icono"></i>
-              <span>Establecimientos</span>
-            </a>
-          </div>
-          <div class="col-md-4">
-            <a href="sucursales.html" class="modulo-card">
-              <i class="bi bi-diagram-3-fill icono"></i>
-              <span>Sucursales</span>
-            </a>
-          </div>
-          <div class="col-md-4">
-            <a href="servicios.html" class="modulo-card">
-              <i class="bi bi-tools icono"></i>
-              <span>Servicios</span>
-            </a>
-          </div>
-          <div class="col-md-4">
-            <a href="especialidades.html" class="modulo-card">
-              <i class="bi bi-tags-fill icono"></i>
-              <span>Especialidades</span>
-            </a>
+            <i class="bi bi-bar-chart-fill icono mb-2"></i>
+            <h5>Control</h5>
+            <p>Seguimiento estadístico de turnos, servicios y personal.</p>
           </div>
         </div>
       </div>
     </section>
+
+    <section class="py-5 text-center bg-rojo text-white">
+      <div class="container">
+        <h4>¿Listo para comenzar?</h4>
+        <p>Accedé al sistema para gestionar tus turnos de manera eficiente.</p>
+        <a href="login.html" class="btn btn-light mt-2">Iniciar sesión</a>
+      </div>
+    </section>
   </main>
 
-  <footer class="text-center text-white py-3">
+  <footer class="text-center text-white py-3 bg-granate">
     <div class="container">
       <small>&copy; 2025 UNLa Turnos - Grupo 22 - OO2 - Universidad Nacional de Lanús</small>
     </div>

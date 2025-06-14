@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registrarse | UNLa Turnos</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-granate shadow-sm">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="index.html">
+      <img src="logo-unla.png" alt="UNLa Logo" width="40" height="40" class="me-2" />
+      <span class="fw-bold text-white">UNLa Turnos</span>
+    </a>
+  </div>
+</nav>
+
+<main class="bg-light" style="min-height: calc(100vh - 112px); display: flex; align-items: center;">
+  <div class="container">
+    <div class="row justify-content-center align-items-center g-5">
+      <div class="col-lg-5">
+        <div class="card p-4 shadow rounded-4">
+          <h4 class="text-center mb-3 text-granate">
+            <i class="bi bi-person-plus-fill me-2"></i> Registrarse
+          </h4>
+          <form id="registro-form">
+            <div class="mb-3">
+              <label for="nombre" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="nombre" name="nombre" required />
+            </div>
+
+            <div class="mb-3">
+              <label for="apellido" class="form-label">Apellido</label>
+              <input type="text" class="form-control" id="apellido" name="apellido" required />
+            </div>
+
+            <div class="mb-3">
+              <label for="dni" class="form-label">DNI</label>
+              <input type="number" class="form-control" id="dni" name="dni" required />
+            </div>
+
+            <div class="mb-3">
+              <label for="direccion" class="form-label">Dirección</label>
+              <input type="text" class="form-control" id="direccion" name="direccion" required />
+            </div>
+
+            <div class="mb-3">
+              <label for="email" class="form-label">Correo electrónico</label>
+              <input type="email" class="form-control" id="email" name="email" required />
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">Contraseña</label>
+              <input type="password" class="form-control" id="password" name="password" required />
+            </div>
+
+            <div class="mb-3">
+              <label for="confirm-password" class="form-label">Confirmar contraseña</label>
+              <input type="password" class="form-control" id="confirm-password" name="confirm-password" required />
+            </div>
+
+            <button type="submit" class="btn btn-light text-dark w-100">Registrarse</button>
+
+            <div class="text-center mt-3">
+              <small>¿Ya tenés cuenta? <a href="login.html" class="text-granate">Iniciá sesión</a></small>
+            </div>
+          </form>
+
+        </div>
+      </div>
+      <div class="col-lg-6 d-none d-lg-block text-center">
+        <img src="register-illustration.svg" alt="Registro gráfico" class="img-fluid" style="max-height: 350px;" />
+        <p class="mt-3 text-muted">Crea tu cuenta para comenzar a reservar y administrar turnos fácilmente.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="text-center text-white py-3 bg-granate">
+  <div class="container">
+    <small>&copy; 2025 UNLa Turnos - Grupo 22 - OO2 - Universidad Nacional de Lanús</small>
+  </div>
+</footer>
+
+<script src="js/registro.js"></script>
+
+</body>
+</html>

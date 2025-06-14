@@ -2,11 +2,13 @@ package com.sistematurnos.service;
 
 import com.sistematurnos.entity.Empleado;
 import com.sistematurnos.entity.Especialidad;
+import com.sistematurnos.entity.RolUsuario;
 import com.sistematurnos.exception.EmpleadoNoEncontradoException;
 import com.sistematurnos.repository.IEmpleadoRepository;
 import com.sistematurnos.repository.IEspecialidadRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,8 +24,11 @@ public class EmpleadoService {
     @Autowired
     private IEspecialidadRepository especialidadRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public Empleado altaEmpleado(String nombre, String apellido, String email, String direccion,
-                                 int dni, boolean estado, LocalDateTime fechaAlta, long cuil, String matricula) {
+                                 int dni, boolean estado, LocalDateTime fechaAlta, long cuil, String matricula, String password) {
 
         if (empleadoRepository.findByDni(dni).isPresent()) {
             throw new EmpleadoNoEncontradoException("ERROR: Ya existe un empleado con ese DNI");
@@ -33,9 +38,22 @@ public class EmpleadoService {
             throw new EmpleadoNoEncontradoException("ERROR: Ya existe un empleado con ese CUIL");
         }
 
-        Empleado e = new Empleado(nombre, apellido, email, direccion, dni, estado, fechaAlta, cuil, matricula);
-        return empleadoRepository.save(e);
+        Empleado empleado = new Empleado();
+        empleado.setNombre(nombre);
+        empleado.setApellido(apellido);
+        empleado.setEmail(email);
+        empleado.setDireccion(direccion);
+        empleado.setDni(dni);
+        empleado.setEstado(estado);
+        empleado.setFechaAlta(fechaAlta);
+        empleado.setCuil(cuil);
+        empleado.setMatricula(matricula);
+        empleado.setPassword(passwordEncoder.encode(password));
+        empleado.setRol(RolUsuario.EMPLEADO);
+
+        return empleadoRepository.save(empleado);
     }
+
 
     public Empleado altaEmpleado(Empleado empleado) {
         if (empleadoRepository.findByDni(empleado.getDni()).isPresent()) {

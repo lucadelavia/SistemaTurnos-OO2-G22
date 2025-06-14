@@ -1,8 +1,10 @@
 package com.sistematurnos.service;
 
 import com.sistematurnos.entity.Usuario;
+import com.sistematurnos.entity.RolUsuario;
 import com.sistematurnos.repository.IUsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -15,30 +17,38 @@ public class UsuarioService {
     @Autowired
     private IUsuarioRepository usuarioRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    // Alta con objeto Usuario
     public Usuario altaUsuario(Usuario u) {
-        if (usuarioRepository.findByDni(u.getDni()).isPresent()) {
-            throw new IllegalArgumentException("ERROR: Ya existe un usuario con ese DNI");
-        }
-        if (usuarioRepository.findByEmail(u.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("ERROR: Ya existe un usuario con ese EMAIL");
-        }
+        validarUsuarioUnico(u.getEmail(), u.getDni());
+        u.setPassword(passwordEncoder.encode(u.getPassword()));
+        u.setFechaAlta(LocalDateTime.now());
+        u.setEstado(true);
         return usuarioRepository.save(u);
     }
 
-    public Usuario altaUsuario(String nombre, String apellido, String email, String direccion, int dni) {
-        if (usuarioRepository.findByDni(dni).isPresent()) {
-            throw new IllegalArgumentException("ERROR: Ya existe un usuario con ese DNI");
-        }
-        if (usuarioRepository.findByEmail(email).isPresent()) {
-            throw new IllegalArgumentException("ERROR: Ya existe un usuario con ese EMAIL");
-        }
-        Usuario u = new Usuario(nombre, apellido, email, direccion, dni, true, LocalDateTime.now());
+    public Usuario altaUsuario(String nombre, String apellido, String email, String direccion, int dni, String password, RolUsuario rol) {
+        validarUsuarioUnico(email, dni);
+
+        Usuario u = new Usuario();
+        u.setNombre(nombre);
+        u.setApellido(apellido);
+        u.setEmail(email);
+        u.setDireccion(direccion);
+        u.setDni(dni);
+        u.setEstado(true);
+        u.setFechaAlta(LocalDateTime.now());
+        u.setPassword(passwordEncoder.encode(password));
+        u.setRol(rol);
+
         return usuarioRepository.save(u);
     }
 
     public void bajaUsuario(int id) {
         Usuario u = obtenerUsuarioPorId(id);
-        usuarioRepository.delete(u);
+        usuarioRepository.delete(u); // o u.setEstado(false); usuarioRepository.save(u);
     }
 
     public Usuario modificarUsuario(Usuario u) {
@@ -88,4 +98,12 @@ public class UsuarioService {
         return usuarios;
     }
 
+    private void validarUsuarioUnico(String email, int dni) {
+        if (usuarioRepository.findByDni(dni).isPresent()) {
+            throw new IllegalArgumentException("ERROR: Ya existe un usuario con ese DNI");
+        }
+        if (usuarioRepository.findByEmail(email).isPresent()) {
+            throw new IllegalArgumentException("ERROR: Ya existe un usuario con ese EMAIL");
+        }
+    }
 }
