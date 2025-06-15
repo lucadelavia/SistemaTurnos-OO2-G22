@@ -1,7 +1,7 @@
 package com.sistematurnos.controller;
 
 import com.sistematurnos.entity.DiasDeAtencion;
-import com.sistematurnos.service.DiasDeAtencionService;
+import com.sistematurnos.service.IDiasDeAtencionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ import java.util.List;
 public class DiasDeAtencionController {
 
     @Autowired
-    private DiasDeAtencionService diasDeAtencionService;
+    private IDiasDeAtencionService diasDeAtencionService;
 
     @GetMapping
     public List<DiasDeAtencion> listarDias() {
