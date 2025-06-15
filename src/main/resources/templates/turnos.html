@@ -10,7 +10,6 @@
 </head>
 <body>
 
-<!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #800000;">
   <div class="container-fluid">
     <a class="navbar-brand" href="/inicio">
@@ -27,11 +26,10 @@
   <h1 class="mb-4 text-center text-granate">Reserva de Turno</h1>
 
   <!-- Formulario -->
-  <div class="card mb-5 d-none" id="reserva-form-wrapper">
+  <div id="reserva-form" class="card mb-5 d-none">
     <div class="card-header bg-granate text-white">Nuevo Turno</div>
     <div class="card-body">
-      <!-- ✅ FORMULARIO con ID CORRECTO -->
-      <form id="reserva-form">
+      <form id="form-turno">
         <div class="row g-3">
           <div class="col-md-6">
             <label class="form-label">Especialidad</label>
@@ -85,9 +83,7 @@
           <th>Servicio</th>
         </tr>
         </thead>
-        <tbody id="turnos-tbody">
-        <!-- Se carga dinámicamente -->
-        </tbody>
+        <tbody id="turnos-tbody"></tbody>
       </table>
     </div>
   </div>

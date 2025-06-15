@@ -7,12 +7,9 @@ const API_EMPLEADOS = `${API_BASE}/empleados`;
 const API_ESPECIALIDADES = `${API_BASE}/especialidades`;
 
 let usuarioActual = null;
-let formTurno = null;
 
 window.addEventListener("DOMContentLoaded", async () => {
   await cargarUsuario();
-
-  formTurno = document.querySelector("#reserva-form form");
 
   if (usuarioActual?.rol === "CLIENTE") {
     document.getElementById("reserva-form").classList.remove("d-none");
@@ -42,7 +39,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     await cargarEmpleadosPorEspecialidad(id);
   });
 
-  formTurno.addEventListener("submit", reservarTurno);
+  document.getElementById("form-turno").addEventListener("submit", reservarTurno);
 });
 
 async function cargarUsuario() {
@@ -125,11 +122,25 @@ function cargarHorarios() {
   if (!idSucursal || !idServicio || !idEmpleado || !fecha) return;
 
   const url = `${API_TURNOS}/disponibilidad?idSucursal=${idSucursal}&idServicio=${idServicio}&idEmpleado=${idEmpleado}&fecha=${fecha}`;
+
   fetch(url)
     .then(res => res.json())
     .then(data => {
       const select = document.getElementById("horario");
       select.innerHTML = '<option value="">Seleccione</option>';
+
+      const mensaje = document.getElementById("mensaje-horarios");
+      if (mensaje) mensaje.remove();
+
+      if (data.length === 0) {
+        const aviso = document.createElement("div");
+        aviso.id = "mensaje-horarios";
+        aviso.className = "alert alert-warning mt-3";
+        aviso.textContent = "La sucursal no atiende el día seleccionado.";
+        select.parentElement.appendChild(aviso);
+        return;
+      }
+
       data.forEach(hora => {
         const dt = new Date(hora);
         const option = document.createElement("option");
@@ -137,7 +148,8 @@ function cargarHorarios() {
         option.textContent = dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
         select.appendChild(option);
       });
-    });
+    })
+    .catch(err => console.error("Error al cargar horarios:", err));
 }
 
 function reservarTurno(e) {
@@ -165,8 +177,10 @@ function reservarTurno(e) {
     })
     .then(() => {
       alert("Turno reservado con éxito");
-      formTurno.reset();  // ✅ USar la referencia correcta
+      document.getElementById("form-turno").reset();
       document.getElementById("horario").innerHTML = "";
+      const mensaje = document.getElementById("mensaje-horarios");
+      if (mensaje) mensaje.remove();
       cargarTurnos();
     })
     .catch(err => alert(err.message));
