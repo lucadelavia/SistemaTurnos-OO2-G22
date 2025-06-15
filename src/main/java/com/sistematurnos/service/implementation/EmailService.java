@@ -1,7 +1,7 @@
-package com.sistematurnos.service;
+package com.sistematurnos.service.implementation;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -9,17 +9,20 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import java.util.Map;
+import com.sistematurnos.service.IEmailService;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 
 @Service
-public class EmailService {
-
+public class EmailService implements IEmailService{
     @Autowired
     private JavaMailSender mailSender;
 
     @Autowired
     private TemplateEngine templateEngine;
 
+    @Override
     public void enviarEmailConHtml(String para, String asunto, String nombreTemplate, Map<String, Object> variables) {
         try {
             MimeMessage mensaje = mailSender.createMimeMessage();
@@ -40,4 +43,3 @@ public class EmailService {
         }
     }
 }
-
