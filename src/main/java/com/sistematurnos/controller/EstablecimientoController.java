@@ -1,7 +1,7 @@
 package com.sistematurnos.controller;
 
 import com.sistematurnos.entity.Establecimiento;
-import com.sistematurnos.service.EstablecimientoService;
+import com.sistematurnos.service.IEstablecimientoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ import java.util.List;
 public class EstablecimientoController {
 
     @Autowired
-    private EstablecimientoService establecimientoService;
+    private IEstablecimientoService establecimientoService;
 
     @GetMapping
     public List<Establecimiento> listarEstablecimientos() {
@@ -77,5 +77,4 @@ public class EstablecimientoController {
             return ResponseEntity.badRequest().build();
         }
     }
-
 }
