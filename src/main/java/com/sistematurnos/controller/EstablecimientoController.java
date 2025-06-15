@@ -1,5 +1,8 @@
 package com.sistematurnos.controller;
 
+import com.sistematurnos.dtos.mapper.EstablecimientoMapper;
+import com.sistematurnos.dtos.request.EstablecimientoRequest;
+import com.sistematurnos.dtos.response.EstablecimientoResponse;
 import com.sistematurnos.entity.Establecimiento;
 import com.sistematurnos.service.EstablecimientoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/establecimientos")
@@ -20,15 +24,19 @@ public class EstablecimientoController {
 
     @Operation(summary = "Listar todos los establecimientos")
     @GetMapping
-    public List<Establecimiento> listarEstablecimientos() {
-        return establecimientoService.traerEstablecimientos();
+    public List<EstablecimientoResponse> listarEstablecimientos() {
+        return establecimientoService.traerEstablecimientos()
+                .stream()
+                .map(EstablecimientoMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Operation(summary = "Obtener establecimiento por ID")
     @GetMapping("/{id}")
-    public ResponseEntity<Establecimiento> obtenerPorId(@PathVariable int id) {
+    public ResponseEntity<EstablecimientoResponse> obtenerPorId(@PathVariable int id) {
         try {
-            return ResponseEntity.ok(establecimientoService.traer(id));
+            Establecimiento est = establecimientoService.traer(id);
+            return ResponseEntity.ok(EstablecimientoMapper.toResponse(est));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
@@ -36,9 +44,11 @@ public class EstablecimientoController {
 
     @Operation(summary = "Crear un nuevo establecimiento")
     @PostMapping
-    public ResponseEntity<Establecimiento> crear(@RequestBody Establecimiento est) {
+    public ResponseEntity<EstablecimientoResponse> crear(@RequestBody EstablecimientoRequest request) {
         try {
-            return ResponseEntity.ok(establecimientoService.altaEstablecimiento(est));
+            Establecimiento nuevo = establecimientoService.altaEstablecimiento(
+                    EstablecimientoMapper.toEntity(request));
+            return ResponseEntity.ok(EstablecimientoMapper.toResponse(nuevo));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
@@ -46,10 +56,12 @@ public class EstablecimientoController {
 
     @Operation(summary = "Modificar un establecimiento")
     @PutMapping("/{id}")
-    public ResponseEntity<Establecimiento> modificar(@PathVariable int id, @RequestBody Establecimiento est) {
+    public ResponseEntity<EstablecimientoResponse> modificar(@PathVariable int id,
+                                                             @RequestBody EstablecimientoRequest request) {
         try {
-            est.setId(id);
-            return ResponseEntity.ok(establecimientoService.modificarEstablecimiento(est));
+            Establecimiento actualizado = establecimientoService.modificarEstablecimiento(
+                    EstablecimientoMapper.toEntity(id, request));
+            return ResponseEntity.ok(EstablecimientoMapper.toResponse(actualizado));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }

@@ -1,6 +1,11 @@
 package com.sistematurnos.controller;
 
+import com.sistematurnos.dtos.request.ServicioRequest;
+import com.sistematurnos.dtos.response.ServicioResponse;
+import com.sistematurnos.dtos.mapper.ServicioMapper;
+import com.sistematurnos.entity.Especialidad;
 import com.sistematurnos.entity.Servicio;
+import com.sistematurnos.service.EspecialidadService;
 import com.sistematurnos.service.ServicioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/servicios")
@@ -18,17 +24,24 @@ public class ServicioController {
     @Autowired
     private ServicioService servicioService;
 
+    @Autowired
+    private EspecialidadService especialidadService;
+
     @Operation(summary = "Listar todos los servicios")
     @GetMapping
-    public List<Servicio> listarServicios() {
-        return servicioService.traerServicios();
+    public List<ServicioResponse> listarServicios() {
+        return servicioService.traerServicios()
+                .stream()
+                .map(ServicioMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Operation(summary = "Obtener servicio por ID")
     @GetMapping("/{id}")
-    public ResponseEntity<Servicio> obtenerPorId(@PathVariable int id) {
+    public ResponseEntity<ServicioResponse> obtenerPorId(@PathVariable int id) {
         try {
-            return ResponseEntity.ok(servicioService.obtenerServicioPorId(id));
+            Servicio servicio = servicioService.obtenerServicioPorId(id);
+            return ResponseEntity.ok(ServicioMapper.toResponse(servicio));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
@@ -36,9 +49,10 @@ public class ServicioController {
 
     @Operation(summary = "Obtener servicio por nombre")
     @GetMapping("/nombre/{nombre}")
-    public ResponseEntity<Servicio> obtenerPorNombre(@PathVariable String nombre) {
+    public ResponseEntity<ServicioResponse> obtenerPorNombre(@PathVariable String nombre) {
         try {
-            return ResponseEntity.ok(servicioService.obtenerServicioPorNombre(nombre));
+            Servicio servicio = servicioService.obtenerServicioPorNombre(nombre);
+            return ResponseEntity.ok(ServicioMapper.toResponse(servicio));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
@@ -46,27 +60,36 @@ public class ServicioController {
 
     @Operation(summary = "Listar servicios por especialidad")
     @GetMapping("/especialidad/{idEspecialidad}")
-    public ResponseEntity<List<Servicio>> serviciosPorEspecialidad(@PathVariable int idEspecialidad) {
+    public ResponseEntity<List<ServicioResponse>> serviciosPorEspecialidad(@PathVariable int idEspecialidad) {
         List<Servicio> servicios = servicioService.buscarPorEspecialidad(idEspecialidad);
-        return ResponseEntity.ok(servicios);
+        List<ServicioResponse> responseList = servicios.stream()
+                .map(ServicioMapper::toResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(responseList);
     }
 
     @Operation(summary = "Crear un nuevo servicio")
     @PostMapping
-    public ResponseEntity<Servicio> crear(@RequestBody Servicio servicio) {
+    public ResponseEntity<ServicioResponse> crear(@RequestBody ServicioRequest request) {
         try {
-            return ResponseEntity.ok(servicioService.altaServicio(servicio));
+            Especialidad especialidad = especialidadService.obtenerEspecialidadPorId(request.idEspecialidad());
+            Servicio servicio = ServicioMapper.toEntity(request, especialidad);
+            Servicio nuevo = servicioService.altaServicio(servicio);
+            return ResponseEntity.ok(ServicioMapper.toResponse(nuevo));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().build();
         }
     }
 
     @Operation(summary = "Modificar un servicio")
     @PutMapping("/{id}")
-    public ResponseEntity<Servicio> modificar(@PathVariable int id, @RequestBody Servicio servicio) {
+    public ResponseEntity<ServicioResponse> modificar(@PathVariable int id, @RequestBody ServicioRequest request) {
         try {
+            Especialidad especialidad = especialidadService.obtenerEspecialidadPorId(request.idEspecialidad());
+            Servicio servicio = ServicioMapper.toEntity(request, especialidad);
             servicio.setId(id);
-            return ResponseEntity.ok(servicioService.modificarServicio(servicio));
+            Servicio actualizado = servicioService.modificarServicio(servicio);
+            return ResponseEntity.ok(ServicioMapper.toResponse(actualizado));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }

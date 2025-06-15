@@ -1,5 +1,8 @@
 package com.sistematurnos.controller;
 
+import com.sistematurnos.dtos.request.DiasDeAtencionRequest;
+import com.sistematurnos.dtos.response.DiasDeAtencionResponse;
+import com.sistematurnos.dtos.mapper.DiasDeAtencionMapper;
 import com.sistematurnos.entity.DiasDeAtencion;
 import com.sistematurnos.service.DiasDeAtencionService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/dias-atencion")
@@ -20,15 +24,18 @@ public class DiasDeAtencionController {
 
     @Operation(summary = "Listar todos los días de atención")
     @GetMapping
-    public List<DiasDeAtencion> listarDias() {
-        return diasDeAtencionService.traerTodos();
+    public List<DiasDeAtencionResponse> listarDias() {
+        return diasDeAtencionService.traerTodos().stream()
+                .map(DiasDeAtencionMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Operation(summary = "Obtener un día de atención por ID")
     @GetMapping("/{id}")
-    public ResponseEntity<DiasDeAtencion> obtenerPorId(@PathVariable int id) {
+    public ResponseEntity<DiasDeAtencionResponse> obtenerPorId(@PathVariable int id) {
         try {
-            return ResponseEntity.ok(diasDeAtencionService.traer(id));
+            DiasDeAtencion dia = diasDeAtencionService.traer(id);
+            return ResponseEntity.ok(DiasDeAtencionMapper.toResponse(dia));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
@@ -36,10 +43,11 @@ public class DiasDeAtencionController {
 
     @Operation(summary = "Crear un nuevo día de atención")
     @PostMapping
-    public ResponseEntity<DiasDeAtencion> crear(@RequestBody DiasDeAtencion dia) {
+    public ResponseEntity<DiasDeAtencionResponse> crear(@RequestBody DiasDeAtencionRequest request) {
         try {
-            DiasDeAtencion nuevo = diasDeAtencionService.altaDiaDeAtencion(dia);
-            return ResponseEntity.ok(nuevo);
+            DiasDeAtencion nuevo = diasDeAtencionService.altaDiaDeAtencion(
+                    DiasDeAtencionMapper.toEntity(request));
+            return ResponseEntity.ok(DiasDeAtencionMapper.toResponse(nuevo));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -47,11 +55,13 @@ public class DiasDeAtencionController {
 
     @Operation(summary = "Actualizar un día de atención existente")
     @PutMapping("/{id}")
-    public ResponseEntity<DiasDeAtencion> actualizar(@PathVariable int id, @RequestBody DiasDeAtencion dia) {
+    public ResponseEntity<DiasDeAtencionResponse> actualizar(@PathVariable int id,
+                                                             @RequestBody DiasDeAtencionRequest request) {
         try {
+            DiasDeAtencion dia = DiasDeAtencionMapper.toEntity(request);
             dia.setId(id);
             DiasDeAtencion actualizado = diasDeAtencionService.modificarDiaDeAtencion(dia);
-            return ResponseEntity.ok(actualizado);
+            return ResponseEntity.ok(DiasDeAtencionMapper.toResponse(actualizado));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }

@@ -1,5 +1,7 @@
 package com.sistematurnos.controller;
 
+import com.sistematurnos.dtos.response.UsuarioResponse;
+import com.sistematurnos.dtos.mapper.UsuarioMapper;
 import com.sistematurnos.entity.Usuario;
 import com.sistematurnos.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,11 +19,12 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
+    @Operation(summary = "Obtener datos del usuario autenticado")
     @GetMapping("/me")
-    public ResponseEntity<Usuario> getMe(Authentication authentication) {
+    public ResponseEntity<UsuarioResponse> getMe(Authentication authentication) {
         String email = authentication.getName();
         Usuario usuario = usuarioService.buscarPorEmail(email);
-        return ResponseEntity.ok(usuario);
+        UsuarioResponse response = UsuarioMapper.toResponse(usuario);
+        return ResponseEntity.ok(response);
     }
-
 }
