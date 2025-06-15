@@ -26,7 +26,7 @@ public class SucursalController {
     private IEspecialidadService especialidadService;
 
     @Autowired
-    private DiasDeAtencionService diasDeAtencionService;
+    private IDiasDeAtencionService diasDeAtencionService;
 
     @Operation(summary = "Listar todas las sucursales")
     @GetMapping
