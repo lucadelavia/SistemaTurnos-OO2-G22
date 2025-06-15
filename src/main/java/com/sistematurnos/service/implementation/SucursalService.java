@@ -1,10 +1,12 @@
-package com.sistematurnos.service;
+package com.sistematurnos.service.implementation;
 
 import com.sistematurnos.entity.DiasDeAtencion;
 import com.sistematurnos.entity.Especialidad;
 import com.sistematurnos.entity.Sucursal;
 import com.sistematurnos.repository.IEspecialidadRepository;
 import com.sistematurnos.repository.ISucursalRepository;
+import com.sistematurnos.service.IDiasDeAtencionService;
+import com.sistematurnos.service.ISucursalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,16 +16,18 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class SucursalService {
+public class SucursalService implements ISucursalService {
 
     @Autowired
     private ISucursalRepository sucursalRepository;
 
     @Autowired
-    private DiasDeAtencionService diasDeAtencionService;
+    private IDiasDeAtencionService diasDeAtencionService;
+    
     @Autowired
     private IEspecialidadRepository especialidadRepository;
 
+    @Override
     public Sucursal altaSucursal(String direccion, String telefono, LocalTime horaApertura, LocalTime horaCierre, int espacio) {
         if (sucursalRepository.findAll().stream().anyMatch(s -> s.getDireccion().equalsIgnoreCase(direccion))) {
             throw new IllegalArgumentException("ERROR: ya existe una sucursal con la dirección: " + direccion);
@@ -39,6 +43,7 @@ public class SucursalService {
         return sucursalRepository.save(suc);
     }
 
+    @Override
     public Sucursal altaSucursal(Sucursal suc) {
         // Validar dirección duplicada
 
@@ -66,14 +71,14 @@ public class SucursalService {
         return sucursalRepository.save(suc);
     }
 
-
+    @Override
     public void bajaSucursal(int id) {
         Sucursal suc = traer(id);
         suc.setEstado(false);
         sucursalRepository.save(suc);
     }
 
-
+    @Override
     public Sucursal modificarSucursal(Sucursal suc) {
         Sucursal actual = traer(suc.getId());
         actual.setDireccion(suc.getDireccion());
@@ -100,18 +105,20 @@ public class SucursalService {
         return sucursalRepository.save(actual);
     }
 
-
+    @Override
     public Sucursal traer(int idSucursal) {
         return sucursalRepository.findById(idSucursal)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: no existe una sucursal con ID: " + idSucursal));
     }
 
+    @Override
     public List<Sucursal> traerSucursales() {
         return sucursalRepository.findAll().stream()
                 .filter(Sucursal::isEstado)
                 .toList();
     }
 
+    @Override
     public void asociarDiaDeAtencion(int idSucursal, int idDiasAtencion) {
         Sucursal suc = traer(idSucursal);
         DiasDeAtencion dia = diasDeAtencionService.traer(idDiasAtencion);
@@ -121,6 +128,7 @@ public class SucursalService {
         }
     }
 
+    @Override
     public void removerDiaDeAtencion(int idSucursal, int idDiasAtencion) {
         Sucursal suc = traer(idSucursal);
         DiasDeAtencion dia = diasDeAtencionService.traer(idDiasAtencion);
@@ -130,6 +138,7 @@ public class SucursalService {
         }
     }
 
+    @Override
     public void asociarEspecialidad(int idSucursal, Especialidad especialidad) {
         Sucursal suc = traer(idSucursal);
         if (!suc.getLstEspecialidad().contains(especialidad)) {
@@ -138,6 +147,7 @@ public class SucursalService {
         }
     }
 
+    @Override
     public void removerEspecialidad(int idSucursal, Especialidad especialidad) {
 
         Sucursal suc = traer(idSucursal);
@@ -147,6 +157,7 @@ public class SucursalService {
         }
     }
 
+    @Override
     public Sucursal guardar(Sucursal suc) {
         return sucursalRepository.save(suc);
     }
