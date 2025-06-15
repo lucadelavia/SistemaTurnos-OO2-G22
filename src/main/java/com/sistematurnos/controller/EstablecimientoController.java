@@ -2,6 +2,8 @@ package com.sistematurnos.controller;
 
 import com.sistematurnos.entity.Establecimiento;
 import com.sistematurnos.service.EstablecimientoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,16 +12,19 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/establecimientos")
+@Tag(name = "Establecimientos", description = "Gestión de establecimientos")
 public class EstablecimientoController {
 
     @Autowired
     private EstablecimientoService establecimientoService;
 
+    @Operation(summary = "Listar todos los establecimientos")
     @GetMapping
     public List<Establecimiento> listarEstablecimientos() {
         return establecimientoService.traerEstablecimientos();
     }
 
+    @Operation(summary = "Obtener establecimiento por ID")
     @GetMapping("/{id}")
     public ResponseEntity<Establecimiento> obtenerPorId(@PathVariable int id) {
         try {
@@ -29,6 +34,7 @@ public class EstablecimientoController {
         }
     }
 
+    @Operation(summary = "Crear un nuevo establecimiento")
     @PostMapping
     public ResponseEntity<Establecimiento> crear(@RequestBody Establecimiento est) {
         try {
@@ -38,6 +44,7 @@ public class EstablecimientoController {
         }
     }
 
+    @Operation(summary = "Modificar un establecimiento")
     @PutMapping("/{id}")
     public ResponseEntity<Establecimiento> modificar(@PathVariable int id, @RequestBody Establecimiento est) {
         try {
@@ -48,6 +55,7 @@ public class EstablecimientoController {
         }
     }
 
+    @Operation(summary = "Eliminar (baja lógica) un establecimiento")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable int id) {
         try {
@@ -58,6 +66,7 @@ public class EstablecimientoController {
         }
     }
 
+    @Operation(summary = "Asociar sucursal a establecimiento")
     @PostMapping("/{idEst}/sucursales/{idSuc}")
     public ResponseEntity<Void> asociarSucursal(@PathVariable int idEst, @PathVariable int idSuc) {
         try {
@@ -68,6 +77,7 @@ public class EstablecimientoController {
         }
     }
 
+    @Operation(summary = "Remover sucursal de establecimiento")
     @DeleteMapping("/{idEst}/sucursales/{idSuc}")
     public ResponseEntity<Void> removerSucursal(@PathVariable int idEst, @PathVariable int idSuc) {
         try {
@@ -77,5 +87,4 @@ public class EstablecimientoController {
             return ResponseEntity.badRequest().build();
         }
     }
-
 }

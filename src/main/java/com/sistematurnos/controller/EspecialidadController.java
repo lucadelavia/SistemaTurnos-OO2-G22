@@ -2,6 +2,8 @@ package com.sistematurnos.controller;
 
 import com.sistematurnos.entity.Especialidad;
 import com.sistematurnos.service.EspecialidadService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,16 +12,19 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/especialidades")
+@Tag(name = "Especialidades", description = "Gestión de especialidades")
 public class EspecialidadController {
 
     @Autowired
     private EspecialidadService especialidadService;
 
+    @Operation(summary = "Listar todas las especialidades")
     @GetMapping
     public List<Especialidad> listarEspecialidades() {
         return especialidadService.traerEspecialidades();
     }
 
+    @Operation(summary = "Obtener especialidad por ID")
     @GetMapping("/{id}")
     public ResponseEntity<Especialidad> obtenerPorId(@PathVariable int id) {
         try {
@@ -29,6 +34,7 @@ public class EspecialidadController {
         }
     }
 
+    @Operation(summary = "Obtener especialidad por nombre")
     @GetMapping("/nombre/{nombre}")
     public ResponseEntity<Especialidad> obtenerPorNombre(@PathVariable String nombre) {
         try {
@@ -38,6 +44,7 @@ public class EspecialidadController {
         }
     }
 
+    @Operation(summary = "Crear una nueva especialidad")
     @PostMapping
     public ResponseEntity<Especialidad> crear(@RequestBody Especialidad especialidad) {
         try {
@@ -47,6 +54,7 @@ public class EspecialidadController {
         }
     }
 
+    @Operation(summary = "Modificar una especialidad")
     @PutMapping("/{id}")
     public ResponseEntity<Especialidad> modificar(@PathVariable int id, @RequestBody Especialidad especialidad) {
         try {
@@ -57,6 +65,7 @@ public class EspecialidadController {
         }
     }
 
+    @Operation(summary = "Eliminar (baja lógica) una especialidad")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable int id) {
         try {

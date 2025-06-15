@@ -2,6 +2,7 @@ package com.sistematurnos.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,8 +20,15 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // Públicos
+                        // Recursos públicos
                         .requestMatchers("/", "/index", "/login", "/registro", "/css/**", "/js/**", "/img/**").permitAll()
+
+                        // Swagger (documentación)
+                        .requestMatchers(
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**"
+                        ).permitAll()
 
                         // Acceso general
                         .requestMatchers("/inicio").authenticated()
@@ -28,14 +36,21 @@ public class SecurityConfig {
                         // ADMIN
                         .requestMatchers("/clientes", "/api/clientes/**").hasRole("ADMIN")
                         .requestMatchers("/empleados", "/api/empleados/**").hasRole("ADMIN")
-                        .requestMatchers("/establecimientos", "/api/establecimientos/**").hasRole("ADMIN")
 
-                        // EMPLEADO: solo puede ver turnos asignados y consultar módulos
-                        .requestMatchers("/turnos", "/api/turnos/**").hasAnyRole("EMPLEADO", "CLIENTE", "ADMIN")
-                        .requestMatchers("/sucursales", "/api/sucursales/**").hasAnyRole("EMPLEADO", "CLIENTE", "ADMIN")
-                        .requestMatchers("/servicios", "/api/servicios/**").hasAnyRole("EMPLEADO", "CLIENTE", "ADMIN")
-                        .requestMatchers("/especialidades", "/api/especialidades/**").hasAnyRole("EMPLEADO", "CLIENTE", "ADMIN")
+                        // Establecimientos:
+                        .requestMatchers("/establecimientos").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
+                        .requestMatchers(HttpMethod.GET, "/api/establecimientos/**").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
+                        .requestMatchers("/api/establecimientos/**").hasRole("ADMIN")
 
+                        // Turnos accesibles para todos los roles
+                        .requestMatchers("/turnos", "/api/turnos/**").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
+
+                        // Acceso a módulos comunes
+                        .requestMatchers("/sucursales", "/api/sucursales/**").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
+                        .requestMatchers("/servicios", "/api/servicios/**").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
+                        .requestMatchers("/especialidades", "/api/especialidades/**").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
+
+                        // Cualquier otro recurso requiere autenticación
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

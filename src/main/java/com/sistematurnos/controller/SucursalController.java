@@ -5,8 +5,9 @@ import com.sistematurnos.entity.Especialidad;
 import com.sistematurnos.entity.Sucursal;
 import com.sistematurnos.service.SucursalService;
 import com.sistematurnos.service.DiasDeAtencionService;
-
 import com.sistematurnos.service.EspecialidadService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/sucursales")
+@Tag(name = "Sucursales", description = "Gestión de sucursales y sus relaciones")
 public class SucursalController {
 
     @Autowired
@@ -26,11 +28,13 @@ public class SucursalController {
     @Autowired
     private DiasDeAtencionService diasDeAtencionService;
 
+    @Operation(summary = "Listar todas las sucursales")
     @GetMapping
     public List<Sucursal> listarSucursales() {
         return sucursalService.traerSucursales();
     }
 
+    @Operation(summary = "Obtener sucursal por ID")
     @GetMapping("/{id}")
     public ResponseEntity<Sucursal> obtenerPorId(@PathVariable int id) {
         try {
@@ -40,6 +44,7 @@ public class SucursalController {
         }
     }
 
+    @Operation(summary = "Crear una nueva sucursal")
     @PostMapping
     public ResponseEntity<Sucursal> crear(@RequestBody Sucursal sucursal) {
         try {
@@ -49,6 +54,7 @@ public class SucursalController {
         }
     }
 
+    @Operation(summary = "Modificar una sucursal existente")
     @PutMapping("/{id}")
     public ResponseEntity<Sucursal> modificar(@PathVariable int id, @RequestBody Sucursal sucursal) {
         try {
@@ -59,6 +65,7 @@ public class SucursalController {
         }
     }
 
+    @Operation(summary = "Eliminar (baja lógica) una sucursal")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable int id) {
         try {
@@ -69,6 +76,7 @@ public class SucursalController {
         }
     }
 
+    @Operation(summary = "Asociar especialidad a una sucursal")
     @PostMapping("/{idSucursal}/especialidades")
     public ResponseEntity<Void> asociarEspecialidad(
             @PathVariable int idSucursal,
@@ -82,6 +90,7 @@ public class SucursalController {
         }
     }
 
+    @Operation(summary = "Remover especialidad de una sucursal")
     @DeleteMapping("/{idSucursal}/especialidades")
     public ResponseEntity<Void> removerEspecialidad(
             @PathVariable int idSucursal,
@@ -95,6 +104,7 @@ public class SucursalController {
         }
     }
 
+    @Operation(summary = "Asociar día de atención a una sucursal")
     @PostMapping("/{idSucursal}/dias-atencion/{idDia}")
     public ResponseEntity<Void> asociarDiaDeAtencion(
             @PathVariable int idSucursal,
@@ -107,6 +117,7 @@ public class SucursalController {
         }
     }
 
+    @Operation(summary = "Remover día de atención de una sucursal")
     @DeleteMapping("/{idSucursal}/dias-atencion/{idDia}")
     public ResponseEntity<Void> removerDiaDeAtencion(
             @PathVariable int idSucursal,
@@ -118,5 +129,4 @@ public class SucursalController {
             return ResponseEntity.badRequest().build();
         }
     }
-
 }
