@@ -1,10 +1,9 @@
 package com.sistematurnos.controller;
 
 import com.sistematurnos.entity.Cliente;
-import com.sistematurnos.service.ClienteService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import com.sistematurnos.service.IClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,7 @@ import java.util.List;
 public class ClienteController {
 
     @Autowired
-    private ClienteService clienteService;
+    private IClienteService clienteService;
 
     @Operation(summary = "Listar todos los clientes activos")
     @GetMapping
