@@ -65,26 +65,4 @@ public class EstablecimientoController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    @Operation(summary = "Asociar sucursal a establecimiento")
-    @PostMapping("/{idEst}/sucursales/{idSuc}")
-    public ResponseEntity<Void> asociarSucursal(@PathVariable int idEst, @PathVariable int idSuc) {
-        try {
-            establecimientoService.asociarSucursalAEstablecimiento(idEst, idSuc);
-            return ResponseEntity.ok().build();
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @Operation(summary = "Remover sucursal de establecimiento")
-    @DeleteMapping("/{idEst}/sucursales/{idSuc}")
-    public ResponseEntity<Void> removerSucursal(@PathVariable int idEst, @PathVariable int idSuc) {
-        try {
-            establecimientoService.removerSucursalDeEstablecimiento(idEst, idSuc);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
 }

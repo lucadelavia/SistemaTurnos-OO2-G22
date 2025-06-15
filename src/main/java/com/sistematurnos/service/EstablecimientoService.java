@@ -68,26 +68,4 @@ public class EstablecimientoService {
         return establecimientoRepository.findAll();
     }
 
-    public void asociarSucursalAEstablecimiento(int idEst, int idSuc) {
-        Establecimiento est = traer(idEst);
-        Sucursal suc = sucursalService.traer(idSuc);
-        if (!est.getSucursales().contains(suc)) {
-            est.getSucursales().add(suc);
-        }
-        suc.setEstablecimiento(est);
-        establecimientoRepository.save(est);
-        sucursalService.guardar(suc);
-    }
-
-    public void removerSucursalDeEstablecimiento(int idEst, int idSuc) {
-        Establecimiento est = traer(idEst);
-        Sucursal suc = sucursalService.traer(idSuc);
-        if (!est.getSucursales().contains(suc)) {
-            throw new IllegalStateException("La sucursal no pertenece a ese establecimiento");
-        }
-        est.getSucursales().remove(suc);
-        suc.setEstablecimiento(null);
-        establecimientoRepository.save(est);
-        sucursalService.guardar(suc);
-    }
 }
