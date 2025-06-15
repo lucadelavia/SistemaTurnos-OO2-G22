@@ -1,7 +1,7 @@
 package com.sistematurnos.controller;
 
 import com.sistematurnos.entity.DiasDeAtencion;
-import com.sistematurnos.service.DiasDeAtencionService;
+import com.sistematurnos.service.IDiasDeAtencionService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import java.util.List;
 public class DiasDeAtencionController {
 
     @Autowired
-    private DiasDeAtencionService diasDeAtencionService;
+    private IDiasDeAtencionService diasDeAtencionService;
 
     @Operation(summary = "Listar todos los días de atención")
     @GetMapping
