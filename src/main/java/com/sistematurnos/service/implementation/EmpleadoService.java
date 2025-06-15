@@ -1,4 +1,14 @@
-package com.sistematurnos.service;
+package com.sistematurnos.service.implementation;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import com.sistematurnos.entity.Empleado;
 import com.sistematurnos.entity.Especialidad;
@@ -6,17 +16,10 @@ import com.sistematurnos.entity.RolUsuario;
 import com.sistematurnos.exception.EmpleadoNoEncontradoException;
 import com.sistematurnos.repository.IEmpleadoRepository;
 import com.sistematurnos.repository.IEspecialidadRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.sistematurnos.service.IEmpleadoService;
 
 @Service
-public class EmpleadoService {
+public class EmpleadoService implements IEmpleadoService{
 
     @Autowired
     private IEmpleadoRepository empleadoRepository;
@@ -27,8 +30,9 @@ public class EmpleadoService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Override
     public Empleado altaEmpleado(String nombre, String apellido, String email, String direccion,
-                                 int dni, boolean estado, LocalDateTime fechaAlta, long cuil, String matricula, String password) {
+                                int dni, boolean estado, LocalDateTime fechaAlta, long cuil, String matricula, String password) {
 
         if (empleadoRepository.findByDni(dni).isPresent()) {
             throw new EmpleadoNoEncontradoException("ERROR: Ya existe un empleado con ese DNI");
@@ -54,7 +58,7 @@ public class EmpleadoService {
         return empleadoRepository.save(empleado);
     }
 
-
+    @Override
     public Empleado altaEmpleado(Empleado empleado) {
         if (empleadoRepository.findByDni(empleado.getDni()).isPresent()) {
             throw new EmpleadoNoEncontradoException("ERROR: Ya existe un empleado con ese DNI");
@@ -67,6 +71,7 @@ public class EmpleadoService {
         return empleadoRepository.save(empleado);
     }
 
+    @Override
     public Empleado altaEmpleadoConEspecialidades(Empleado empleado) {
         empleado.setEstado(true);
         empleado.setFechaAlta(LocalDateTime.now());
@@ -83,21 +88,25 @@ public class EmpleadoService {
         return empleadoRepository.save(empleado);
     }
 
+    @Override
     public Empleado obtenerEmpleadoPorId(int id) {
         return empleadoRepository.findById(id)
                 .orElseThrow(() -> new EmpleadoNoEncontradoException("ERROR: No existe el empleado solicitado con ID " + id));
     }
 
+    @Override
     public Empleado obtenerEmpleadoPorCuil(long cuil) {
         return empleadoRepository.findByCuil(cuil)
                 .orElseThrow(() -> new EmpleadoNoEncontradoException("ERROR: No existe el empleado solicitado con CUIL " + cuil));
     }
 
+    @Override
     public Empleado obtenerEmpleadoPorMatricula(String matricula) {
         return empleadoRepository.findByMatricula(matricula)
                 .orElseThrow(() -> new EmpleadoNoEncontradoException("No existe un empleado con la matrícula: " + matricula));
     }
 
+    @Override
     public Empleado modificarEmpleado(Empleado e) {
         Empleado actual = obtenerEmpleadoPorId(e.getId());
 
@@ -119,6 +128,7 @@ public class EmpleadoService {
         return empleadoRepository.save(actual);
     }
 
+    @Override
     public void bajaEmpleado(int id) {
         Empleado empleado = empleadoRepository.findById(id)
                 .orElseThrow(() -> new EmpleadoNoEncontradoException("Empleado no encontrado con ID " + id));
@@ -126,6 +136,7 @@ public class EmpleadoService {
         empleadoRepository.save(empleado);
     }
 
+    @Override
     public void asignarEspecialidad(int idEmpleado, Especialidad esp) {
         Empleado e = obtenerEmpleadoPorId(idEmpleado);
         Especialidad especialidad = especialidadRepository.findById(esp.getId())
@@ -137,6 +148,7 @@ public class EmpleadoService {
         }
     }
 
+    @Override
     public void removerEspecialidad(int idEmpleado, Especialidad esp) {
         Empleado e = obtenerEmpleadoPorId(idEmpleado);
         Especialidad especialidad = especialidadRepository.findById(esp.getId())
@@ -148,6 +160,7 @@ public class EmpleadoService {
         }
     }
 
+    @Override
     public List<Empleado> traerEmpleados() {
         return empleadoRepository.findByEstadoTrue();
     }
