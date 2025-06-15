@@ -1,5 +1,6 @@
 package com.sistematurnos.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sistematurnos.entity.enums.Rol;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,6 +21,7 @@ public class Empleado extends Usuario {
     private long cuil;
     private String matricula;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
             name = "empleado_especialidad",

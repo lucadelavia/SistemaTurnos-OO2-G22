@@ -28,6 +28,11 @@ public class EspecialidadService {
         return especialidadRepository.save(e);
     }
 
+    public Especialidad obtenerPorId(int id) {
+        return especialidadRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No existe la especialidad con ID: " + id));
+    }
+
     public void bajaEspecialidad(int id) {
         Especialidad actual = especialidadRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: No existe especialidad con ID: " + id));

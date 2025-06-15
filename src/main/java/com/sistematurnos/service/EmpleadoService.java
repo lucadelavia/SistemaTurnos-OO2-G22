@@ -9,6 +9,7 @@ import com.sistematurnos.repository.IEspecialidadRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.sistematurnos.entity.Servicio;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -62,6 +63,20 @@ public class EmpleadoService {
         return empleadoRepository.save(empleado);
     }
 
+    @Autowired
+    private ServicioService servicioService;
+
+    public List<Empleado> buscarPorServicio(int idServicio) {
+        Servicio servicio = servicioService.obtenerServicioPorId(idServicio);
+
+        Especialidad especialidad = servicio.getEspecialidad();
+        if (especialidad == null) {
+            throw new IllegalArgumentException("ERROR: El servicio no tiene especialidad asignada.");
+        }
+
+        return empleadoRepository.findByLstEspecialidadesContaining(especialidad);
+    }
+
     public Empleado obtenerEmpleadoPorId(int id) {
         return empleadoRepository.findById(id)
                 .orElseThrow(() -> new EmpleadoNoEncontradoException("ERROR: No existe el empleado solicitado con ID " + id));
@@ -75,6 +90,12 @@ public class EmpleadoService {
     public Empleado obtenerEmpleadoPorMatricula(String matricula) {
         return empleadoRepository.findByMatricula(matricula)
                 .orElseThrow(() -> new EmpleadoNoEncontradoException("No existe un empleado con la matrícula: " + matricula));
+    }
+
+    public List<Empleado> buscarPorEspecialidad(int idEspecialidad) {
+        Especialidad especialidad = especialidadRepository.findById(idEspecialidad)
+                .orElseThrow(() -> new IllegalArgumentException("Especialidad no encontrada con ID " + idEspecialidad));
+        return empleadoRepository.findByLstEspecialidadesContaining(especialidad);
     }
 
     public Empleado modificarEmpleado(Empleado e) {
@@ -129,4 +150,5 @@ public class EmpleadoService {
     public List<Empleado> traerEmpleados() {
         return empleadoRepository.findByEstadoTrue();
     }
+
 }

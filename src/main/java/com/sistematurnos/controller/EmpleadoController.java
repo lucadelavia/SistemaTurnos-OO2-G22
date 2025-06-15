@@ -25,6 +25,17 @@ public class EmpleadoController {
         return empleadoService.traerEmpleados();
     }
 
+    @Operation(summary = "Listar empleados que pueden realizar un servicio (por especialidad)")
+    @GetMapping("/servicio/{idServicio}")
+    public ResponseEntity<List<Empleado>> empleadosPorServicio(@PathVariable int idServicio) {
+        try {
+            List<Empleado> empleados = empleadoService.buscarPorServicio(idServicio);
+            return ResponseEntity.ok(empleados);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @Operation(summary = "Buscar empleado por ID")
     @GetMapping("/{id}")
     public ResponseEntity<Empleado> obtenerPorId(@PathVariable int id) {
@@ -52,6 +63,17 @@ public class EmpleadoController {
             return ResponseEntity.ok(empleadoService.obtenerEmpleadoPorMatricula(matricula));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Operation(summary = "Listar empleados por especialidad")
+    @GetMapping("/especialidad/{idEspecialidad}")
+    public ResponseEntity<List<Empleado>> empleadosPorEspecialidad(@PathVariable int idEspecialidad) {
+        try {
+            List<Empleado> empleados = empleadoService.buscarPorEspecialidad(idEspecialidad);
+            return ResponseEntity.ok(empleados);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 

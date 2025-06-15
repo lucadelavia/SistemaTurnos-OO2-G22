@@ -44,6 +44,13 @@ public class ServicioController {
         }
     }
 
+    @Operation(summary = "Listar servicios por especialidad")
+    @GetMapping("/especialidad/{idEspecialidad}")
+    public ResponseEntity<List<Servicio>> serviciosPorEspecialidad(@PathVariable int idEspecialidad) {
+        List<Servicio> servicios = servicioService.buscarPorEspecialidad(idEspecialidad);
+        return ResponseEntity.ok(servicios);
+    }
+
     @Operation(summary = "Crear un nuevo servicio")
     @PostMapping
     public ResponseEntity<Servicio> crear(@RequestBody Servicio servicio) {

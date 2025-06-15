@@ -30,18 +30,20 @@ public class SecurityConfig {
                                 "/v3/api-docs/**"
                         ).permitAll()
 
-                        // Acceso general
+                        // Página principal
                         .requestMatchers("/inicio").authenticated()
 
-                        // Permitir GET para cliente y empleado según su rol
-                        .requestMatchers(HttpMethod.GET, "/api/clientes/**").hasAnyRole("ADMIN", "CLIENTE")
-                        .requestMatchers(HttpMethod.GET, "/api/empleados/**").hasAnyRole("ADMIN", "EMPLEADO")
+                        // 🔒 Obtener datos del usuario autenticado
+                        .requestMatchers("/api/usuario/me").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
 
-                        // Solo admin puede modificar clientes y empleados
+                        // Clientes: lectura para admin y cliente
+                        .requestMatchers(HttpMethod.GET, "/api/clientes/**").hasAnyRole("ADMIN", "CLIENTE")
                         .requestMatchers(HttpMethod.POST, "/api/clientes/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/clientes/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/clientes/**").hasRole("ADMIN")
 
+                        // Empleados: lectura para admin y empleado
+                        .requestMatchers(HttpMethod.GET, "/api/empleados/**").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
                         .requestMatchers(HttpMethod.POST, "/api/empleados/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/empleados/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/empleados/**").hasRole("ADMIN")
@@ -51,15 +53,15 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/establecimientos/**").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
                         .requestMatchers("/api/establecimientos/**").hasRole("ADMIN")
 
-                        // Turnos accesibles para todos los roles
+                        // Turnos
                         .requestMatchers("/turnos", "/api/turnos/**").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
 
-                        // Acceso a módulos comunes
+                        // Sucursales, servicios, especialidades
                         .requestMatchers("/sucursales", "/api/sucursales/**").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
                         .requestMatchers("/servicios", "/api/servicios/**").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
                         .requestMatchers("/especialidades", "/api/especialidades/**").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
 
-                        // Cualquier otro recurso requiere autenticación
+                        // Cualquier otra ruta necesita autenticación
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

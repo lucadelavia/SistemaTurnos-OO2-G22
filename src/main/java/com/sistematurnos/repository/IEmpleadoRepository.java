@@ -2,6 +2,7 @@ package com.sistematurnos.repository;
 
 import com.sistematurnos.entity.Empleado;
 import org.springframework.data.jpa.repository.JpaRepository;
+import com.sistematurnos.entity.Especialidad;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +13,6 @@ public interface IEmpleadoRepository extends JpaRepository<Empleado, Integer> {
 	Optional<Empleado> findByCuil(long cuil);
 	Optional<Empleado> findByMatricula(String matricula);
 	List<Empleado> findByEstadoTrue();
-
+	List<Empleado> findByLstEspecialidadesContaining(Especialidad especialidad);
 	List<Empleado> findByLstEspecialidadesNombre(String nombre);
 }

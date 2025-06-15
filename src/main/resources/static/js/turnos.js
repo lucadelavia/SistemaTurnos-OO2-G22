@@ -1,50 +1,48 @@
 const API_BASE = "/api";
-const API_USUARIO = "/auth/usuario";
+const API_USUARIO = `${API_BASE}/usuario/me`;
 const API_TURNOS = `${API_BASE}/turnos`;
 const API_SUCURSALES = `${API_BASE}/sucursales`;
 const API_SERVICIOS = `${API_BASE}/servicios`;
 const API_EMPLEADOS = `${API_BASE}/empleados`;
-const API_CLIENTES = `${API_BASE}/clientes`;
+const API_ESPECIALIDADES = `${API_BASE}/especialidades`;
 
 let usuarioActual = null;
-let clienteActual = null;
-let empleadoActual = null;
+let formTurno = null;
 
 window.addEventListener("DOMContentLoaded", async () => {
   await cargarUsuario();
 
-  // Mostrar el formulario si es cliente o admin
-  if (usuarioActual?.rol === "CLIENTE" || usuarioActual?.rol === "ADMIN") {
+  formTurno = document.querySelector("#reserva-form form");
+
+  if (usuarioActual?.rol === "CLIENTE") {
     document.getElementById("reserva-form").classList.remove("d-none");
+    document.getElementById("cliente").value = usuarioActual.id;
+  } else if (usuarioActual?.rol === "ADMIN") {
+    document.getElementById("reserva-form").classList.remove("d-none");
+    document.getElementById("cliente-group").classList.remove("d-none");
   }
 
-  // Obtener cliente o empleado según el rol
-  if (usuarioActual?.rol === "CLIENTE") {
-    const res = await fetch(`${API_CLIENTES}/${usuarioActual.id}`);
-    if (res.ok) clienteActual = await res.json();
-  }
-
-  if (usuarioActual?.rol === "EMPLEADO") {
-    const res = await fetch(`${API_EMPLEADOS}/${usuarioActual.id}`);
-    if (res.ok) empleadoActual = await res.json();
-  }
-
-  // Ocultar el campo cliente manual si es cliente logueado
-  if (usuarioActual?.rol === "CLIENTE") {
-    const inputCliente = document.getElementById("cliente-group");
-    if (inputCliente) inputCliente.classList.add("d-none");
-  }
-
+  await cargarEspecialidades();
   cargarSucursales();
-  cargarServicios();
-  cargarEmpleados();
   cargarTurnos();
 
   document.getElementById("fecha").addEventListener("change", cargarHorarios);
   document.getElementById("sucursal").addEventListener("change", cargarHorarios);
-  document.getElementById("servicio").addEventListener("change", cargarHorarios);
+  document.getElementById("servicio").addEventListener("change", async () => {
+    const idServicio = document.getElementById("servicio").value;
+    if (!idServicio) return;
+    await cargarEmpleadosPorServicio(idServicio);
+    await cargarHorarios();
+  });
   document.getElementById("empleado").addEventListener("change", cargarHorarios);
-  document.querySelector("#reserva-form form").addEventListener("submit", reservarTurno);
+  document.getElementById("especialidad").addEventListener("change", async () => {
+    const id = document.getElementById("especialidad").value;
+    if (!id) return;
+    await cargarServiciosPorEspecialidad(id);
+    await cargarEmpleadosPorEspecialidad(id);
+  });
+
+  formTurno.addEventListener("submit", reservarTurno);
 });
 
 async function cargarUsuario() {
@@ -56,6 +54,16 @@ async function cargarUsuario() {
   }
 }
 
+async function cargarEspecialidades() {
+  try {
+    const res = await fetch(API_ESPECIALIDADES);
+    const data = await res.json();
+    cargarOptions("especialidad", data, "nombre");
+  } catch (err) {
+    console.error("Error al cargar especialidades", err);
+  }
+}
+
 function cargarSucursales() {
   fetch(API_SUCURSALES)
     .then(res => res.json())
@@ -63,23 +71,43 @@ function cargarSucursales() {
     .catch(err => console.error("Error al cargar sucursales", err));
 }
 
-function cargarServicios() {
-  fetch(API_SERVICIOS)
-    .then(res => res.json())
-    .then(data => cargarOptions("servicio", data, "nombreServicio"))
-    .catch(err => console.error("Error al cargar servicios", err));
+async function cargarServiciosPorEspecialidad(idEspecialidad) {
+  try {
+    const res = await fetch(`${API_SERVICIOS}/especialidad/${idEspecialidad}`);
+    const data = await res.json();
+    cargarOptions("servicio", data, "nombreServicio");
+  } catch (err) {
+    console.error("Error al cargar servicios por especialidad", err);
+  }
 }
 
-function cargarEmpleados() {
-  fetch(API_EMPLEADOS)
-    .then(res => res.json())
-    .then(data => cargarOptions("empleado", data, "nombre"))
-    .catch(err => console.error("Error al cargar empleados", err));
+async function cargarEmpleadosPorEspecialidad(idEspecialidad) {
+  try {
+    const res = await fetch(`${API_EMPLEADOS}/especialidad/${idEspecialidad}`);
+    const data = await res.json();
+    cargarOptions("empleado", data, "nombre");
+  } catch (err) {
+    console.error("Error al cargar empleados por especialidad", err);
+  }
+}
+
+async function cargarEmpleadosPorServicio(idServicio) {
+  try {
+    const res = await fetch(`${API_EMPLEADOS}/servicio/${idServicio}`);
+    const data = await res.json();
+    cargarOptions("empleado", data, "nombre");
+  } catch (err) {
+    console.error("Error al cargar empleados por servicio", err);
+  }
 }
 
 function cargarOptions(selectId, lista, fieldName) {
   const select = document.getElementById(selectId);
   select.innerHTML = '<option value="">Seleccione</option>';
+  if (!Array.isArray(lista)) {
+    console.warn(`Respuesta inesperada en ${selectId}:`, lista);
+    return;
+  }
   lista.forEach(item => {
     const option = document.createElement("option");
     option.value = item.id;
@@ -116,12 +144,11 @@ function reservarTurno(e) {
   e.preventDefault();
 
   const horario = document.getElementById("horario").value;
-
   const turno = {
     fechaHora: new Date(horario).toISOString(),
     estado: true,
     codigo: generarCodigo(),
-    cliente: { id: clienteActual?.id ?? parseInt(document.getElementById("cliente").value) },
+    cliente: { id: parseInt(document.getElementById("cliente").value) },
     empleado: { id: parseInt(document.getElementById("empleado").value) },
     sucursal: { id: parseInt(document.getElementById("sucursal").value) },
     servicio: { id: parseInt(document.getElementById("servicio").value) }
@@ -138,7 +165,7 @@ function reservarTurno(e) {
     })
     .then(() => {
       alert("Turno reservado con éxito");
-      document.getElementById("reserva-form").reset();
+      formTurno.reset();  // ✅ USar la referencia correcta
       document.getElementById("horario").innerHTML = "";
       cargarTurnos();
     })
@@ -153,10 +180,10 @@ function cargarTurnos() {
       tbody.innerHTML = "";
 
       const turnosFiltrados =
-        usuarioActual?.rol === "EMPLEADO" && empleadoActual
-          ? data.filter(t => t.empleado?.id === empleadoActual.id)
-          : usuarioActual?.rol === "CLIENTE" && clienteActual
-          ? data.filter(t => t.cliente?.id === clienteActual.id)
+        usuarioActual?.rol === "EMPLEADO"
+          ? data.filter(t => t.empleado?.id === usuarioActual.id)
+          : usuarioActual?.rol === "CLIENTE"
+          ? data.filter(t => t.cliente?.id === usuarioActual.id)
           : data;
 
       turnosFiltrados.forEach(t => {

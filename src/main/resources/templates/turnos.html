@@ -15,12 +15,10 @@
   <div class="container-fluid">
     <a class="navbar-brand" href="/inicio">
       <img src="img/logo-unla.png" alt="UNLa" width="30" height="30" class="d-inline-block align-text-top"/>
+      UNLa Turnos
     </a>
-    <div class="ms-auto d-flex align-items-center gap-3">
-      <span id="bienvenida" class="text-white small fw-bold"></span>
-      <form action="/logout" method="POST">
-        <button type="submit" class="btn btn-outline-light btn-sm">Cerrar sesión</button>
-      </form>
+    <div class="d-flex">
+      <a class="nav-link text-white" href="/logout">Cerrar Sesión</a>
     </div>
   </div>
 </nav>
@@ -29,14 +27,15 @@
   <h1 class="mb-4 text-center text-granate">Reserva de Turno</h1>
 
   <!-- Formulario -->
-  <div id="reserva-form" class="card mb-5 d-none">
+  <div class="card mb-5 d-none" id="reserva-form-wrapper">
     <div class="card-header bg-granate text-white">Nuevo Turno</div>
     <div class="card-body">
-      <form>
+      <!-- ✅ FORMULARIO con ID CORRECTO -->
+      <form id="reserva-form">
         <div class="row g-3">
           <div class="col-md-6">
-            <label class="form-label">Sucursal</label>
-            <select id="sucursal" class="form-select" required></select>
+            <label class="form-label">Especialidad</label>
+            <select id="especialidad" class="form-select" required></select>
           </div>
           <div class="col-md-6">
             <label class="form-label">Servicio</label>
@@ -45,6 +44,14 @@
           <div class="col-md-6">
             <label class="form-label">Empleado</label>
             <select id="empleado" class="form-select" required></select>
+          </div>
+          <div class="col-md-6" id="cliente-group" style="display: none;">
+            <label class="form-label">Cliente (ID)</label>
+            <input type="number" id="cliente" class="form-control" required/>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Sucursal</label>
+            <select id="sucursal" class="form-select" required></select>
           </div>
           <div class="col-md-6">
             <label class="form-label">Fecha</label>
@@ -78,7 +85,9 @@
           <th>Servicio</th>
         </tr>
         </thead>
-        <tbody id="turnos-tbody"></tbody>
+        <tbody id="turnos-tbody">
+        <!-- Se carga dinámicamente -->
+        </tbody>
       </table>
     </div>
   </div>
