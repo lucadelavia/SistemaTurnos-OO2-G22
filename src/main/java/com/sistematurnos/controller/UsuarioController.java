@@ -1,8 +1,7 @@
 package com.sistematurnos.controller;
 
 import com.sistematurnos.entity.Usuario;
-import com.sistematurnos.service.UsuarioService;
-import io.swagger.v3.oas.annotations.Operation;
+import com.sistematurnos.service.IUsuarioService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class UsuarioController {
 
     @Autowired
-    private UsuarioService usuarioService;
+    private IUsuarioService usuarioService;
 
     @GetMapping("/me")
     public ResponseEntity<Usuario> getMe(Authentication authentication) {
