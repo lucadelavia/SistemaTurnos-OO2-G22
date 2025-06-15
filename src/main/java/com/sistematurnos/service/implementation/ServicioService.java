@@ -7,20 +7,27 @@ import org.springframework.stereotype.Service;
 
 import com.sistematurnos.entity.Servicio;
 import com.sistematurnos.repository.IServicioRepository;
+import com.sistematurnos.service.IEspecialidadService;
 import com.sistematurnos.service.IServicioService;
+import com.sistematurnos.entity.Especialidad;
 
 @Service
 public class ServicioService implements IServicioService{
     @Autowired
     private IServicioRepository servicioRepository;
 
+    @Autowired
+    private IEspecialidadService especialidadService;
+
     @Override
-    public Servicio altaServicio(String nombreServicio, int duracion) {
+    public Servicio altaServicio(String nombreServicio, int duracion, int idEspecialidad) {
         if (servicioRepository.findByNombreServicio(nombreServicio).isPresent()) {
             throw new IllegalArgumentException("Este Servicio ya existe.");
         }
-        Servicio s = new Servicio(nombreServicio, duracion);
-        return servicioRepository.save(s);
+
+        Especialidad especialidad = especialidadService.obtenerEspecialidadPorId(idEspecialidad);
+        Servicio servicio = new Servicio(nombreServicio, duracion, especialidad);
+        return servicioRepository.save(servicio);
     }
 
     @Override
@@ -61,5 +68,10 @@ public class ServicioService implements IServicioService{
     @Override
     public List<Servicio> traerServicios() {
         return servicioRepository.findByEstadoTrue();
+    }
+
+    @Override
+    public List<Servicio> buscarPorEspecialidad(int idEspecialidad) {
+        return servicioRepository.findByEspecialidadId(idEspecialidad);
     }
 }

@@ -5,8 +5,8 @@ import com.sistematurnos.dtos.response.ServicioResponse;
 import com.sistematurnos.dtos.mapper.ServicioMapper;
 import com.sistematurnos.entity.Especialidad;
 import com.sistematurnos.entity.Servicio;
-import com.sistematurnos.service.EspecialidadService;
-import com.sistematurnos.service.ServicioService;
+import com.sistematurnos.service.IEspecialidadService;
+import com.sistematurnos.service.IServicioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +22,10 @@ import java.util.stream.Collectors;
 public class ServicioController {
 
     @Autowired
-    private ServicioService servicioService;
+    private IServicioService servicioService;
 
     @Autowired
-    private EspecialidadService especialidadService;
+    private IEspecialidadService especialidadService;
 
     @Operation(summary = "Listar todos los servicios")
     @GetMapping
