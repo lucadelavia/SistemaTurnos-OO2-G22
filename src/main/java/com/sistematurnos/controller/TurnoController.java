@@ -1,7 +1,11 @@
 package com.sistematurnos.controller;
 
 import com.sistematurnos.entity.Turno;
+<<<<<<< HEAD
 import com.sistematurnos.service.ITurnoService;
+=======
+import com.sistematurnos.service.TurnoService;
+>>>>>>> 99f4d3c (Version Funcional Spring Security)
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +20,11 @@ import java.util.List;
 public class TurnoController {
 
     @Autowired
+<<<<<<< HEAD
     private ITurnoService turnoService;
+=======
+    private TurnoService turnoService;
+>>>>>>> 99f4d3c (Version Funcional Spring Security)
 
     @GetMapping
     public List<Turno> listarTurnos() {
