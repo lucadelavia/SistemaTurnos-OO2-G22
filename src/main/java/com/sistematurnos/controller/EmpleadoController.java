@@ -2,7 +2,7 @@ package com.sistematurnos.controller;
 
 import com.sistematurnos.entity.Empleado;
 import com.sistematurnos.entity.Especialidad;
-import com.sistematurnos.service.EmpleadoService;
+import com.sistematurnos.service.IEmpleadoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +14,7 @@ import java.util.List;
 public class EmpleadoController {
 
     @Autowired
-    private EmpleadoService empleadoService;
+    private IEmpleadoService empleadoService;
 
     @GetMapping
     public List<Empleado> listarEmpleados() {
