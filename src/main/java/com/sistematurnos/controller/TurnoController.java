@@ -1,7 +1,7 @@
 package com.sistematurnos.controller;
 
 import com.sistematurnos.entity.Turno;
-import com.sistematurnos.service.TurnoService;
+import com.sistematurnos.service.ITurnoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,7 +20,7 @@ import java.util.List;
 public class TurnoController {
 
     @Autowired
-    private TurnoService turnoService;
+    private ITurnoService turnoService;
 
     @Operation(summary = "Listar todos los turnos")
     @GetMapping
