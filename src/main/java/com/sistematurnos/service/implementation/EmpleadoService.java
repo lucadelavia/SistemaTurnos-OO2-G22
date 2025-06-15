@@ -2,11 +2,14 @@ package com.sistematurnos.service.implementation;
 
 import com.sistematurnos.entity.Empleado;
 import com.sistematurnos.entity.Especialidad;
+import com.sistematurnos.entity.Servicio;
 import com.sistematurnos.entity.enums.Rol; 
 import com.sistematurnos.exception.EmpleadoNoEncontradoException;
 import com.sistematurnos.repository.IEmpleadoRepository;
 import com.sistematurnos.repository.IEspecialidadRepository;
 import com.sistematurnos.service.IEmpleadoService;
+import com.sistematurnos.service.IServicioService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,9 @@ public class EmpleadoService implements IEmpleadoService {
 
     @Autowired
     private IEspecialidadRepository especialidadRepository;
+
+    @Autowired
+    private IServicioService servicioService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -102,6 +108,23 @@ public class EmpleadoService implements IEmpleadoService {
     public Empleado obtenerEmpleadoPorMatricula(String matricula) {
         return empleadoRepository.findByMatricula(matricula)
                 .orElseThrow(() -> new EmpleadoNoEncontradoException("No existe un empleado con la matrícula: " + matricula));
+    }
+    
+    public List<Empleado> buscarPorServicio(int idServicio) {
+        Servicio servicio = servicioService.obtenerServicioPorId(idServicio);
+
+        Especialidad especialidad = servicio.getEspecialidad();
+        if (especialidad == null) {
+            throw new IllegalArgumentException("ERROR: El servicio no tiene especialidad asignada.");
+        }
+
+        return empleadoRepository.findByLstEspecialidadesContaining(especialidad);
+    }
+    
+    public List<Empleado> buscarPorEspecialidad(int idEspecialidad) {
+        Especialidad especialidad = especialidadRepository.findById(idEspecialidad)
+                .orElseThrow(() -> new IllegalArgumentException("Especialidad no encontrada con ID " + idEspecialidad));
+        return empleadoRepository.findByLstEspecialidadesContaining(especialidad);
     }
 
     @Override

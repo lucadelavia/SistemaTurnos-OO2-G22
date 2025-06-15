@@ -2,7 +2,7 @@ package com.sistematurnos.controller;
 
 import com.sistematurnos.entity.Empleado;
 import com.sistematurnos.entity.Especialidad;
-import com.sistematurnos.service.EmpleadoService;
+import com.sistematurnos.service.IEmpleadoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import java.util.List;
 public class EmpleadoController {
 
     @Autowired
-    private EmpleadoService empleadoService;
+    private IEmpleadoService empleadoService;
 
     @Operation(summary = "Listar todos los empleados")
     @GetMapping

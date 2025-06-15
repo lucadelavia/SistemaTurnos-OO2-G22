@@ -21,6 +21,10 @@ public interface IEmpleadoService {
     public Empleado obtenerEmpleadoPorCuil(long cuil);
 
     public Empleado obtenerEmpleadoPorMatricula(String matricula);
+    
+    public List<Empleado> buscarPorServicio(int idServicio);
+    
+    public List<Empleado> buscarPorEspecialidad(int idEspecialidad);
 
     public Empleado modificarEmpleado(Empleado e);
 
