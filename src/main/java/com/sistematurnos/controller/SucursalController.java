@@ -3,9 +3,9 @@ package com.sistematurnos.controller;
 import com.sistematurnos.entity.DiasDeAtencion;
 import com.sistematurnos.entity.Especialidad;
 import com.sistematurnos.entity.Sucursal;
-import com.sistematurnos.service.SucursalService;
-import com.sistematurnos.service.DiasDeAtencionService;
-import com.sistematurnos.service.EspecialidadService;
+import com.sistematurnos.service.ISucursalService;
+import com.sistematurnos.service.IDiasDeAtencionService;
+import com.sistematurnos.service.IEspecialidadService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +20,10 @@ import java.util.List;
 public class SucursalController {
 
     @Autowired
-    private SucursalService sucursalService;
+    private ISucursalService sucursalService;
 
     @Autowired
-    private EspecialidadService especialidadService;
+    private IEspecialidadService especialidadService;
 
     @Autowired
     private DiasDeAtencionService diasDeAtencionService;
