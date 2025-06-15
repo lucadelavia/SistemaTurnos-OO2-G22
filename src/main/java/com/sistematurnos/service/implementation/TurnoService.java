@@ -19,7 +19,7 @@ import com.sistematurnos.entity.Sucursal;
 import com.sistematurnos.entity.Turno;
 import com.sistematurnos.exception.TurnoNoEncontradoException;
 import com.sistematurnos.repository.ITurnoRepository;
-import com.sistematurnos.service.EmailService;
+import com.sistematurnos.service.IEmailService;
 import com.sistematurnos.service.IClienteService;
 import com.sistematurnos.service.IEmpleadoService;
 import com.sistematurnos.service.IServicioService;
@@ -44,7 +44,7 @@ public class TurnoService implements ITurnoService{
     private IClienteService clienteService;
 
     @Autowired
-    private EmailService emailService;
+    private IEmailService emailService;
 
     @Override
     public Turno altaTurno(LocalDateTime fechaHora, boolean estadoActivo, String codigo,
