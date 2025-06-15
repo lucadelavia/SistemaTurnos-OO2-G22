@@ -1,7 +1,7 @@
 package com.sistematurnos.controller;
 
 import com.sistematurnos.entity.Especialidad;
-import com.sistematurnos.service.EspecialidadService;
+import com.sistematurnos.service.IEspecialidadService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import java.util.List;
 public class EspecialidadController {
 
     @Autowired
-    private EspecialidadService especialidadService;
+    private IEspecialidadService especialidadService;
 
     @Operation(summary = "Listar todas las especialidades")
     @GetMapping
