@@ -1,4 +1,4 @@
-package com.sistematurnos.service;
+package com.sistematurnos.service.implementation;
 
 import com.sistematurnos.entity.Usuario;
 import com.sistematurnos.repository.IUsuarioRepository;
@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.User;
 
 @Service
-public class UsuarioDetailsService implements UserDetailsService {
+public class IUsuarioDetailsService implements UserDetailsService {
 
     private final IUsuarioRepository usuarioRepository;
 
-    public UsuarioDetailsService(IUsuarioRepository usuarioRepository) {
+    public IUsuarioDetailsService(IUsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
     }
 
