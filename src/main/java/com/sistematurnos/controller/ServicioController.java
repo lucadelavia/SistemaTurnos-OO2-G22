@@ -1,7 +1,7 @@
 package com.sistematurnos.controller;
 
 import com.sistematurnos.entity.Servicio;
-import com.sistematurnos.service.ServicioService;
+import com.sistematurnos.service.IServicioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import java.util.List;
 public class ServicioController {
 
     @Autowired
-    private ServicioService servicioService;
+    private IServicioService servicioService;
 
     @Operation(summary = "Listar todos los servicios")
     @GetMapping
