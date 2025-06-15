@@ -3,7 +3,7 @@ package com.sistematurnos.controller;
 import com.sistematurnos.dtos.response.UsuarioResponse;
 import com.sistematurnos.dtos.mapper.UsuarioMapper;
 import com.sistematurnos.entity.Usuario;
-import com.sistematurnos.service.UsuarioService;
+import com.sistematurnos.service.IUsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class UsuarioController {
 
     @Autowired
-    private UsuarioService usuarioService;
+    private IUsuarioService usuarioService;
 
     @Operation(summary = "Obtener datos del usuario autenticado")
     @GetMapping("/me")

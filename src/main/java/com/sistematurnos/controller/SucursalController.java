@@ -4,9 +4,8 @@ import com.sistematurnos.dtos.mapper.SucursalMapper;
 import com.sistematurnos.dtos.response.SucursalResponse;
 import com.sistematurnos.entity.Especialidad;
 import com.sistematurnos.entity.Sucursal;
-import com.sistematurnos.service.DiasDeAtencionService;
-import com.sistematurnos.service.EspecialidadService;
-import com.sistematurnos.service.SucursalService;
+import com.sistematurnos.service.IEspecialidadService;
+import com.sistematurnos.service.ISucursalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +21,10 @@ import java.util.stream.Collectors;
 public class SucursalController {
 
     @Autowired
-    private SucursalService sucursalService;
+    private ISucursalService sucursalService;
 
     @Autowired
-    private EspecialidadService especialidadService;
-
-    @Autowired
-    private DiasDeAtencionService diasDeAtencionService;
+    private IEspecialidadService especialidadService;
 
     @Operation(summary = "Listar todas las sucursales")
     @GetMapping

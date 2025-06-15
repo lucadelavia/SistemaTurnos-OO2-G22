@@ -22,11 +22,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/turnos")
 public class TurnoController {
 
-    @Autowired private TurnoService turnoService;
-    @Autowired private ClienteService clienteService;
-    @Autowired private EmpleadoService empleadoService;
-    @Autowired private SucursalService sucursalService;
-    @Autowired private ServicioService servicioService;
+    @Autowired private ITurnoService turnoService;
+    @Autowired private IClienteService clienteService;
+    @Autowired private IEmpleadoService empleadoService;
+    @Autowired private ISucursalService sucursalService;
+    @Autowired private IServicioService servicioService;
 
     @Operation(summary = "Listar todos los turnos")
     @GetMapping

@@ -4,7 +4,7 @@ import com.sistematurnos.dtos.mapper.EstablecimientoMapper;
 import com.sistematurnos.dtos.request.EstablecimientoRequest;
 import com.sistematurnos.dtos.response.EstablecimientoResponse;
 import com.sistematurnos.entity.Establecimiento;
-import com.sistematurnos.service.EstablecimientoService;
+import com.sistematurnos.service.IEstablecimientoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class EstablecimientoController {
 
     @Autowired
-    private EstablecimientoService establecimientoService;
+    private IEstablecimientoService establecimientoService;
 
     @Operation(summary = "Listar todos los establecimientos")
     @GetMapping

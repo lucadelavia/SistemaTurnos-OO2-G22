@@ -4,7 +4,7 @@ import com.sistematurnos.dtos.request.ClienteRequest;
 import com.sistematurnos.dtos.response.ClienteResponse;
 import com.sistematurnos.dtos.mapper.ClienteMapper;
 import com.sistematurnos.entity.Cliente;
-import com.sistematurnos.service.ClienteService;
+import com.sistematurnos.service.IClienteService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import java.util.List;
 public class ClienteController {
 
     @Autowired
-    private ClienteService clienteService;
+    private IClienteService clienteService;
 
     @Operation(summary = "Listar todos los clientes activos")
     @GetMapping
