@@ -1,21 +1,10 @@
 const API_EMPLEADOS = "/api/empleados";
 const API_ESPECIALIDADES = "/api/especialidades";
-<<<<<<< HEAD
-=======
 const API_ROL = "/auth/rol";
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 
 const form = document.getElementById("empleado-form");
 const tbody = document.getElementById("empleados-tbody");
 const especialidadesContainer = document.getElementById("especialidades-container");
-<<<<<<< HEAD
-
-let editando = false;
-let idEditando = null;
-
-// Cargar empleados y especialidades al iniciar
-window.addEventListener("DOMContentLoaded", async () => {
-=======
 const formCard = document.querySelector(".card.mb-5");
 
 let editando = false;
@@ -25,14 +14,10 @@ let esAdmin = false;
 // Inicializar
 window.addEventListener("DOMContentLoaded", async () => {
   await verificarRol();
->>>>>>> 99f4d3c (Version Funcional Spring Security)
   await cargarEspecialidades();
   await cargarEmpleados();
 });
 
-<<<<<<< HEAD
-// Envío del formulario
-=======
 // 🔐 Verificar rol del usuario
 async function verificarRol() {
   try {
@@ -52,7 +37,6 @@ async function verificarRol() {
 }
 
 // 📤 Enviar formulario
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -94,40 +78,6 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-<<<<<<< HEAD
-// Cargar empleados
-async function cargarEmpleados() {
-  tbody.innerHTML = "";
-  const res = await fetch(API_EMPLEADOS);
-  const empleados = await res.json();
-
-  empleados.forEach((e) => {
-    const fila = document.createElement("tr");
-    fila.innerHTML = `
-      <td>${e.id}</td>
-      <td>${e.nombre}</td>
-      <td>${e.apellido}</td>
-      <td>${e.email}</td>
-      <td>${e.direccion}</td>
-      <td>${e.dni}</td>
-      <td>${e.cuil}</td>
-      <td>${e.matricula ?? "-"}</td>
-      <td>${e.lstEspecialidades?.map(es => es.nombre).join(", ") || "-"}</td>
-      <td>${e.estado ? "Activo" : "Inactivo"}</td>
-      <td>${e.fechaAlta ? e.fechaAlta.split("T")[0] : ""}</td>
-      <td>
-        <button class="btn btn-sm btn-warning" onclick="editarEmpleado(${e.id})">✏️</button>
-        <button class="btn btn-sm btn-danger" onclick="darBajaEmpleado(${e.id})">🗑️</button>
-      </td>
-    `;
-    tbody.appendChild(fila);
-  });
-}
-
-// Dar de baja lógico
-async function darBajaEmpleado(id) {
-  if (confirm("¿Estás seguro de dar de baja este empleado?")) {
-=======
 // 📥 Cargar empleados
 async function cargarEmpleados() {
   try {
@@ -170,7 +120,6 @@ async function darBajaEmpleado(id) {
   if (!confirm("¿Estás seguro de dar de baja este empleado?")) return;
 
   try {
->>>>>>> 99f4d3c (Version Funcional Spring Security)
     const res = await fetch(`${API_EMPLEADOS}/${id}`);
     const empleado = await res.json();
     empleado.estado = false;
@@ -182,43 +131,6 @@ async function darBajaEmpleado(id) {
     });
 
     await cargarEmpleados();
-<<<<<<< HEAD
-  }
-}
-
-// Editar
-async function editarEmpleado(id) {
-  const res = await fetch(`${API_EMPLEADOS}/${id}`);
-  const e = await res.json();
-
-  form.nombre.value = e.nombre;
-  form.apellido.value = e.apellido;
-  form.email.value = e.email;
-  form.direccion.value = e.direccion;
-  form.dni.value = e.dni;
-  form.cuil.value = e.cuil;
-  form.matricula.value = e.matricula ?? "";
-
-  document.querySelectorAll("input[name='especialidades']").forEach((checkbox) => {
-    checkbox.checked = e.lstEspecialidades?.some(es => es.id === parseInt(checkbox.value)) || false;
-  });
-
-  editando = true;
-  idEditando = id;
-}
-
-// Cargar especialidades
-async function cargarEspecialidades() {
-  const res = await fetch(API_ESPECIALIDADES);
-  const especialidades = await res.json();
-
-  especialidadesContainer.innerHTML = especialidades.map(es => `
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="checkbox" id="esp-${es.id}" name="especialidades" value="${es.id}" />
-      <label class="form-check-label" for="esp-${es.id}">${es.nombre}</label>
-    </div>
-  `).join("");
-=======
   } catch (err) {
     console.error("Error al dar de baja:", err);
   }
@@ -264,5 +176,4 @@ async function cargarEspecialidades() {
   } catch (err) {
     console.error("Error al cargar especialidades:", err);
   }
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 }

@@ -1,17 +1,4 @@
 const API_ESTABLECIMIENTOS = "/api/establecimientos";
-<<<<<<< HEAD
-const form = document.getElementById("establecimiento-form");
-const tbody = document.getElementById("establecimientos-tbody");
-
-let editando = false;
-let idEditando = null;
-
-// Cargar al iniciar
-window.addEventListener("DOMContentLoaded", cargarEstablecimientos);
-
-// Enviar formulario
-form.addEventListener("submit", async (e) => {
-=======
 const API_ROL = "/auth/rol";
 
 const form = document.getElementById("establecimiento-form");
@@ -55,7 +42,6 @@ async function verificarRol() {
 
 // Enviar formulario
 form?.addEventListener("submit", async (e) => {
->>>>>>> 99f4d3c (Version Funcional Spring Security)
   e.preventDefault();
 
   const establecimiento = {
@@ -99,29 +85,21 @@ async function cargarEstablecimientos() {
       <td>${e.direccion}</td>
       <td>${e.descripcion || "-"}</td>
       <td>
-<<<<<<< HEAD
-        <button class="btn btn-sm btn-warning" onclick="editarEstablecimiento(${e.id})">✏️</button>
-        <button class="btn btn-sm btn-danger" onclick="eliminarEstablecimiento(${e.id})">🗑️</button>
-=======
         ${esAdmin
           ? `
           <button class="btn btn-sm btn-warning" onclick="editarEstablecimiento(${e.id})">✏️</button>
           <button class="btn btn-sm btn-danger" onclick="eliminarEstablecimiento(${e.id})">🗑️</button>
         `
           : ""}
->>>>>>> 99f4d3c (Version Funcional Spring Security)
       </td>
     `;
     tbody.appendChild(fila);
   });
-<<<<<<< HEAD
-=======
 
   // Si no es admin, ocultar columna "Acciones" visualmente también en tbody
   if (!esAdmin) {
     document.querySelectorAll("#establecimientos-tbody td:last-child").forEach(td => td.classList.add("d-none"));
   }
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 }
 
 // Editar
@@ -138,11 +116,7 @@ async function editarEstablecimiento(id) {
   idEditando = id;
 }
 
-<<<<<<< HEAD
-// Eliminar (baja lógica o hard según backend)
-=======
 // Eliminar
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 async function eliminarEstablecimiento(id) {
   if (confirm("¿Seguro que querés eliminar este establecimiento?")) {
     await fetch(`${API_ESTABLECIMIENTOS}/${id}`, { method: "DELETE" });

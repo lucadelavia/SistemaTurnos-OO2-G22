@@ -1,19 +1,9 @@
 package com.sistematurnos.controller;
 
-<<<<<<< HEAD
 import com.sistematurnos.entity.Especialidad;
 import com.sistematurnos.entity.Sucursal;
 import com.sistematurnos.service.ISucursalService;
 import com.sistematurnos.service.IEspecialidadService;
-=======
-import com.sistematurnos.entity.DiasDeAtencion;
-import com.sistematurnos.entity.Especialidad;
-import com.sistematurnos.entity.Sucursal;
-import com.sistematurnos.service.SucursalService;
-import com.sistematurnos.service.DiasDeAtencionService;
-
-import com.sistematurnos.service.EspecialidadService;
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,12 +15,6 @@ import java.util.List;
 public class SucursalController {
 
     @Autowired
-<<<<<<< HEAD
-    private ISucursalService sucursalService;
-
-    @Autowired
-    private IEspecialidadService especialidadService;
-=======
     private SucursalService sucursalService;
 
     @Autowired
@@ -38,7 +22,6 @@ public class SucursalController {
 
     @Autowired
     private DiasDeAtencionService diasDeAtencionService;
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 
     @GetMapping
     public List<Sucursal> listarSucursales() {
@@ -132,8 +115,4 @@ public class SucursalController {
             return ResponseEntity.badRequest().build();
         }
     }
-<<<<<<< HEAD
-=======
-
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 }

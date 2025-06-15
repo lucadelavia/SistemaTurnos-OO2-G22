@@ -1,11 +1,7 @@
 package com.sistematurnos.controller;
 
 import com.sistematurnos.entity.Servicio;
-<<<<<<< HEAD
 import com.sistematurnos.service.IServicioService;
-=======
-import com.sistematurnos.service.ServicioService;
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +13,7 @@ import java.util.List;
 public class ServicioController {
 
     @Autowired
-<<<<<<< HEAD
     private IServicioService servicioService;
-=======
-    private ServicioService servicioService;
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 
     @GetMapping
     public List<Servicio> listarServicios() {

@@ -1,20 +1,10 @@
 const API_URL = "/api/clientes";
-<<<<<<< HEAD
-=======
 const ROL_URL = "/auth/rol";
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 const form = document.getElementById("cliente-form");
 const tbody = document.getElementById("clientes-tbody");
 
 let editando = false;
 let idEditando = null;
-<<<<<<< HEAD
-
-// Cargar clientes al iniciar
-window.addEventListener("DOMContentLoaded", cargarClientes);
-
-// Envío de formulario
-=======
 let rolUsuario = null;
 
 // Cargar al iniciar
@@ -37,7 +27,6 @@ async function obtenerRol() {
   }
 }
 
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -53,21 +42,6 @@ form.addEventListener("submit", async (e) => {
   };
 
   try {
-<<<<<<< HEAD
-    if (editando) {
-      await fetch(`${API_URL}/${idEditando}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(cliente),
-      });
-    } else {
-      await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(cliente),
-      });
-    }
-=======
     const method = editando ? "PUT" : "POST";
     const url = editando ? `${API_URL}/${idEditando}` : API_URL;
 
@@ -76,7 +50,6 @@ form.addEventListener("submit", async (e) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(cliente),
     });
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 
     form.reset();
     editando = false;
@@ -87,10 +60,6 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-<<<<<<< HEAD
-// Cargar y mostrar todos los clientes
-=======
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 async function cargarClientes() {
   tbody.innerHTML = "";
   const res = await fetch(API_URL);
@@ -108,25 +77,16 @@ async function cargarClientes() {
       <td>${c.estado ? "Activo" : "Inactivo"}</td>
       <td>${c.fechaAlta ? c.fechaAlta.split("T")[0] : ""}</td>
       <td>
-<<<<<<< HEAD
-        <button class="btn btn-sm btn-warning" onclick="editarCliente(${c.id})">✏️</button>
-        <button class="btn btn-sm btn-danger" onclick="eliminarCliente(${c.id})">🗑️</button>
-=======
         ${rolUsuario === "ADMIN" ? `
           <button class="btn btn-sm btn-warning" onclick="editarCliente(${c.id})">✏️</button>
           <button class="btn btn-sm btn-danger" onclick="eliminarCliente(${c.id})">🗑️</button>
         ` : "-"}
->>>>>>> 99f4d3c (Version Funcional Spring Security)
       </td>
     `;
     tbody.appendChild(fila);
   });
 }
 
-<<<<<<< HEAD
-// Eliminar cliente
-=======
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 async function eliminarCliente(id) {
   if (confirm("¿Estás seguro de dar de baja este cliente?")) {
     await fetch(`${API_URL}/${id}`, { method: "DELETE" });
@@ -134,10 +94,6 @@ async function eliminarCliente(id) {
   }
 }
 
-<<<<<<< HEAD
-// Editar cliente
-=======
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 async function editarCliente(id) {
   const res = await fetch(`${API_URL}/${id}`);
   const c = await res.json();

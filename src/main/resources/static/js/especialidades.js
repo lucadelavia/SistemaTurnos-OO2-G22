@@ -1,15 +1,4 @@
 const API_ESPECIALIDADES = "/api/especialidades";
-<<<<<<< HEAD
-
-const form = document.getElementById("especialidad-form");
-const tbody = document.getElementById("especialidades-tbody");
-
-let editando = false;
-let idEditando = null;
-
-// Cargar al iniciar
-window.addEventListener("DOMContentLoaded", cargarEspecialidades);
-=======
 const API_USUARIO = "/auth/rol";
 
 const form = document.getElementById("especialidad-form");
@@ -49,7 +38,6 @@ async function verificarRol() {
     window.location.href = "/login";
   }
 }
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -87,18 +75,11 @@ async function cargarEspecialidades() {
     fila.innerHTML = `
       <td>${esp.id}</td>
       <td>${esp.nombre}</td>
-<<<<<<< HEAD
-      <td>
-        <button class="btn btn-sm btn-warning" onclick="editarEspecialidad(${esp.id})">✏️</button>
-        <button class="btn btn-sm btn-danger" onclick="eliminarEspecialidad(${esp.id})">🗑️</button>
-      </td>
-=======
       ${esAdmin ? `
         <td>
           <button class="btn btn-sm btn-warning" onclick="editarEspecialidad(${esp.id})">✏️</button>
           <button class="btn btn-sm btn-danger" onclick="eliminarEspecialidad(${esp.id})">🗑️</button>
         </td>` : ``}
->>>>>>> 99f4d3c (Version Funcional Spring Security)
     `;
     tbody.appendChild(fila);
   });
@@ -107,10 +88,6 @@ async function cargarEspecialidades() {
 async function editarEspecialidad(id) {
   const res = await fetch(`${API_ESPECIALIDADES}/${id}`);
   const esp = await res.json();
-<<<<<<< HEAD
-
-=======
->>>>>>> 99f4d3c (Version Funcional Spring Security)
   form.nombre.value = esp.nombre;
   editando = true;
   idEditando = id;

@@ -2,14 +2,6 @@ const API_SERVICIOS = "/api/servicios";
 
 const form = document.getElementById("servicio-form");
 const tbody = document.getElementById("servicios-tbody");
-<<<<<<< HEAD
-
-let editando = false;
-let idEditando = null;
-
-document.addEventListener("DOMContentLoaded", cargarServicios);
-
-=======
 const formCard = document.querySelector(".card.mb-5");
 const thAcciones = document.getElementById("th-acciones");
 
@@ -41,18 +33,13 @@ async function verificarRol() {
 }
 
 // Enviar formulario
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const servicio = {
     nombreServicio: form.nombreServicio.value.trim(),
-<<<<<<< HEAD
-    duracion: parseInt(form.duracion.value)
-=======
     duracion: parseInt(form.duracion.value),
     estado: true
->>>>>>> 99f4d3c (Version Funcional Spring Security)
   };
 
   const method = editando ? "PUT" : "POST";
@@ -70,28 +57,6 @@ form.addEventListener("submit", async (e) => {
   await cargarServicios();
 });
 
-<<<<<<< HEAD
-async function cargarServicios() {
-  const res = await fetch(API_SERVICIOS);
-  const servicios = await res.json();
-  tbody.innerHTML = "";
-
-  servicios.forEach(s => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${s.id}</td>
-      <td>${s.nombreServicio}</td>
-      <td>${s.duracion} min</td>
-      <td>
-        <button class="btn btn-sm btn-warning me-1" onclick="editarServicio(${s.id})">✏️</button>
-        <button class="btn btn-sm btn-danger" onclick="eliminarServicio(${s.id})">🗑️</button>
-      </td>
-    `;
-    tbody.appendChild(row);
-  });
-}
-
-=======
 // Cargar servicios activos
 async function cargarServicios() {
   tbody.innerHTML = "";
@@ -117,7 +82,6 @@ async function cargarServicios() {
 }
 
 // Editar
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 async function editarServicio(id) {
   const res = await fetch(`${API_SERVICIOS}/${id}`);
   const s = await res.json();
@@ -129,15 +93,6 @@ async function editarServicio(id) {
   idEditando = id;
 }
 
-<<<<<<< HEAD
-async function eliminarServicio(id) {
-  if (confirm("¿Estás seguro de que querés eliminar este servicio?")) {
-    await fetch(`${API_SERVICIOS}/${id}`, {
-      method: "DELETE"
-    });
-    await cargarServicios();
-  }
-=======
 // Baja lógica
 async function darBajaServicio(id) {
   if (!confirm("¿Estás seguro de que querés dar de baja este servicio?")) return;
@@ -153,5 +108,4 @@ async function darBajaServicio(id) {
   });
 
   await cargarServicios();
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 }

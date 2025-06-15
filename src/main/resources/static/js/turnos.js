@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-// turnos.js
-
-const apiBase = '/api';
-
-window.addEventListener('DOMContentLoaded', () => {
-=======
 const apiBase = '/api';
 
 let usuarioActual = null;
@@ -18,7 +11,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('reserva-form').classList.add('d-none');
   }
 
->>>>>>> 99f4d3c (Version Funcional Spring Security)
   cargarSucursales();
   cargarServicios();
   cargarEmpleados();
@@ -32,14 +24,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('reserva-form').addEventListener('submit', reservarTurno);
 });
 
-<<<<<<< HEAD
-=======
 async function cargarUsuario() {
   const res = await fetch('/auth/usuario');
   usuarioActual = await res.json();
 }
 
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 function cargarSucursales() {
   fetch(`${apiBase}/sucursales`)
     .then(res => res.json())
@@ -95,10 +84,6 @@ function cargarHorarios() {
 function reservarTurno(e) {
   e.preventDefault();
 
-<<<<<<< HEAD
-  const fecha = document.getElementById('fecha').value;
-=======
->>>>>>> 99f4d3c (Version Funcional Spring Security)
   const horario = document.getElementById('horario').value;
   const fechaHora = new Date(horario).toISOString();
 
@@ -136,31 +121,20 @@ function cargarTurnos() {
     .then(data => {
       const tbody = document.getElementById('turnos-tbody');
       tbody.innerHTML = '';
-<<<<<<< HEAD
-      data.forEach(t => {
-=======
       const turnosFiltrados = usuarioActual.rol === 'EMPLEADO'
         ? data.filter(t => t.empleado?.id === usuarioActual.id)
         : data;
 
       turnosFiltrados.forEach(t => {
->>>>>>> 99f4d3c (Version Funcional Spring Security)
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${t.id}</td>
           <td>${new Date(t.fechaHora).toLocaleString()}</td>
           <td>${t.codigo}</td>
-<<<<<<< HEAD
-          <td>${t.cliente.id}</td>
-          <td>${t.empleado.id}</td>
-          <td>${t.sucursal.id}</td>
-          <td>${t.servicio.id}</td>
-=======
           <td>${t.cliente?.nombre || t.cliente?.id || '-'}</td>
           <td>${t.empleado?.nombre || t.empleado?.id || '-'}</td>
           <td>${t.sucursal?.direccion || t.sucursal?.id || '-'}</td>
           <td>${t.servicio?.nombreServicio || t.servicio?.id || '-'}</td>
->>>>>>> 99f4d3c (Version Funcional Spring Security)
         `;
         tbody.appendChild(row);
       });

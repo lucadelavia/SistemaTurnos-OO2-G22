@@ -1,11 +1,7 @@
 package com.sistematurnos.controller;
 
 import com.sistematurnos.entity.DiasDeAtencion;
-<<<<<<< HEAD
-import com.sistematurnos.service.IDiasDeAtencionService;
-=======
 import com.sistematurnos.service.DiasDeAtencionService;
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +13,7 @@ import java.util.List;
 public class DiasDeAtencionController {
 
     @Autowired
-<<<<<<< HEAD
-    private IDiasDeAtencionService diasDeAtencionService;
-=======
     private DiasDeAtencionService diasDeAtencionService;
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 
     @GetMapping
     public List<DiasDeAtencion> listarDias() {

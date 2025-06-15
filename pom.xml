@@ -101,10 +101,6 @@
 			<version>0.11.5</version>
 			<scope>runtime</scope>
 		</dependency>
-<<<<<<< HEAD
-=======
-
->>>>>>> 99f4d3c (Version Funcional Spring Security)
 	</dependencies>
 
 	<build>
