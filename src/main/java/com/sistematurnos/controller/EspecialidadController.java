@@ -1,7 +1,7 @@
 package com.sistematurnos.controller;
 
 import com.sistematurnos.entity.Especialidad;
-import com.sistematurnos.service.EspecialidadService;
+import com.sistematurnos.service.IEspecialidadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ import java.util.List;
 public class EspecialidadController {
 
     @Autowired
-    private EspecialidadService especialidadService;
+    private IEspecialidadService especialidadService;
 
     @GetMapping
     public List<Especialidad> listarEspecialidades() {
