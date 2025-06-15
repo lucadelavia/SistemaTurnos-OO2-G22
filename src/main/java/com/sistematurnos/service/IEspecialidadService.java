@@ -1,15 +1,21 @@
 package com.sistematurnos.service;
 
 import com.sistematurnos.entity.Especialidad;
-import com.sistematurnos.repository.IEspecialidadRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 public interface IEspecialidadService {
-    public List<Especialidad> traerEspecialidades();
-
-    
-    
+	public List<Especialidad> traerEspecialidades();
+	
+	public Especialidad altaEspecialidad(String Nombre);
+	
+	public Especialidad altaEspecialidad(Especialidad e);
+	
+	public void bajaEspecialidad(int id);
+	
+	public Especialidad modificarEspecialidad(Especialidad e);    
+	
+	public Especialidad obtenerEspecialidadPorNombre(String nombre);
+	
+	public Especialidad obtenerEspecialidadPorId (int id);
 }
