@@ -17,9 +17,11 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
-    @Operation(summary = "Obtener datos del usuario autenticado")
     @GetMapping("/me")
-    public ResponseEntity<?> getMe(Authentication authentication) {
-        return ResponseEntity.ok(authentication.getPrincipal());
+    public ResponseEntity<Usuario> getMe(Authentication authentication) {
+        String email = authentication.getName();
+        Usuario usuario = usuarioService.buscarPorEmail(email);
+        return ResponseEntity.ok(usuario);
     }
+
 }

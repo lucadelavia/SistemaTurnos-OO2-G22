@@ -33,11 +33,20 @@ public class SecurityConfig {
                         // Acceso general
                         .requestMatchers("/inicio").authenticated()
 
-                        // ADMIN
-                        .requestMatchers("/clientes", "/api/clientes/**").hasRole("ADMIN")
-                        .requestMatchers("/empleados", "/api/empleados/**").hasRole("ADMIN")
+                        // Permitir GET para cliente y empleado según su rol
+                        .requestMatchers(HttpMethod.GET, "/api/clientes/**").hasAnyRole("ADMIN", "CLIENTE")
+                        .requestMatchers(HttpMethod.GET, "/api/empleados/**").hasAnyRole("ADMIN", "EMPLEADO")
 
-                        // Establecimientos:
+                        // Solo admin puede modificar clientes y empleados
+                        .requestMatchers(HttpMethod.POST, "/api/clientes/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/clientes/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/clientes/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/api/empleados/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/empleados/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/empleados/**").hasRole("ADMIN")
+
+                        // Establecimientos
                         .requestMatchers("/establecimientos").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
                         .requestMatchers(HttpMethod.GET, "/api/establecimientos/**").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
                         .requestMatchers("/api/establecimientos/**").hasRole("ADMIN")

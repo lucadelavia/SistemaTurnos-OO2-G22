@@ -10,14 +10,17 @@
 </head>
 <body>
 
+<!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #800000;">
   <div class="container-fluid">
     <a class="navbar-brand" href="/inicio">
       <img src="img/logo-unla.png" alt="UNLa" width="30" height="30" class="d-inline-block align-text-top"/>
     </a>
-    <div class="d-flex">
-      <a class="nav-link text-white" href="#">Login</a>
-      <a class="nav-link text-white" href="#">Información</a>
+    <div class="ms-auto d-flex align-items-center gap-3">
+      <span id="bienvenida" class="text-white small fw-bold"></span>
+      <form action="/logout" method="POST">
+        <button type="submit" class="btn btn-outline-light btn-sm">Cerrar sesión</button>
+      </form>
     </div>
   </div>
 </nav>
@@ -25,7 +28,7 @@
 <main class="container py-5">
   <h1 class="mb-4 text-center text-granate">Reserva de Turno</h1>
 
-  <!-- Formulario oculto por defecto -->
+  <!-- Formulario -->
   <div id="reserva-form" class="card mb-5 d-none">
     <div class="card-header bg-granate text-white">Nuevo Turno</div>
     <div class="card-body">
@@ -42,10 +45,6 @@
           <div class="col-md-6">
             <label class="form-label">Empleado</label>
             <select id="empleado" class="form-select" required></select>
-          </div>
-          <div class="col-md-6" id="cliente-group">
-            <label class="form-label">Cliente (ID)</label>
-            <input type="number" id="cliente" class="form-control" required/>
           </div>
           <div class="col-md-6">
             <label class="form-label">Fecha</label>

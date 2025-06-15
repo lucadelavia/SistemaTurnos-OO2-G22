@@ -4,6 +4,7 @@ import com.sistematurnos.entity.Usuario;
 import com.sistematurnos.entity.enums.Rol;
 import com.sistematurnos.repository.IUsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -57,6 +58,11 @@ public class UsuarioService {
         );
 
         return usuarioRepository.save(u);
+    }
+
+    public Usuario buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
     }
 
     public void bajaUsuario(int id) {

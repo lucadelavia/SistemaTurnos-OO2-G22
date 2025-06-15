@@ -4,16 +4,35 @@ const API_TURNOS = `${API_BASE}/turnos`;
 const API_SUCURSALES = `${API_BASE}/sucursales`;
 const API_SERVICIOS = `${API_BASE}/servicios`;
 const API_EMPLEADOS = `${API_BASE}/empleados`;
+const API_CLIENTES = `${API_BASE}/clientes`;
 
 let usuarioActual = null;
+let clienteActual = null;
+let empleadoActual = null;
 
 window.addEventListener("DOMContentLoaded", async () => {
   await cargarUsuario();
 
-  if (usuarioActual?.rol === "CLIENTE") {
+  // Mostrar el formulario si es cliente o admin
+  if (usuarioActual?.rol === "CLIENTE" || usuarioActual?.rol === "ADMIN") {
     document.getElementById("reserva-form").classList.remove("d-none");
-    document.getElementById("cliente").value = usuarioActual.id;
-    document.getElementById("cliente").setAttribute("readonly", true);
+  }
+
+  // Obtener cliente o empleado según el rol
+  if (usuarioActual?.rol === "CLIENTE") {
+    const res = await fetch(`${API_CLIENTES}/${usuarioActual.id}`);
+    if (res.ok) clienteActual = await res.json();
+  }
+
+  if (usuarioActual?.rol === "EMPLEADO") {
+    const res = await fetch(`${API_EMPLEADOS}/${usuarioActual.id}`);
+    if (res.ok) empleadoActual = await res.json();
+  }
+
+  // Ocultar el campo cliente manual si es cliente logueado
+  if (usuarioActual?.rol === "CLIENTE") {
+    const inputCliente = document.getElementById("cliente-group");
+    if (inputCliente) inputCliente.classList.add("d-none");
   }
 
   cargarSucursales();
@@ -25,7 +44,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("sucursal").addEventListener("change", cargarHorarios);
   document.getElementById("servicio").addEventListener("change", cargarHorarios);
   document.getElementById("empleado").addEventListener("change", cargarHorarios);
-  document.getElementById("reserva-form").addEventListener("submit", reservarTurno);
+  document.querySelector("#reserva-form form").addEventListener("submit", reservarTurno);
 });
 
 async function cargarUsuario() {
@@ -53,20 +72,12 @@ function cargarServicios() {
 
 function cargarEmpleados() {
   fetch(API_EMPLEADOS)
-    .then(res => {
-      if (!res.ok) throw new Error("Respuesta inesperada para empleado");
-      return res.json();
-    })
+    .then(res => res.json())
     .then(data => cargarOptions("empleado", data, "nombre"))
     .catch(err => console.error("Error al cargar empleados", err));
 }
 
 function cargarOptions(selectId, lista, fieldName) {
-  if (!Array.isArray(lista)) {
-    console.warn(`Respuesta inesperada en ${selectId}:`, lista);
-    return;
-  }
-
   const select = document.getElementById(selectId);
   select.innerHTML = '<option value="">Seleccione</option>';
   lista.forEach(item => {
@@ -105,11 +116,12 @@ function reservarTurno(e) {
   e.preventDefault();
 
   const horario = document.getElementById("horario").value;
+
   const turno = {
     fechaHora: new Date(horario).toISOString(),
     estado: true,
     codigo: generarCodigo(),
-    cliente: { id: parseInt(document.getElementById("cliente").value) },
+    cliente: { id: clienteActual?.id ?? parseInt(document.getElementById("cliente").value) },
     empleado: { id: parseInt(document.getElementById("empleado").value) },
     sucursal: { id: parseInt(document.getElementById("sucursal").value) },
     servicio: { id: parseInt(document.getElementById("servicio").value) }
@@ -141,10 +153,10 @@ function cargarTurnos() {
       tbody.innerHTML = "";
 
       const turnosFiltrados =
-        usuarioActual?.rol === "EMPLEADO"
-          ? data.filter(t => t.empleado?.id === usuarioActual.id)
-          : usuarioActual?.rol === "CLIENTE"
-          ? data.filter(t => t.cliente?.id === usuarioActual.id)
+        usuarioActual?.rol === "EMPLEADO" && empleadoActual
+          ? data.filter(t => t.empleado?.id === empleadoActual.id)
+          : usuarioActual?.rol === "CLIENTE" && clienteActual
+          ? data.filter(t => t.cliente?.id === clienteActual.id)
           : data;
 
       turnosFiltrados.forEach(t => {
