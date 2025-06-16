@@ -1,5 +1,6 @@
 package com.sistematurnos.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,7 +9,7 @@ import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter 
+@Getter
 @Setter
 @ToString
 @EqualsAndHashCode
@@ -23,7 +24,7 @@ public class Sucursal {
     private int id;
 
     private String direccion;
-    
+
     @Column(nullable = false, unique = true)
     private String telefono;
 
@@ -34,10 +35,11 @@ public class Sucursal {
     private LocalTime horaCierre;
 
     private int espacio;
-    
+
     @Column(nullable = false)
     private boolean estado = true;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idestablecimiento")
     private Establecimiento establecimiento;

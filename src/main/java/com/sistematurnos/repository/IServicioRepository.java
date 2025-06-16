@@ -14,4 +14,6 @@ public interface IServicioRepository extends JpaRepository<Servicio, Integer> {
 
 	List<Servicio> findByEstadoTrue();
 
+	List<Servicio> findByEspecialidadId(int idEspecialidad);
+
 }

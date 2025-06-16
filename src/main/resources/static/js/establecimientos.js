@@ -1,15 +1,47 @@
 const API_ESTABLECIMIENTOS = "/api/establecimientos";
+const API_ROL = "/auth/rol";
+
 const form = document.getElementById("establecimiento-form");
 const tbody = document.getElementById("establecimientos-tbody");
+const thAcciones = document.getElementById("th-acciones");
+const formCard = document.getElementById("form-card");
+const bienvenida = document.getElementById("bienvenida");
 
 let editando = false;
 let idEditando = null;
+let esAdmin = false;
 
-// Cargar al iniciar
-window.addEventListener("DOMContentLoaded", cargarEstablecimientos);
+// Inicialización
+window.addEventListener("DOMContentLoaded", async () => {
+  await verificarRol();
+  await cargarEstablecimientos();
+});
+
+// Verificar rol del usuario
+async function verificarRol() {
+  try {
+    const res = await fetch(API_ROL);
+    if (!res.ok) throw new Error("No autenticado");
+
+    const rol = await res.text();
+    esAdmin = rol === "ADMIN";
+
+    if (!esAdmin) {
+      formCard?.classList.add("d-none");
+      thAcciones?.classList.add("d-none");
+    }
+
+    // Mostrar bienvenida
+    bienvenida.textContent = `¡Hola! (${rol})`;
+
+  } catch (error) {
+    console.warn("🔒 Redirigiendo a login...");
+    window.location.href = "/login";
+  }
+}
 
 // Enviar formulario
-form.addEventListener("submit", async (e) => {
+form?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const establecimiento = {
@@ -53,12 +85,21 @@ async function cargarEstablecimientos() {
       <td>${e.direccion}</td>
       <td>${e.descripcion || "-"}</td>
       <td>
-        <button class="btn btn-sm btn-warning" onclick="editarEstablecimiento(${e.id})">✏️</button>
-        <button class="btn btn-sm btn-danger" onclick="eliminarEstablecimiento(${e.id})">🗑️</button>
+        ${esAdmin
+          ? `
+          <button class="btn btn-sm btn-warning" onclick="editarEstablecimiento(${e.id})">✏️</button>
+          <button class="btn btn-sm btn-danger" onclick="eliminarEstablecimiento(${e.id})">🗑️</button>
+        `
+          : ""}
       </td>
     `;
     tbody.appendChild(fila);
   });
+
+  // Si no es admin, ocultar columna "Acciones" visualmente también en tbody
+  if (!esAdmin) {
+    document.querySelectorAll("#establecimientos-tbody td:last-child").forEach(td => td.classList.add("d-none"));
+  }
 }
 
 // Editar
@@ -75,7 +116,7 @@ async function editarEstablecimiento(id) {
   idEditando = id;
 }
 
-// Eliminar (baja lógica o hard según backend)
+// Eliminar
 async function eliminarEstablecimiento(id) {
   if (confirm("¿Seguro que querés eliminar este establecimiento?")) {
     await fetch(`${API_ESTABLECIMIENTOS}/${id}`, { method: "DELETE" });

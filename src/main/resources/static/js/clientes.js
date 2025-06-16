@@ -1,14 +1,38 @@
 const API_URL = "/api/clientes";
+const ROL_URL = "/auth/rol";
 const form = document.getElementById("cliente-form");
 const tbody = document.getElementById("clientes-tbody");
+const passwordGroup = document.getElementById("password-group");
+const passwordInput = document.getElementById("password");
 
 let editando = false;
 let idEditando = null;
+let rolUsuario = null;
 
-// Cargar clientes al iniciar
-window.addEventListener("DOMContentLoaded", cargarClientes);
+window.addEventListener("DOMContentLoaded", async () => {
+  rolUsuario = await obtenerRol();
 
-// Envío de formulario
+  if (rolUsuario === "ADMIN") {
+    form.style.display = "block";
+    passwordGroup.classList.remove("d-none");
+  } else {
+    form.style.display = "none";
+  }
+
+  await cargarClientes();
+});
+
+async function obtenerRol() {
+  try {
+    const res = await fetch(ROL_URL);
+    if (!res.ok) throw new Error("Error al obtener rol");
+    return await res.text();
+  } catch (err) {
+    console.error("No se pudo determinar el rol del usuario", err);
+    return null;
+  }
+}
+
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -23,31 +47,29 @@ form.addEventListener("submit", async (e) => {
     fechaAlta: new Date().toISOString()
   };
 
+  if (rolUsuario === "ADMIN") {
+    cliente.password = passwordInput.value || "123456";
+  }
+
   try {
-    if (editando) {
-      await fetch(`${API_URL}/${idEditando}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(cliente),
-      });
-    } else {
-      await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(cliente),
-      });
-    }
+    const method = editando ? "PUT" : "POST";
+    const url = editando ? `${API_URL}/${idEditando}` : API_URL;
+
+    await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(cliente),
+    });
 
     form.reset();
     editando = false;
     idEditando = null;
-    cargarClientes();
+    await cargarClientes();
   } catch (err) {
     console.error("Error al guardar:", err);
   }
 });
 
-// Cargar y mostrar todos los clientes
 async function cargarClientes() {
   tbody.innerHTML = "";
   const res = await fetch(API_URL);
@@ -65,23 +87,23 @@ async function cargarClientes() {
       <td>${c.estado ? "Activo" : "Inactivo"}</td>
       <td>${c.fechaAlta ? c.fechaAlta.split("T")[0] : ""}</td>
       <td>
-        <button class="btn btn-sm btn-warning" onclick="editarCliente(${c.id})">✏️</button>
-        <button class="btn btn-sm btn-danger" onclick="eliminarCliente(${c.id})">🗑️</button>
+        ${rolUsuario === "ADMIN" ? `
+          <button class="btn btn-sm btn-warning" onclick="editarCliente(${c.id})"><i class="bi bi-pencil-fill"></i></button>
+          <button class="btn btn-sm btn-danger" onclick="eliminarCliente(${c.id})"><i class="bi bi-trash-fill"></i></button>
+        ` : "-"}
       </td>
     `;
     tbody.appendChild(fila);
   });
 }
 
-// Eliminar cliente
 async function eliminarCliente(id) {
   if (confirm("¿Estás seguro de dar de baja este cliente?")) {
     await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-    cargarClientes();
+    await cargarClientes();
   }
 }
 
-// Editar cliente
 async function editarCliente(id) {
   const res = await fetch(`${API_URL}/${id}`);
   const c = await res.json();
@@ -92,6 +114,7 @@ async function editarCliente(id) {
   form.direccion.value = c.direccion;
   form.dni.value = c.dni;
   form.nroCliente.value = c.nroCliente;
+  passwordInput.value = "";
 
   editando = true;
   idEditando = id;

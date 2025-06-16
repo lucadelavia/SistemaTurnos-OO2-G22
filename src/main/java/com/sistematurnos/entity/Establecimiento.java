@@ -3,8 +3,6 @@ package com.sistematurnos.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Set;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter 
@@ -31,9 +29,6 @@ public class Establecimiento {
     private String direccion; 
     
     private String descripcion;
-
-    @OneToMany(mappedBy = "establecimiento", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Sucursal> sucursales;
     
     public Establecimiento(String nombre, String cuit, String direccion, String descripcion) {
         this.nombre = nombre;

@@ -2,6 +2,7 @@ package com.sistematurnos.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -10,7 +11,7 @@ import lombok.*;
 @EqualsAndHashCode
 
 @Entity
-@Table(name = "Servicios")
+@Table(name = "servicios")
 public class Servicio {
 
     @Id
@@ -27,9 +28,15 @@ public class Servicio {
     @Column(nullable = false)
     private boolean estado = true;
 
-    public Servicio(String nombreServicio, int duracion) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idEspecialidad", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Especialidad especialidad;
+
+    public Servicio(String nombreServicio, int duracion, Especialidad especialidad) {
         this.nombreServicio = nombreServicio;
         this.duracion = duracion;
+        this.especialidad = especialidad;
         this.estado = true;
     }
 }
