@@ -38,14 +38,14 @@ public class ClienteController {
     }
 
     @Operation(summary = "Obtener un cliente por su número de cliente")
-    @GetMapping("/nroCliente/{nro}")
+    @GetMapping("/numero/{nro}")
     public ResponseEntity<ClienteResponse> obtenerPorNroCliente(@PathVariable int nro) {
         Cliente cliente = clienteService.traerClientePorNroCliente(nro);
         return ResponseEntity.ok(ClienteMapper.toResponse(cliente));
     }
 
     @Operation(summary = "Listar clientes con número mayor a un valor dado")
-    @GetMapping("/mayorNroCliente/{limite}")
+    @GetMapping("/numero-mayor-a/{limite}")
     public List<ClienteResponse> clientesConNroClienteMayorA(@PathVariable int limite) {
         return clienteService.findByNroClienteGreaterThan(limite).stream()
                 .map(ClienteMapper::toResponse)

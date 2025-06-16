@@ -3,7 +3,6 @@ package com.sistematurnos.dtos.mapper;
 import com.sistematurnos.dtos.request.EmpleadoRequest;
 import com.sistematurnos.dtos.response.EmpleadoResponse;
 import com.sistematurnos.entity.Empleado;
-import com.sistematurnos.entity.enums.Rol;
 import com.sistematurnos.entity.Especialidad;
 
 import java.time.LocalDateTime;
@@ -12,38 +11,41 @@ import java.util.stream.Collectors;
 
 public class EmpleadoMapper {
 
-    public static Empleado toEntity(EmpleadoRequest request, Set<Especialidad> especialidades) {
+    public static Empleado toEntity(EmpleadoRequest dto, Set<Especialidad> especialidades) {
         Empleado empleado = new Empleado();
-        empleado.setNombre(request.nombre());
-        empleado.setApellido(request.apellido());
-        empleado.setEmail(request.email());
-        empleado.setPassword(request.password());
-        empleado.setDireccion(request.direccion());
-        empleado.setDni(request.dni());
-        empleado.setCuil(request.cuil());
-        empleado.setMatricula(request.matricula());
-        empleado.setEstado(true);
+        empleado.setNombre(dto.nombre());
+        empleado.setApellido(dto.apellido());
+        empleado.setEmail(dto.email());
+        empleado.setPassword(dto.password());
+        empleado.setDireccion(dto.direccion());
+        empleado.setDni(dto.dni());
+        empleado.setRol(dto.rol());
+        empleado.setCuil(dto.cuil());
+        empleado.setMatricula(dto.matricula());
         empleado.setFechaAlta(LocalDateTime.now());
-        empleado.setRol(Rol.EMPLEADO);
+        empleado.setEstado(true);
         empleado.setLstEspecialidades(especialidades);
         return empleado;
     }
 
-    public static EmpleadoResponse toResponse(Empleado empleado) {
-        Set<String> nombresEsp = empleado.getLstEspecialidades().stream()
+    public static EmpleadoResponse toResponse(Empleado e) {
+        Set<String> nombresEspecialidades = e.getLstEspecialidades().stream()
                 .map(Especialidad::getNombre)
                 .collect(Collectors.toSet());
 
         return new EmpleadoResponse(
-                empleado.getId(),
-                empleado.getNombre(),
-                empleado.getApellido(),
-                empleado.getEmail(),
-                empleado.getDireccion(),
-                empleado.getDni(),
-                empleado.getCuil(),
-                empleado.getMatricula(),
-                nombresEsp
+                e.getId(),
+                e.getNombre(),
+                e.getApellido(),
+                e.getEmail(),
+                e.getDireccion(),
+                e.getDni(),
+                e.isEstado(),
+                e.getFechaAlta(),
+                e.getRol(),
+                e.getCuil(),
+                e.getMatricula(),
+                nombresEspecialidades
         );
     }
 }

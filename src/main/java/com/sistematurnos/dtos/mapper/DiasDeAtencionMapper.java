@@ -10,7 +10,7 @@ public class DiasDeAtencionMapper {
         return new DiasDeAtencion(dto.nombre());
     }
 
-    public static DiasDeAtencionResponse toResponse(DiasDeAtencion entidad) {
-        return new DiasDeAtencionResponse(entidad.getId(), entidad.getNombre());
+    public static DiasDeAtencionResponse toResponse(DiasDeAtencion dia) {
+        return new DiasDeAtencionResponse(dia.getId(), dia.getNombre());
     }
 }

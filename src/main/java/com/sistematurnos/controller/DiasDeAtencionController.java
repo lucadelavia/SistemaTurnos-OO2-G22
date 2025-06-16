@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/dias-atencion")
@@ -27,7 +26,7 @@ public class DiasDeAtencionController {
     public List<DiasDeAtencionResponse> listarDias() {
         return diasDeAtencionService.traerTodos().stream()
                 .map(DiasDeAtencionMapper::toResponse)
-                .collect(Collectors.toList());
+                .toList(); // reemplazo moderno de collect(Collectors.toList())
     }
 
     @Operation(summary = "Obtener un día de atención por ID")
