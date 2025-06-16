@@ -11,38 +11,31 @@ let editando = false;
 let idEditando = null;
 let esAdmin = false;
 
-// Inicializar
 window.addEventListener("DOMContentLoaded", async () => {
   await verificarRol();
   await cargarEspecialidades();
   await cargarEmpleados();
 });
 
-// 🔐 Verificar rol del usuario
 async function verificarRol() {
   try {
     const res = await fetch(API_ROL);
     if (!res.ok) throw new Error("No autenticado");
     const rol = await res.text();
     esAdmin = rol === "ADMIN";
-
-    // Si no es admin, ocultar el formulario
-    if (!esAdmin && formCard) {
-      formCard.style.display = "none";
-    }
+    if (!esAdmin && formCard) formCard.style.display = "none";
   } catch (err) {
     console.error("No se pudo verificar el rol:", err);
     window.location.href = "/login";
   }
 }
 
-// 📤 Enviar formulario
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const especialidadesSeleccionadas = Array.from(
     document.querySelectorAll("input[name='especialidades']:checked")
-  ).map((input) => ({ id: parseInt(input.value) }));
+  ).map((input) => parseInt(input.value));
 
   const empleado = {
     nombre: form.nombre.value,
@@ -51,10 +44,9 @@ form.addEventListener("submit", async (e) => {
     direccion: form.direccion.value,
     dni: parseInt(form.dni.value),
     cuil: parseInt(form.cuil.value),
+    password: form.password.value,
     matricula: form.matricula.value || null,
-    estado: true,
-    fechaAlta: new Date().toISOString(),
-    lstEspecialidades: especialidadesSeleccionadas
+    especialidadesIds: especialidadesSeleccionadas
   };
 
   try {
@@ -78,7 +70,6 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-// 📥 Cargar empleados
 async function cargarEmpleados() {
   try {
     const res = await fetch(API_EMPLEADOS);
@@ -115,7 +106,6 @@ async function cargarEmpleados() {
   }
 }
 
-// 🗑️ Baja lógica del empleado
 async function darBajaEmpleado(id) {
   if (!confirm("¿Estás seguro de dar de baja este empleado?")) return;
 
@@ -136,7 +126,6 @@ async function darBajaEmpleado(id) {
   }
 }
 
-// ✏️ Cargar datos del empleado a editar
 async function editarEmpleado(id) {
   try {
     const res = await fetch(`${API_EMPLEADOS}/${id}`);
@@ -149,6 +138,7 @@ async function editarEmpleado(id) {
     form.dni.value = e.dni;
     form.cuil.value = e.cuil;
     form.matricula.value = e.matricula ?? "";
+    form.password.value = ""; // No prellenar contraseña por seguridad
 
     document.querySelectorAll("input[name='especialidades']").forEach((checkbox) => {
       checkbox.checked = e.lstEspecialidades?.some(es => es.id === parseInt(checkbox.value)) || false;
@@ -161,7 +151,6 @@ async function editarEmpleado(id) {
   }
 }
 
-// 📋 Cargar especialidades
 async function cargarEspecialidades() {
   try {
     const res = await fetch(API_ESPECIALIDADES);

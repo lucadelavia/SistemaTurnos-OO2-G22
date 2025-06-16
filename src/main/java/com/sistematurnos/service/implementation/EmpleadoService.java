@@ -79,6 +79,7 @@ public class EmpleadoService implements IEmpleadoService {
     public Empleado altaEmpleadoConEspecialidades(Empleado empleado) {
         empleado.setEstado(true);
         empleado.setFechaAlta(LocalDateTime.now());
+        empleado.setPassword(passwordEncoder.encode(empleado.getPassword()));
 
         if (empleado.getLstEspecialidades() != null && !empleado.getLstEspecialidades().isEmpty()) {
             Set<Especialidad> especialidadesExistentes = empleado.getLstEspecialidades().stream()
@@ -96,6 +97,11 @@ public class EmpleadoService implements IEmpleadoService {
     public Empleado obtenerEmpleadoPorId(int id) {
         return empleadoRepository.findById(id)
                 .orElseThrow(() -> new EmpleadoNoEncontradoException("ERROR: No existe el empleado solicitado con ID " + id));
+    }
+
+    public Especialidad obtenerEspecialidadPorId(int idEspecialidad) {
+        return especialidadRepository.findById(idEspecialidad)
+                .orElseThrow(() -> new IllegalArgumentException("Especialidad no encontrada con ID: " + idEspecialidad));
     }
 
     @Override

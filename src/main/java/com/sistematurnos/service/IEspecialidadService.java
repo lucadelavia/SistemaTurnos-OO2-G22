@@ -18,4 +18,5 @@ public interface IEspecialidadService {
 	public Especialidad obtenerEspecialidadPorNombre(String nombre);
 	
 	public Especialidad obtenerEspecialidadPorId (int id);
+
 }

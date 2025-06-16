@@ -24,18 +24,14 @@ public class TurnoMapper {
                 turno.getFechaHora(),
                 turno.isEstado(),
                 turno.getCodigo(),
-
-                turno.getCliente() != null ? turno.getCliente().getId() : null,
-                turno.getCliente() != null ? turno.getCliente().getNombre() : null,
-
-                turno.getEmpleado() != null ? turno.getEmpleado().getId() : null,
-                turno.getEmpleado() != null ? turno.getEmpleado().getNombre() : null,
-
-                turno.getSucursal() != null ? turno.getSucursal().getId() : null,
-                turno.getSucursal() != null ? turno.getSucursal().getDireccion() : null,
-
-                turno.getServicio() != null ? turno.getServicio().getId() : null,
-                turno.getServicio() != null ? turno.getServicio().getNombreServicio() : null
+                turno.getCliente().getId(),
+                turno.getCliente().getNombre(),
+                turno.getEmpleado().getId(),
+                turno.getEmpleado().getNombre(),
+                turno.getSucursal().getId(),
+                turno.getSucursal().getDireccion(),
+                turno.getServicio().getId(),
+                turno.getServicio().getNombreServicio()
         );
     }
 }

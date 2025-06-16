@@ -127,10 +127,8 @@ function cargarHorarios() {
     .then(data => {
       const select = document.getElementById("horario");
       select.innerHTML = '<option value="">Seleccione</option>';
-
       const mensaje = document.getElementById("mensaje-horarios");
       if (mensaje) mensaje.remove();
-
       if (data.length === 0) {
         const aviso = document.createElement("div");
         aviso.id = "mensaje-horarios";
@@ -139,7 +137,6 @@ function cargarHorarios() {
         select.parentElement.appendChild(aviso);
         return;
       }
-
       data.forEach(hora => {
         const dt = new Date(hora);
         const option = document.createElement("option");
@@ -153,16 +150,17 @@ function cargarHorarios() {
 
 function reservarTurno(e) {
   e.preventDefault();
-
   const horario = document.getElementById("horario").value;
+  if (!horario) return alert("Debés seleccionar un horario.");
+
   const turno = {
     fechaHora: new Date(horario).toISOString(),
     estado: true,
     codigo: generarCodigo(),
-    cliente: { id: parseInt(document.getElementById("cliente").value) },
-    empleado: { id: parseInt(document.getElementById("empleado").value) },
-    sucursal: { id: parseInt(document.getElementById("sucursal").value) },
-    servicio: { id: parseInt(document.getElementById("servicio").value) }
+    idCliente: parseInt(document.getElementById("cliente").value),
+    idEmpleado: parseInt(document.getElementById("empleado").value),
+    idSucursal: parseInt(document.getElementById("sucursal").value),
+    idServicio: parseInt(document.getElementById("servicio").value)
   };
 
   const method = editando ? "PUT" : "POST";
@@ -228,48 +226,58 @@ function cargarTurnos() {
     .catch(err => console.error("Error al cargar turnos:", err));
 }
 
-function eliminarTurno(id) {
-  if (confirm("¿Seguro que desea eliminar el turno?")) {
-    fetch(`${API_TURNOS}/${id}`, { method: "DELETE" })
-      .then(() => cargarTurnos())
-      .catch(err => alert("Error al eliminar turno: " + err));
-  }
-}
-
 async function editarTurno(id) {
   try {
     const res = await fetch(`${API_TURNOS}/${id}`);
     const t = await res.json();
 
-    document.getElementById("cliente").value = t.clienteId;
+    const servicioRes = await fetch(`${API_SERVICIOS}/${t.servicioId}`);
+    const servicio = await servicioRes.json();
+    const especialidadId = servicio.especialidad?.id || servicio.idEspecialidad;
+
+    if (especialidadId) {
+      await cargarServiciosPorEspecialidad(especialidadId);
+      await cargarEmpleadosPorEspecialidad(especialidadId);
+      document.getElementById("especialidad").value = especialidadId;
+    }
+
+    document.getElementById("servicio").value = t.servicioId;
     document.getElementById("empleado").value = t.empleadoId;
     document.getElementById("sucursal").value = t.sucursalId;
-    document.getElementById("servicio").value = t.servicioId;
-
-    const fecha = t.fechaHora.split("T")[0];
-    document.getElementById("fecha").value = fecha;
-
-    await cargarEmpleadosPorServicio(t.servicioId);
+    document.getElementById("cliente").value = t.clienteId;
+    document.getElementById("fecha").value = t.fechaHora.split("T")[0];
     await cargarHorarios();
 
-    const horario = new Date(t.fechaHora);
-    const isoHorario = horario.toISOString();
     setTimeout(() => {
-      const horarioSelect = document.getElementById("horario");
-      for (const opt of horarioSelect.options) {
-        if (opt.value === isoHorario) {
+      const horario = new Date(t.fechaHora).toISOString();
+      const selectHorario = document.getElementById("horario");
+      for (const opt of selectHorario.options) {
+        if (opt.value === horario) {
           opt.selected = true;
           break;
         }
       }
-    }, 500);
+    }, 300);
 
     editando = true;
     idEditando = id;
     document.getElementById("btn-submit").textContent = "Guardar cambios";
   } catch (err) {
-    alert("Error al cargar turno para editar");
+    console.error("Error al cargar turno para editar:", err);
+    alert("No se pudo cargar el turno para editar.");
   }
+}
+
+function eliminarTurno(id) {
+  if (!confirm("¿Deseás eliminar este turno permanentemente?")) return;
+  fetch(`${API_TURNOS}/${id}`, {
+    method: "DELETE"
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("No se pudo eliminar el turno");
+      cargarTurnos();
+    })
+    .catch(err => alert("Error al eliminar el turno: " + err));
 }
 
 function generarCodigo() {
