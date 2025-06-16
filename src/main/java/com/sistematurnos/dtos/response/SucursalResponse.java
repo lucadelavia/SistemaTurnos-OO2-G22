@@ -1,20 +1,17 @@
 package com.sistematurnos.dtos.response;
 
-import com.sistematurnos.dtos.response.simple.DiaDeAtencionSimple;
-import com.sistematurnos.dtos.response.simple.EspecialidadSimple;
-
 import java.time.LocalTime;
 import java.util.Set;
 
 public record SucursalResponse(
-        int id,
+        Integer id,
         String direccion,
         String telefono,
         LocalTime horaApertura,
         LocalTime horaCierre,
         int espacio,
         boolean estado,
-        String establecimientoNombre,
-        Set<EspecialidadSimple> especialidades,
-        Set<DiaDeAtencionSimple> dias
+        Integer idEstablecimiento,
+        Set<?> lstEspecialidad,  // Puede ser Set<Integer> o Set<EspecialidadResponse>
+        Set<?> lstDiasDeAtencion  // Puede ser Set<Integer> o Set<DiasDeAtencionResponse>
 ) {}

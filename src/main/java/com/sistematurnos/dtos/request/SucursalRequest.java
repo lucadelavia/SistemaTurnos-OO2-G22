@@ -8,5 +8,6 @@ public record SucursalRequest(
         LocalTime horaApertura,
         LocalTime horaCierre,
         int espacio,
+        boolean estado,
         int idEstablecimiento
 ) {}

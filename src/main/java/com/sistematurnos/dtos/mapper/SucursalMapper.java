@@ -1,35 +1,40 @@
 package com.sistematurnos.dtos.mapper;
 
+import com.sistematurnos.dtos.request.SucursalRequest;
 import com.sistematurnos.dtos.response.SucursalResponse;
-import com.sistematurnos.dtos.response.simple.DiaDeAtencionSimple;
-import com.sistematurnos.dtos.response.simple.EspecialidadSimple;
-import com.sistematurnos.entity.Sucursal;
-
-import java.util.Set;
+import com.sistematurnos.entity.*;
 import java.util.stream.Collectors;
 
 public class SucursalMapper {
 
-    public static SucursalResponse toResponse(Sucursal s) {
-        Set<EspecialidadSimple> especialidades = s.getLstEspecialidad().stream()
-                .map(e -> new EspecialidadSimple(e.getId(), e.getNombre()))
-                .collect(Collectors.toSet());
+    public static Sucursal toEntity(SucursalRequest dto) {
+        Sucursal sucursal = new Sucursal();
+        sucursal.setDireccion(dto.direccion());
+        sucursal.setTelefono(dto.telefono());
+        sucursal.setHoraApertura(dto.horaApertura());
+        sucursal.setHoraCierre(dto.horaCierre());
+        sucursal.setEspacio(dto.espacio());
+        sucursal.setEstado(dto.estado());
+        return sucursal;
+    }
 
-        Set<DiaDeAtencionSimple> dias = s.getLstDiasDeAtencion().stream()
-                .map(d -> new DiaDeAtencionSimple(d.getId(), d.getNombre()))
-                .collect(Collectors.toSet());
-
+    public static SucursalResponse toResponse(Sucursal sucursal) {
         return new SucursalResponse(
-                s.getId(),
-                s.getDireccion(),
-                s.getTelefono(),
-                s.getHoraApertura(),
-                s.getHoraCierre(),
-                s.getEspacio(),
-                s.isEstado(),
-                s.getEstablecimiento().getNombre(),
-                especialidades,
-                dias
+                sucursal.getId(),
+                sucursal.getDireccion(),
+                sucursal.getTelefono(),
+                sucursal.getHoraApertura(),
+                sucursal.getHoraCierre(),
+                sucursal.getEspacio(),
+                sucursal.isEstado(),
+                sucursal.getEstablecimiento() != null ? 
+                    sucursal.getEstablecimiento().getId() : null,
+                sucursal.getLstEspecialidad().stream()
+                    .map(Especialidad::getId)
+                    .collect(Collectors.toSet()),
+                sucursal.getLstDiasDeAtencion().stream()
+                    .map(DiasDeAtencion::getId)
+                    .collect(Collectors.toSet())
         );
     }
 }
