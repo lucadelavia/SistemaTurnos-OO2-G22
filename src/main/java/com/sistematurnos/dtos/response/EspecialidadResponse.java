@@ -1,5 +1,11 @@
 package com.sistematurnos.dtos.response;
 
-public record EspecialidadResponse(int id, String nombre) {
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
+public class EspecialidadResponse {
+    private int id;
+    private String nombre;
 }

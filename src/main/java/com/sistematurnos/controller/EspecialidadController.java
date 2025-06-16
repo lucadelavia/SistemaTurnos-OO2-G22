@@ -67,8 +67,9 @@ public class EspecialidadController {
     @PutMapping("/{id}")
     public ResponseEntity<EspecialidadResponse> modificar(@PathVariable int id, @RequestBody EspecialidadRequest request) {
         try {
+            request.setId(id);  
             Especialidad actualizada = especialidadService.modificarEspecialidad(
-                    EspecialidadMapper.toEntity(id, request));
+                    EspecialidadMapper.toEntity(request));
             return ResponseEntity.ok(EspecialidadMapper.toResponse(actualizada));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
