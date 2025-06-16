@@ -24,7 +24,6 @@ public class ClienteService implements IClienteService {
 
     @Override
     public Cliente altaCliente(String nombre, String apellido, String email, String direccion, int dni, String password) {
-
         if (clienteRepository.findByDni(dni).isPresent()) {
             throw new ClienteDuplicadoException("Ya existe un cliente con ese DNI.");
         }
@@ -38,8 +37,8 @@ public class ClienteService implements IClienteService {
         cliente.setEstado(true);
         cliente.setFechaAlta(LocalDateTime.now());
         cliente.setPassword(passwordEncoder.encode(password));
-        cliente.setRol(Rol.CLIENTE); 
-        
+        cliente.setRol(Rol.CLIENTE);
+
         return clienteRepository.save(cliente);
     }
 
@@ -48,6 +47,8 @@ public class ClienteService implements IClienteService {
         if (clienteRepository.findByDni(cliente.getDni()).isPresent()) {
             throw new ClienteDuplicadoException("Ya existe un cliente con ese DNI.");
         }
+
+        cliente.setPassword(passwordEncoder.encode(cliente.getPassword()));
         return clienteRepository.save(cliente);
     }
 

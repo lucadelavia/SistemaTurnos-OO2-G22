@@ -2,17 +2,23 @@ const API_URL = "/api/clientes";
 const ROL_URL = "/auth/rol";
 const form = document.getElementById("cliente-form");
 const tbody = document.getElementById("clientes-tbody");
+const passwordGroup = document.getElementById("password-group");
+const passwordInput = document.getElementById("password");
 
 let editando = false;
 let idEditando = null;
 let rolUsuario = null;
 
-// Cargar al iniciar
 window.addEventListener("DOMContentLoaded", async () => {
   rolUsuario = await obtenerRol();
-  if (rolUsuario !== "ADMIN") {
+
+  if (rolUsuario === "ADMIN") {
+    form.style.display = "block";
+    passwordGroup.classList.remove("d-none");
+  } else {
     form.style.display = "none";
   }
+
   await cargarClientes();
 });
 
@@ -41,6 +47,10 @@ form.addEventListener("submit", async (e) => {
     fechaAlta: new Date().toISOString()
   };
 
+  if (rolUsuario === "ADMIN") {
+    cliente.password = passwordInput.value || "123456";
+  }
+
   try {
     const method = editando ? "PUT" : "POST";
     const url = editando ? `${API_URL}/${idEditando}` : API_URL;
@@ -54,7 +64,7 @@ form.addEventListener("submit", async (e) => {
     form.reset();
     editando = false;
     idEditando = null;
-    cargarClientes();
+    await cargarClientes();
   } catch (err) {
     console.error("Error al guardar:", err);
   }
@@ -78,8 +88,8 @@ async function cargarClientes() {
       <td>${c.fechaAlta ? c.fechaAlta.split("T")[0] : ""}</td>
       <td>
         ${rolUsuario === "ADMIN" ? `
-          <button class="btn btn-sm btn-warning" onclick="editarCliente(${c.id})">✏️</button>
-          <button class="btn btn-sm btn-danger" onclick="eliminarCliente(${c.id})">🗑️</button>
+          <button class="btn btn-sm btn-warning" onclick="editarCliente(${c.id})"><i class="bi bi-pencil-fill"></i></button>
+          <button class="btn btn-sm btn-danger" onclick="eliminarCliente(${c.id})"><i class="bi bi-trash-fill"></i></button>
         ` : "-"}
       </td>
     `;
@@ -90,7 +100,7 @@ async function cargarClientes() {
 async function eliminarCliente(id) {
   if (confirm("¿Estás seguro de dar de baja este cliente?")) {
     await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-    cargarClientes();
+    await cargarClientes();
   }
 }
 
@@ -104,6 +114,7 @@ async function editarCliente(id) {
   form.direccion.value = c.direccion;
   form.dni.value = c.dni;
   form.nroCliente.value = c.nroCliente;
+  passwordInput.value = "";
 
   editando = true;
   idEditando = id;

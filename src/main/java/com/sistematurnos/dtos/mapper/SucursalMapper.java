@@ -1,8 +1,9 @@
 package com.sistematurnos.dtos.mapper;
 
 import com.sistematurnos.dtos.request.SucursalRequest;
-import com.sistematurnos.dtos.response.SucursalResponse;
+import com.sistematurnos.dtos.response.*;
 import com.sistematurnos.entity.*;
+
 import java.util.stream.Collectors;
 
 public class SucursalMapper {
@@ -27,14 +28,13 @@ public class SucursalMapper {
                 sucursal.getHoraCierre(),
                 sucursal.getEspacio(),
                 sucursal.isEstado(),
-                sucursal.getEstablecimiento() != null ? 
-                    sucursal.getEstablecimiento().getId() : null,
+                sucursal.getEstablecimiento() != null ? sucursal.getEstablecimiento().getId() : null,
                 sucursal.getLstEspecialidad().stream()
-                    .map(Especialidad::getId)
-                    .collect(Collectors.toSet()),
+                        .map(e -> new EspecialidadResponse(e.getId(), e.getNombre()))
+                        .collect(Collectors.toSet()),
                 sucursal.getLstDiasDeAtencion().stream()
-                    .map(DiasDeAtencion::getId)
-                    .collect(Collectors.toSet())
+                        .map(d -> new DiasDeAtencionResponse(d.getId(), d.getNombre()))
+                        .collect(Collectors.toSet())
         );
     }
 }

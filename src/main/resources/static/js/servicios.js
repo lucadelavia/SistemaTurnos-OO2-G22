@@ -11,7 +11,6 @@ let editando = false;
 let idEditando = null;
 let esAdmin = false;
 
-// Al iniciar
 window.addEventListener("DOMContentLoaded", async () => {
   await verificarRol();
   await cargarEspecialidades();
@@ -35,7 +34,7 @@ async function verificarRol() {
   }
 }
 
-// Cargar especialidades
+// Cargar especialidades en el <select>
 async function cargarEspecialidades() {
   try {
     const res = await fetch(API_ESPECIALIDADES);
@@ -61,8 +60,7 @@ form.addEventListener("submit", async (e) => {
   const servicio = {
     nombreServicio: form.nombreServicio.value.trim(),
     duracion: parseInt(form.duracion.value),
-    estado: true,
-    especialidad: { id: parseInt(selectEspecialidad.value) }
+    idEspecialidad: parseInt(selectEspecialidad.value)
   };
 
   const method = editando ? "PUT" : "POST";
@@ -85,7 +83,7 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-// Cargar servicios activos
+// Cargar servicios
 async function cargarServicios() {
   try {
     const res = await fetch(API_SERVICIOS);
@@ -101,7 +99,7 @@ async function cargarServicios() {
           <td>${s.id}</td>
           <td>${s.nombreServicio}</td>
           <td>${s.duracion} min</td>
-          <td>${s.especialidad?.nombre || "-"}</td>
+          <td>${s.nombreEspecialidad || "-"}</td>
           <td>${s.estado ? "Activo" : "Inactivo"}</td>
           <td ${!esAdmin ? 'style="display:none;"' : ''}>
             <button class="btn btn-sm btn-warning me-1" onclick="editarServicio(${s.id})">✏️</button>
@@ -123,7 +121,7 @@ async function editarServicio(id) {
 
     form.nombreServicio.value = s.nombreServicio;
     form.duracion.value = s.duracion;
-    selectEspecialidad.value = s.especialidad?.id || "";
+    selectEspecialidad.value = s.idEspecialidad;
 
     editando = true;
     idEditando = id;
@@ -144,7 +142,12 @@ async function darBajaServicio(id) {
     await fetch(`${API_SERVICIOS}/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(servicio)
+      body: JSON.stringify({
+        nombreServicio: servicio.nombreServicio,
+        duracion: servicio.duracion,
+        idEspecialidad: servicio.idEspecialidad,
+        estado: false
+      })
     });
 
     await cargarServicios();

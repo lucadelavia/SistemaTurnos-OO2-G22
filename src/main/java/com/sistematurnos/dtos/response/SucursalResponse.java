@@ -12,6 +12,6 @@ public record SucursalResponse(
         int espacio,
         boolean estado,
         Integer idEstablecimiento,
-        Set<?> lstEspecialidad,  // Puede ser Set<Integer> o Set<EspecialidadResponse>
-        Set<?> lstDiasDeAtencion  // Puede ser Set<Integer> o Set<DiasDeAtencionResponse>
+        Set<EspecialidadResponse> lstEspecialidad,
+        Set<DiasDeAtencionResponse> lstDiasDeAtencion
 ) {}

@@ -7,8 +7,16 @@ public record TurnoResponse(
         LocalDateTime fechaHora,
         boolean estadoActivo,
         String codigo,
-        Object cliente,  // Puede ser Integer o ClienteResponse
-        Object empleado, // Puede ser Integer o EmpleadoResponse
-        Object sucursal, // Puede ser Integer o SucursalResponse
-        Object servicio  // Puede ser Integer o ServicioResponse
+
+        Integer clienteId,
+        String clienteNombre,
+
+        Integer empleadoId,
+        String empleadoNombre,
+
+        Integer sucursalId,
+        String sucursalDireccion,
+
+        Integer servicioId,
+        String servicioNombre
 ) {}
