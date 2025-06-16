@@ -7,28 +7,28 @@ import com.sistematurnos.entity.Establecimiento;
 public class EstablecimientoMapper {
 
     public static EstablecimientoResponse toResponse(Establecimiento est) {
-        EstablecimientoResponse dto = new EstablecimientoResponse();
-        dto.setId(est.getId());
-        dto.setNombre(est.getNombre());
-        dto.setCuit(est.getCuit());
-        dto.setDireccion(est.getDireccion());
-        dto.setDescripcion(est.getDescripcion());
-        return dto;
+        return new EstablecimientoResponse(
+            est.getId(),
+            est.getNombre(),
+            est.getCuit(),
+            est.getDireccion(),
+            est.getDescripcion()
+        );
     }
 
     public static Establecimiento toEntity(EstablecimientoRequest request) {
         Establecimiento est = new Establecimiento();
-        est.setId(request.getId());
-        est.setNombre(request.getNombre());
-        est.setCuit(request.getCuit());
-        est.setDireccion(request.getDireccion());
-        est.setDescripcion(request.getDescripcion());
+        est.setId(request.id());
+        est.setNombre(request.nombre());
+        est.setCuit(request.cuit());
+        est.setDireccion(request.direccion());
+        est.setDescripcion(request.descripcion());
         return est;
     }
 
     public static Establecimiento toEntity(int id, EstablecimientoRequest request) {
         Establecimiento est = toEntity(request);
-        est.setId(id); 
+        est.setId(id);
         return est;
     }
 }
