@@ -3,12 +3,12 @@ package com.sistematurnos.dtos.response;
 import java.time.LocalDateTime;
 
 public record TurnoResponse(
-        int id,
+        Integer id,
         LocalDateTime fechaHora,
-        boolean estado,
+        boolean estadoActivo,
         String codigo,
-        String nombreCliente,
-        String nombreEmpleado,
-        String nombreServicio,
-        String direccionSucursal
+        Object cliente,  // Puede ser Integer o ClienteResponse
+        Object empleado, // Puede ser Integer o EmpleadoResponse
+        Object sucursal, // Puede ser Integer o SucursalResponse
+        Object servicio  // Puede ser Integer o ServicioResponse
 ) {}

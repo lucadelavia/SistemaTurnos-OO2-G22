@@ -6,29 +6,24 @@ import com.sistematurnos.entity.*;
 
 public class TurnoMapper {
 
+    public static Turno toEntity(TurnoRequest dto) {
+        Turno turno = new Turno();
+        turno.setFechaHora(dto.fechaHora());
+        turno.setEstado(dto.estado());
+        turno.setCodigo(dto.codigo());
+        return turno;
+    }
+
     public static TurnoResponse toResponse(Turno turno) {
         return new TurnoResponse(
                 turno.getId(),
                 turno.getFechaHora(),
                 turno.isEstado(),
                 turno.getCodigo(),
-                turno.getCliente().getNombre() + " " + turno.getCliente().getApellido(),
-                turno.getEmpleado().getNombre() + " " + turno.getEmpleado().getApellido(),
-                turno.getServicio().getNombreServicio(),
-                turno.getSucursal().getDireccion()
-        );
-    }
-
-    public static Turno toEntity(TurnoRequest req, Cliente cliente, Empleado empleado,
-                                 Sucursal sucursal, Servicio servicio) {
-        return new Turno(
-                req.fechaHora(),
-                req.estado(),
-                req.codigo(),
-                servicio,
-                cliente,
-                sucursal,
-                empleado
+                turno.getCliente() != null ? turno.getCliente().getId() : null,
+                turno.getEmpleado() != null ? turno.getEmpleado().getId() : null,
+                turno.getSucursal() != null ? turno.getSucursal().getId() : null,
+                turno.getServicio() != null ? turno.getServicio().getId() : null
         );
     }
 }
