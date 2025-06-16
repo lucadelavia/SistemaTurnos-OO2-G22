@@ -1,5 +1,7 @@
 package com.sistematurnos.dtos.request;
 
+import com.sistematurnos.entity.enums.Rol;
+
 public record ClienteRequest(
         String nombre,
         String apellido,
@@ -7,5 +9,6 @@ public record ClienteRequest(
         String password,
         String direccion,
         int dni,
+        Rol rol,
         int nroCliente
 ) {}

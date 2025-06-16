@@ -7,8 +7,6 @@ const API_EMPLEADOS = `${API_BASE}/empleados`;
 const API_ESPECIALIDADES = `${API_BASE}/especialidades`;
 
 let usuarioActual = null;
-let editando = false;
-let idEditando = null;
 
 window.addEventListener("DOMContentLoaded", async () => {
   await cargarUsuario();
@@ -19,7 +17,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   } else if (usuarioActual?.rol === "ADMIN") {
     document.getElementById("reserva-form").classList.remove("d-none");
     document.getElementById("cliente-group").classList.remove("d-none");
-    document.getElementById("th-acciones").classList.remove("d-none");
   }
 
   await cargarEspecialidades();
@@ -104,6 +101,7 @@ async function cargarEmpleadosPorServicio(idServicio) {
 function cargarOptions(selectId, lista, fieldName) {
   const select = document.getElementById(selectId);
   select.innerHTML = '<option value="">Seleccione</option>';
+  if (!Array.isArray(lista)) return;
   lista.forEach(item => {
     const option = document.createElement("option");
     option.value = item.id;
@@ -127,8 +125,10 @@ function cargarHorarios() {
     .then(data => {
       const select = document.getElementById("horario");
       select.innerHTML = '<option value="">Seleccione</option>';
+
       const mensaje = document.getElementById("mensaje-horarios");
       if (mensaje) mensaje.remove();
+
       if (data.length === 0) {
         const aviso = document.createElement("div");
         aviso.id = "mensaje-horarios";
@@ -137,6 +137,7 @@ function cargarHorarios() {
         select.parentElement.appendChild(aviso);
         return;
       }
+
       data.forEach(hora => {
         const dt = new Date(hora);
         const option = document.createElement("option");
@@ -150,9 +151,8 @@ function cargarHorarios() {
 
 function reservarTurno(e) {
   e.preventDefault();
-  const horario = document.getElementById("horario").value;
-  if (!horario) return alert("Debés seleccionar un horario.");
 
+  const horario = document.getElementById("horario").value;
   const turno = {
     fechaHora: new Date(horario).toISOString(),
     estado: true,
@@ -163,25 +163,21 @@ function reservarTurno(e) {
     idServicio: parseInt(document.getElementById("servicio").value)
   };
 
-  const method = editando ? "PUT" : "POST";
-  const url = editando ? `${API_TURNOS}/${idEditando}` : API_TURNOS;
-
-  fetch(url, {
-    method,
+  fetch(API_TURNOS, {
+    method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(turno)
   })
     .then(res => {
-      if (!res.ok) throw new Error("Error al guardar el turno");
+      if (!res.ok) throw new Error("Error al reservar el turno");
       return res.json();
     })
     .then(() => {
-      alert(editando ? "Turno modificado con éxito" : "Turno reservado con éxito");
+      alert("Turno reservado con éxito");
       document.getElementById("form-turno").reset();
       document.getElementById("horario").innerHTML = "";
-      document.getElementById("btn-submit").textContent = "Reservar";
-      editando = false;
-      idEditando = null;
+      const mensaje = document.getElementById("mensaje-horarios");
+      if (mensaje) mensaje.remove();
       cargarTurnos();
     })
     .catch(err => alert(err.message));
@@ -211,73 +207,11 @@ function cargarTurnos() {
           <td>${t.empleadoNombre || t.empleadoId || "-"}</td>
           <td>${t.sucursalDireccion || t.sucursalId || "-"}</td>
           <td>${t.servicioNombre || t.servicioId || "-"}</td>
-          ${
-            usuarioActual?.rol === "ADMIN" || usuarioActual?.rol === "CLIENTE"
-              ? `<td>
-                  <button class="btn btn-sm btn-warning" onclick="editarTurno(${t.id})">✏️</button>
-                  <button class="btn btn-sm btn-danger" onclick="eliminarTurno(${t.id})">🗑️</button>
-                </td>`
-              : ""
-          }
         `;
         tbody.appendChild(row);
       });
     })
     .catch(err => console.error("Error al cargar turnos:", err));
-}
-
-async function editarTurno(id) {
-  try {
-    const res = await fetch(`${API_TURNOS}/${id}`);
-    const t = await res.json();
-
-    const servicioRes = await fetch(`${API_SERVICIOS}/${t.servicioId}`);
-    const servicio = await servicioRes.json();
-    const especialidadId = servicio.especialidad?.id || servicio.idEspecialidad;
-
-    if (especialidadId) {
-      await cargarServiciosPorEspecialidad(especialidadId);
-      await cargarEmpleadosPorEspecialidad(especialidadId);
-      document.getElementById("especialidad").value = especialidadId;
-    }
-
-    document.getElementById("servicio").value = t.servicioId;
-    document.getElementById("empleado").value = t.empleadoId;
-    document.getElementById("sucursal").value = t.sucursalId;
-    document.getElementById("cliente").value = t.clienteId;
-    document.getElementById("fecha").value = t.fechaHora.split("T")[0];
-    await cargarHorarios();
-
-    setTimeout(() => {
-      const horario = new Date(t.fechaHora).toISOString();
-      const selectHorario = document.getElementById("horario");
-      for (const opt of selectHorario.options) {
-        if (opt.value === horario) {
-          opt.selected = true;
-          break;
-        }
-      }
-    }, 300);
-
-    editando = true;
-    idEditando = id;
-    document.getElementById("btn-submit").textContent = "Guardar cambios";
-  } catch (err) {
-    console.error("Error al cargar turno para editar:", err);
-    alert("No se pudo cargar el turno para editar.");
-  }
-}
-
-function eliminarTurno(id) {
-  if (!confirm("¿Deseás eliminar este turno permanentemente?")) return;
-  fetch(`${API_TURNOS}/${id}`, {
-    method: "DELETE"
-  })
-    .then(res => {
-      if (!res.ok) throw new Error("No se pudo eliminar el turno");
-      cargarTurnos();
-    })
-    .catch(err => alert("Error al eliminar el turno: " + err));
 }
 
 function generarCodigo() {

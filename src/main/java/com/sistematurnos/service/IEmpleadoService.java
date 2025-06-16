@@ -33,7 +33,4 @@ public interface IEmpleadoService {
     public void asignarEspecialidad(int idEmpleado, Especialidad esp);
 
     public void removerEspecialidad(int idEmpleado, Especialidad esp);
-
-    Especialidad obtenerEspecialidadPorId(int id);
-
 }

@@ -3,7 +3,6 @@ package com.sistematurnos.dtos.mapper;
 import com.sistematurnos.dtos.request.ClienteRequest;
 import com.sistematurnos.dtos.response.ClienteResponse;
 import com.sistematurnos.entity.Cliente;
-import com.sistematurnos.entity.enums.Rol;
 
 import java.time.LocalDateTime;
 
@@ -17,9 +16,8 @@ public class ClienteMapper {
         cliente.setPassword(dto.password());
         cliente.setDireccion(dto.direccion());
         cliente.setDni(dto.dni());
+        cliente.setRol(dto.rol());
         cliente.setNroCliente(dto.nroCliente());
-        cliente.setRol(Rol.CLIENTE);
-
         cliente.setEstado(true);
         cliente.setFechaAlta(LocalDateTime.now());
         return cliente;

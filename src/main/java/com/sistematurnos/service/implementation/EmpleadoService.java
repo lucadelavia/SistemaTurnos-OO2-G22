@@ -77,38 +77,25 @@ public class EmpleadoService implements IEmpleadoService {
 
     @Override
     public Empleado altaEmpleadoConEspecialidades(Empleado empleado) {
-        // Estado inicial
         empleado.setEstado(true);
         empleado.setFechaAlta(LocalDateTime.now());
 
-        // Guardar primero el empleado SIN especialidades para obtener su ID
-        Set<Especialidad> especialidades = empleado.getLstEspecialidades(); // temporal
-        empleado.setLstEspecialidades(null); // evitar error de clave foránea
-
-        Empleado guardado = empleadoRepository.save(empleado);
-
-        if (especialidades != null && !especialidades.isEmpty()) {
-            Set<Especialidad> especialidadesExistentes = especialidades.stream()
+        if (empleado.getLstEspecialidades() != null && !empleado.getLstEspecialidades().isEmpty()) {
+            Set<Especialidad> especialidadesExistentes = empleado.getLstEspecialidades().stream()
                     .map(espec -> especialidadRepository.findById(espec.getId())
                             .orElseThrow(() -> new EmpleadoNoEncontradoException("Especialidad no encontrada: " + espec.getId())))
                     .collect(Collectors.toSet());
 
-            guardado.setLstEspecialidades(especialidadesExistentes);
-            guardado = empleadoRepository.save(guardado); // volver a guardar
+            empleado.setLstEspecialidades(especialidadesExistentes);
         }
 
-        return guardado;
+        return empleadoRepository.save(empleado);
     }
 
     @Override
     public Empleado obtenerEmpleadoPorId(int id) {
         return empleadoRepository.findById(id)
                 .orElseThrow(() -> new EmpleadoNoEncontradoException("ERROR: No existe el empleado solicitado con ID " + id));
-    }
-
-    public Especialidad obtenerEspecialidadPorId(int idEspecialidad) {
-        return especialidadRepository.findById(idEspecialidad)
-                .orElseThrow(() -> new IllegalArgumentException("Especialidad no encontrada con ID: " + idEspecialidad));
     }
 
     @Override

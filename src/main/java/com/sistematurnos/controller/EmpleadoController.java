@@ -1,7 +1,5 @@
 package com.sistematurnos.controller;
 
-import com.sistematurnos.dtos.mapper.EmpleadoMapper;
-import com.sistematurnos.dtos.request.EmpleadoRequest;
 import com.sistematurnos.entity.Empleado;
 import com.sistematurnos.entity.Especialidad;
 import com.sistematurnos.service.IEmpleadoService;
@@ -12,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/empleados")
@@ -93,19 +89,12 @@ public class EmpleadoController {
 
     @Operation(summary = "Crear empleado con especialidades")
     @PostMapping("/con-especialidades")
-    public ResponseEntity<Empleado> crearEmpleadoConEspecialidades(@RequestBody EmpleadoRequest request) {
+    public ResponseEntity<Empleado> crearEmpleadoConEspecialidades(@RequestBody Empleado empleado) {
         try {
-            Set<Especialidad> especialidades = request.especialidadesIds().stream()
-                    .map(empleadoService::obtenerEspecialidadPorId)
-                    .collect(Collectors.toSet());
-
-            Empleado empleado = EmpleadoMapper.toEntity(request, especialidades);
-            Empleado guardado = empleadoService.altaEmpleadoConEspecialidades(empleado);
-
-            return ResponseEntity.ok(guardado);
-        } catch (Exception e) {
-            e.printStackTrace(); // 🔍 Esto ayuda en desarrollo a ver el error real
-            return ResponseEntity.badRequest().build();
+            Empleado nuevo = empleadoService.altaEmpleadoConEspecialidades(empleado);
+            return ResponseEntity.ok(nuevo);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
         }
     }
 

@@ -5,6 +5,7 @@ import com.sistematurnos.dtos.response.TurnoResponse;
 import com.sistematurnos.dtos.mapper.TurnoMapper;
 import com.sistematurnos.entity.*;
 import com.sistematurnos.service.*;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -27,6 +28,7 @@ public class TurnoController {
     @Autowired private ISucursalService sucursalService;
     @Autowired private IServicioService servicioService;
 
+    @Operation(summary = "Listar todos los turnos")
     @GetMapping
     public List<TurnoResponse> listarTurnos() {
         return turnoService.traerTurnos().stream()
@@ -34,16 +36,18 @@ public class TurnoController {
                 .collect(Collectors.toList());
     }
 
+    @Operation(summary = "Obtener un turno por su ID")
     @GetMapping("/{id}")
     public ResponseEntity<TurnoResponse> obtenerPorId(@PathVariable int id) {
         try {
             Turno turno = turnoService.obtenerTurnoPorId(id);
             return ResponseEntity.ok(TurnoMapper.toResponse(turno));
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
+    @Operation(summary = "Crear un nuevo turno")
     @PostMapping
     public ResponseEntity<TurnoResponse> crear(@RequestBody TurnoRequest request) {
         try {
@@ -52,14 +56,16 @@ public class TurnoController {
             Sucursal sucursal = sucursalService.traer(request.idSucursal());
             Servicio servicio = servicioService.obtenerServicioPorId(request.idServicio());
 
-            Turno turno = TurnoMapper.toEntity(request, cliente, empleado, sucursal, servicio);
-            Turno guardado = turnoService.altaTurno(turno);
+            Turno nuevo = TurnoMapper.toEntity(request, cliente, empleado, sucursal, servicio);
+            Turno guardado = turnoService.altaTurno(nuevo);
+
             return ResponseEntity.ok(TurnoMapper.toResponse(guardado));
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
+    @Operation(summary = "Modificar un turno existente")
     @PutMapping("/{id}")
     public ResponseEntity<TurnoResponse> modificar(@PathVariable int id, @RequestBody TurnoRequest request) {
         try {
@@ -70,24 +76,26 @@ public class TurnoController {
 
             Turno turno = TurnoMapper.toEntity(request, cliente, empleado, sucursal, servicio);
             turno.setId(id);
-
             Turno actualizado = turnoService.modificarTurno(turno);
-            return ResponseEntity.ok(TurnoMapper.toResponse(actualizado));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable int id) {
-        try {
-            turnoService.bajaTurno(id); // Ahora elimina físicamente el turno
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
+            return ResponseEntity.ok(TurnoMapper.toResponse(actualizado));
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
+    @Operation(summary = "Eliminar un turno (baja lógica)")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable int id) {
+        try {
+            turnoService.bajaTurno(id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Operation(summary = "Obtener horarios disponibles para un turno")
     @GetMapping("/disponibilidad")
     public ResponseEntity<List<LocalDateTime>> obtenerHorariosDisponibles(
             @RequestParam int idSucursal,
@@ -97,11 +105,12 @@ public class TurnoController {
         try {
             return ResponseEntity.ok(
                     turnoService.obtenerHorariosDisponibles(idSucursal, idServicio, idEmpleado, fecha));
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
+    @Operation(summary = "Obtener turnos por cliente")
     @GetMapping("/cliente/{id}")
     public List<TurnoResponse> turnosPorCliente(@PathVariable int id) {
         return turnoService.obtenerTurnosPorCliente(id).stream()
@@ -109,6 +118,7 @@ public class TurnoController {
                 .collect(Collectors.toList());
     }
 
+    @Operation(summary = "Obtener turnos por empleado")
     @GetMapping("/empleado/{id}")
     public List<TurnoResponse> turnosPorEmpleado(@PathVariable int id) {
         return turnoService.obtenerTurnosPorEmpleado(id).stream()
@@ -116,6 +126,7 @@ public class TurnoController {
                 .collect(Collectors.toList());
     }
 
+    @Operation(summary = "Obtener turnos por sucursal")
     @GetMapping("/sucursal/{id}")
     public List<TurnoResponse> turnosPorSucursal(@PathVariable int id) {
         return turnoService.obtenerTurnosPorSucursal(id).stream()
@@ -123,6 +134,7 @@ public class TurnoController {
                 .collect(Collectors.toList());
     }
 
+    @Operation(summary = "Obtener turnos por servicio")
     @GetMapping("/servicio/{id}")
     public List<TurnoResponse> turnosPorServicio(@PathVariable int id) {
         return turnoService.obtenerTurnosPorServicio(id).stream()
@@ -130,16 +142,18 @@ public class TurnoController {
                 .collect(Collectors.toList());
     }
 
+    @Operation(summary = "Obtener turno por código")
     @GetMapping("/codigo/{codigo}")
     public ResponseEntity<TurnoResponse> turnoPorCodigo(@PathVariable String codigo) {
         try {
             Turno turno = turnoService.obtenerTurnoPorCodigo(codigo);
             return ResponseEntity.ok(TurnoMapper.toResponse(turno));
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
+    @Operation(summary = "Obtener turnos por fecha y estado")
     @GetMapping("/fecha")
     public List<TurnoResponse> turnosPorFecha(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
@@ -149,6 +163,7 @@ public class TurnoController {
                 .collect(Collectors.toList());
     }
 
+    @Operation(summary = "Obtener turnos entre dos fechas")
     @GetMapping("/rango-fechas")
     public List<TurnoResponse> turnosEntreFechas(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
@@ -158,6 +173,7 @@ public class TurnoController {
                 .collect(Collectors.toList());
     }
 
+    @Operation(summary = "Obtener turnos por fecha y sucursal")
     @GetMapping("/por-fecha-sucursal")
     public List<TurnoResponse> turnosPorFechaYSucursal(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
@@ -167,6 +183,7 @@ public class TurnoController {
                 .collect(Collectors.toList());
     }
 
+    @Operation(summary = "Obtener turnos por fecha y servicio")
     @GetMapping("/por-fecha-servicio")
     public List<TurnoResponse> turnosPorFechaYServicio(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
@@ -176,6 +193,7 @@ public class TurnoController {
                 .collect(Collectors.toList());
     }
 
+    @Operation(summary = "Obtener turnos por fecha y cliente")
     @GetMapping("/por-fecha-cliente")
     public List<TurnoResponse> turnosPorFechaYCliente(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
@@ -185,6 +203,7 @@ public class TurnoController {
                 .collect(Collectors.toList());
     }
 
+    @Operation(summary = "Obtener turnos por fecha y empleado")
     @GetMapping("/por-fecha-empleado")
     public List<TurnoResponse> turnosPorFechaYEmpleado(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,

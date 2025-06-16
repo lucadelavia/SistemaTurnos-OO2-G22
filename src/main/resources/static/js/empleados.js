@@ -11,31 +11,38 @@ let editando = false;
 let idEditando = null;
 let esAdmin = false;
 
+// Inicializar
 window.addEventListener("DOMContentLoaded", async () => {
   await verificarRol();
   await cargarEspecialidades();
   await cargarEmpleados();
 });
 
+// 🔐 Verificar rol del usuario
 async function verificarRol() {
   try {
     const res = await fetch(API_ROL);
     if (!res.ok) throw new Error("No autenticado");
     const rol = await res.text();
     esAdmin = rol === "ADMIN";
-    if (!esAdmin && formCard) formCard.style.display = "none";
+
+    // Si no es admin, ocultar el formulario
+    if (!esAdmin && formCard) {
+      formCard.style.display = "none";
+    }
   } catch (err) {
     console.error("No se pudo verificar el rol:", err);
     window.location.href = "/login";
   }
 }
 
+// 📤 Enviar formulario
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const especialidadesSeleccionadas = Array.from(
     document.querySelectorAll("input[name='especialidades']:checked")
-  ).map((input) => parseInt(input.value));
+  ).map((input) => ({ id: parseInt(input.value) }));
 
   const empleado = {
     nombre: form.nombre.value,
@@ -44,9 +51,10 @@ form.addEventListener("submit", async (e) => {
     direccion: form.direccion.value,
     dni: parseInt(form.dni.value),
     cuil: parseInt(form.cuil.value),
-    password: form.password.value,
     matricula: form.matricula.value || null,
-    especialidadesIds: especialidadesSeleccionadas
+    estado: true,
+    fechaAlta: new Date().toISOString(),
+    lstEspecialidades: especialidadesSeleccionadas
   };
 
   try {
@@ -70,6 +78,7 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
+// 📥 Cargar empleados
 async function cargarEmpleados() {
   try {
     const res = await fetch(API_EMPLEADOS);
@@ -87,7 +96,7 @@ async function cargarEmpleados() {
         <td>${e.dni}</td>
         <td>${e.cuil}</td>
         <td>${e.matricula ?? "-"}</td>
-        <td>${e.especialidades?.join(", ") || "-"}</td>
+        <td>${e.lstEspecialidades?.map(es => es.nombre).join(", ") || "-"}</td>
         <td>${e.estado ? "Activo" : "Inactivo"}</td>
         <td>${e.fechaAlta ? e.fechaAlta.split("T")[0] : ""}</td>
         <td>
@@ -106,20 +115,28 @@ async function cargarEmpleados() {
   }
 }
 
+// 🗑️ Baja lógica del empleado
 async function darBajaEmpleado(id) {
-  if (!confirm("¿Estás seguro de eliminar este empleado?")) return;
+  if (!confirm("¿Estás seguro de dar de baja este empleado?")) return;
 
   try {
+    const res = await fetch(`${API_EMPLEADOS}/${id}`);
+    const empleado = await res.json();
+    empleado.estado = false;
+
     await fetch(`${API_EMPLEADOS}/${id}`, {
-      method: "DELETE",
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(empleado),
     });
 
     await cargarEmpleados();
   } catch (err) {
-    console.error("Error al eliminar empleado:", err);
+    console.error("Error al dar de baja:", err);
   }
 }
 
+// ✏️ Cargar datos del empleado a editar
 async function editarEmpleado(id) {
   try {
     const res = await fetch(`${API_EMPLEADOS}/${id}`);
@@ -132,10 +149,9 @@ async function editarEmpleado(id) {
     form.dni.value = e.dni;
     form.cuil.value = e.cuil;
     form.matricula.value = e.matricula ?? "";
-    form.password.value = ""; // No mostrar por seguridad
 
     document.querySelectorAll("input[name='especialidades']").forEach((checkbox) => {
-      checkbox.checked = e.especialidades?.includes(checkbox.labels[0].textContent) || false;
+      checkbox.checked = e.lstEspecialidades?.some(es => es.id === parseInt(checkbox.value)) || false;
     });
 
     editando = true;
@@ -145,6 +161,7 @@ async function editarEmpleado(id) {
   }
 }
 
+// 📋 Cargar especialidades
 async function cargarEspecialidades() {
   try {
     const res = await fetch(API_ESPECIALIDADES);

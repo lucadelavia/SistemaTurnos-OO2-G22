@@ -4,7 +4,6 @@ import com.sistematurnos.dtos.request.EmpleadoRequest;
 import com.sistematurnos.dtos.response.EmpleadoResponse;
 import com.sistematurnos.entity.Empleado;
 import com.sistematurnos.entity.Especialidad;
-import com.sistematurnos.entity.enums.Rol;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -20,12 +19,11 @@ public class EmpleadoMapper {
         empleado.setPassword(dto.password());
         empleado.setDireccion(dto.direccion());
         empleado.setDni(dto.dni());
+        empleado.setRol(dto.rol());
         empleado.setCuil(dto.cuil());
         empleado.setMatricula(dto.matricula());
         empleado.setFechaAlta(LocalDateTime.now());
         empleado.setEstado(true);
-        empleado.setRol(Rol.EMPLEADO);
-
         empleado.setLstEspecialidades(especialidades);
         return empleado;
     }
