@@ -7,16 +7,20 @@ import com.sistematurnos.entity.Especialidad;
 public class EspecialidadMapper {
 
     public static EspecialidadResponse toResponse(Especialidad especialidad) {
-        EspecialidadResponse response = new EspecialidadResponse();
-        response.setId(especialidad.getId());
-        response.setNombre(especialidad.getNombre());
-        return response;
+        return new EspecialidadResponse(
+            especialidad.getId(),
+            especialidad.getNombre()
+        );
     }
 
     public static Especialidad toEntity(EspecialidadRequest request) {
-        Especialidad especialidad = new Especialidad();
-        especialidad.setId(request.getId());
-        especialidad.setNombre(request.getNombre());
-        return especialidad;
+        return new Especialidad(
+            request.id(),
+            request.nombre()
+        );
+    }
+
+    public static Especialidad toEntity(int id, EspecialidadRequest request) {
+        return new Especialidad(id, request.nombre());
     }
 }
