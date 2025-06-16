@@ -87,7 +87,7 @@ async function cargarEmpleados() {
         <td>${e.dni}</td>
         <td>${e.cuil}</td>
         <td>${e.matricula ?? "-"}</td>
-        <td>${e.lstEspecialidades?.map(es => es.nombre).join(", ") || "-"}</td>
+        <td>${e.especialidades?.join(", ") || "-"}</td>
         <td>${e.estado ? "Activo" : "Inactivo"}</td>
         <td>${e.fechaAlta ? e.fechaAlta.split("T")[0] : ""}</td>
         <td>
@@ -107,22 +107,16 @@ async function cargarEmpleados() {
 }
 
 async function darBajaEmpleado(id) {
-  if (!confirm("¿Estás seguro de dar de baja este empleado?")) return;
+  if (!confirm("¿Estás seguro de eliminar este empleado?")) return;
 
   try {
-    const res = await fetch(`${API_EMPLEADOS}/${id}`);
-    const empleado = await res.json();
-    empleado.estado = false;
-
     await fetch(`${API_EMPLEADOS}/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(empleado),
+      method: "DELETE",
     });
 
     await cargarEmpleados();
   } catch (err) {
-    console.error("Error al dar de baja:", err);
+    console.error("Error al eliminar empleado:", err);
   }
 }
 
@@ -138,10 +132,10 @@ async function editarEmpleado(id) {
     form.dni.value = e.dni;
     form.cuil.value = e.cuil;
     form.matricula.value = e.matricula ?? "";
-    form.password.value = ""; // No prellenar contraseña por seguridad
+    form.password.value = ""; // No mostrar por seguridad
 
     document.querySelectorAll("input[name='especialidades']").forEach((checkbox) => {
-      checkbox.checked = e.lstEspecialidades?.some(es => es.id === parseInt(checkbox.value)) || false;
+      checkbox.checked = e.especialidades?.includes(checkbox.labels[0].textContent) || false;
     });
 
     editando = true;
