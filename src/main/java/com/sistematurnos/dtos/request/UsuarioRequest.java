@@ -9,6 +9,6 @@ public record UsuarioRequest(
         String password,
         String direccion,
         int dni,
+        boolean estado,
         Rol rol
-) {
-}
+) {}
