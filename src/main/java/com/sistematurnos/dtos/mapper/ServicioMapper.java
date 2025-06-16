@@ -7,6 +7,17 @@ import com.sistematurnos.entity.Servicio;
 
 public class ServicioMapper {
 
+    public static ServicioResponse toResponse(Servicio servicio) {
+        return new ServicioResponse(
+            servicio.getId(),
+            servicio.getNombreServicio(),
+            servicio.getDuracion(),
+            servicio.isEstado(),
+            servicio.getEspecialidad().getId(),
+            servicio.getEspecialidad().getNombre()
+        );
+    }
+
     public static Servicio toEntity(ServicioRequest request, Especialidad especialidad) {
         Servicio servicio = new Servicio();
         servicio.setNombreServicio(request.nombreServicio());
@@ -14,14 +25,5 @@ public class ServicioMapper {
         servicio.setEspecialidad(especialidad);
         servicio.setEstado(true);
         return servicio;
-    }
-
-    public static ServicioResponse toResponse(Servicio servicio) {
-        return new ServicioResponse(
-                servicio.getId(),
-                servicio.getNombreServicio(),
-                servicio.getDuracion(),
-                servicio.getEspecialidad().getNombre()
-        );
     }
 }
