@@ -42,8 +42,23 @@ spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 spring.thymeleaf.cache=false
 
+Variables requeridas:
+
+JWT_SECRET=pEknuCzE+HPLvMdbKt3lgixHTfQkMPbczXYM6v8D76I=
+EMAIL_PASSWORD=zsls jfrs brre vdvm
 
 ---
+
+🧑‍💼 Usuario administrador
+Para comenzar a operar el sistema es necesario tener un usuario ADMIN creado.
+
+INSERT INTO usuario (nombre, apellido, email, password, direccion, dni, cuil, rol, estado, fecha_alta)
+VALUES ('Admin', 'Sistema', 'admin@example.com', '$2a$10$hashdeejemplo', 'Dirección Admin', 12345678, '20-12345678-9', 'ADMIN', 1, NOW());
+
+🙋‍♀️ Alta de clientes
+Los clientes se registran desde el formulario web accediendo a /registro.
+
+Una vez registrados, podrán iniciar sesión y reservar turnos desde la interfaz.
 
 ## ▶️ Cómo correr el proyecto
 
@@ -55,14 +70,16 @@ http://localhost:8080
 
 ---
 
-## 🧪 Funcionalidades principales
+🧪 Funcionalidades principales
+ABM de Clientes, Empleados, Servicios, Turnos y Sucursales
+Asignación de empleados a especialidades
+Alta de turnos con validación de disponibilidad horaria
+Envío de confirmación por email (simulado desde consola o real mediante SMTP)
+Manejo de errores con excepciones personalizadas
+Soporte para vistas HTML (Thymeleaf) y API REST JSON
+Autenticación y autorización con Spring Security
+Generación de JWT y protección de rutas
 
-- ABM de **Clientes**, **Empleados**, **Servicios**, **Turnos** y **Sucursales**
-- Asignación de **empleados a especialidades**
-- **Alta de turnos** con validación de disponibilidad horaria
-- **Envío de confirmación por email** (simulado desde consola)
-- **Manejo de errores** con excepciones personalizadas
-- Soporte para **vistas HTML** (Thymeleaf) o **REST API** (JSON)
 
 ---
 
@@ -97,6 +114,30 @@ Si usás una cuenta de Gmail y tenés la verificación en dos pasos activada, ne
 📌 Guía oficial de Google:  
 👉 https://myaccount.google.com/apppasswords
 
+🔒 Seguridad
+Configuración con Spring Security y autenticación basada en formularios.
+
+Login (/login) y logout (/logout)
+
+JWT para endpoints protegidos
+
+Roles: ADMIN, EMPLEADO, CLIENTE
+
+📚 Swagger
+El proyecto incluye documentación automática con Swagger:
+
+📌 Cómo acceder
+Una vez iniciado el proyecto, ingresá a:
+http://localhost:8080/swagger-ui/index.html
+
+🔧 Dependencia usada
+
+<dependency>
+  <groupId>org.springdoc</groupId>
+  <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+  <version>2.8.6</version>
+</dependency>
+
 ## ⚠️ Excepciones personalizadas
 
 El sistema cuenta con una clase `GlobalExceptionHandler` anotada con `@ControllerAdvice`, que captura y gestiona los errores más comunes del negocio. Algunas de las excepciones definidas:
@@ -112,16 +153,18 @@ Estas excepciones pueden ser mostradas como:
 
 ---
 
-## 📂 Estructura del proyecto
+📂 Estructura del Proyecto
 
-├── controller/ # Controladores (web o REST)
-├── entity/ # Entidades del dominio (JPA)
-├── service/ # Lógica de negocio
-├── repository/ # Acceso a base de datos (Spring Data JPA)
-├── exception/ # Excepciones personalizadas
-├── templates/ # Vistas Thymeleaf (HTML)
-├── static/ # Archivos estáticos (CSS, JS)
+├── controller/           # Controladores REST
+├── entity/               # Entidades JPA
+├── service/              # Lógica de negocio
+├── repository/           # Acceso a base de datos
+├── exception/            # Excepciones personalizadas
+├── dtos/                 # DTOs con record class
+├── templates/            # Vistas Thymeleaf
+├── static/               # Archivos estáticos (JS, CSS)
+├── config/               # Seguridad, Swagger
 ├── resources/
-│ ├── application.properties
-│ └── data.sql # (opcional) carga de datos iniciales
+│   ├── application.properties
+│   └── data.sql          # (opcional) carga inicial
 └── SistemaTurnosApplication.java
