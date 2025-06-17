@@ -1,170 +1,149 @@
 # 🗓️ Sistema de Turnos - OO2 - Grupo 22
 
-Proyecto desarrollado por el  **Grupo 22** para la materia **Orientación a Objetos 2 (OO2)** de la **Universidad Nacional de Lanús**.
-
-Este sistema permite la gestión de turnos entre clientes, empleados, sucursales y servicios. Incluye validaciones, excepciones personalizadas y una interfaz web simple para la interacción con los datos.
+## 📌 Tabla de Contenidos
+- [Descripción](#-descripción)
+- [Requisitos](#-requisitos)
+- [Configuración](#-configuración)
+  - [Variables de Entorno](#variables-de-entorno)
+  - [Base de Datos](#base-de-datos)
+- [Instalación](#-instalación)
+- [Uso](#-uso)
+  - [Datos Iniciales](#datos-iniciales)
+  - [Usuarios de Prueba](#usuarios-de-prueba)
+- [Funcionalidades](#-funcionalidades)
+- [Documentación API](#-documentación-api)
+- [Estructura del Proyecto](#-estructura-del-proyecto)
+- [Contribución](#contribución)
 
 ---
 
-## 🔽 ¿Cómo bajar el proyecto?
-
-1. Asegurate de tener instalado **Git**, **Java 17 o superior**, y **Maven**.
-2. Abrí una terminal y ejecutá los siguientes comandos para clonar el repositorio y posicionarte en la rama correcta:
-
-git clone https://github.com/lucadelavia/SistemaTurnos-OO2-G22.git
-
-3. Abrí el proyecto en tu IDE.
+## 🌟 Descripción
+Sistema de gestión de turnos desarrollado para la materia **Orientación a Objetos 2** de la Universidad Nacional de Lanús. Permite la gestión completa de clientes, empleados, servicios y turnos con autenticación **JWT** y envío de confirmaciones por email.
 
 ---
 
-## 🛠️ Configuración previa
+## 💻 Requisitos
+- Java 17+
+- MySQL 8.0+ o MariaDB
+- Maven 3.6+
+- Git
 
-### 📌 1. Crear la base de datos
+---
 
-Debés tener instalado **MySQL** o **MariaDB**.
+## ⚙️ Configuración
 
-Luego, creá una base de datos llamada `sistematurnos` con el siguiente comando:
+### Variables de Entorno
+Configurar en `src/main/resources/application.properties` o como variables del sistema:
 
-CREATE DATABASE sistematurnos;
+```properties
+# Database
+DB_URL=jdbc:mysql://localhost:3306/sistematurnos
+DB_USERNAME=root
+DB_PASSWORD=root
 
-Podés hacerlo desde consola o desde alguna herramienta gráfica como MySQL Workbench o DBeaver.
-
-### 📌 2. Configurar `application.properties`
-
-Ubicación: `src/main/resources/application.properties`
-
-Revisá que el archivo tenga esta configuración y actualizá usuario y contraseña con tus datos locales:
-
-spring.datasource.url=jdbc:mysql://localhost:3306/sistematurnos
-spring.datasource.username=tu_usuario
-spring.datasource.password=tu_contraseña
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.thymeleaf.cache=false
-
-Variables requeridas:
-
+# JWT
 JWT_SECRET=pEknuCzE+HPLvMdbKt3lgixHTfQkMPbczXYM6v8D76I=
+
+# Email (para confirmación de turnos)
+EMAIL_USER=unlaturnos@gmail.com
 EMAIL_PASSWORD=zsls jfrs brre vdvm
 
----
+### Base de Datos  
+Crear la base de datos ejecutando:
 
-🧑‍💼 Usuario administrador
-Para comenzar a operar el sistema es necesario tener un usuario ADMIN creado.
+```sql
+CREATE DATABASE sistematurnos CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
 
-INSERT INTO usuario (nombre, apellido, email, password, direccion, dni, cuil, rol, estado, fecha_alta)
-VALUES ('Admin', 'Sistema', 'admin@example.com', '$2a$10$hashdeejemplo', 'Dirección Admin', 12345678, '20-12345678-9', 'ADMIN', 1, NOW());
+El esquema se generará automáticamente al iniciar la aplicación gracias a la siguiente propiedad:
 
-🙋‍♀️ Alta de clientes
-Los clientes se registran desde el formulario web accediendo a /registro.
-
-Una vez registrados, podrán iniciar sesión y reservar turnos desde la interfaz.
-
-## ▶️ Cómo correr el proyecto
-
-1. Ejecutá la clase principal `SistemaTurnosApplication.java` desde tu IDE.
-2. Una vez iniciado, accedé a la aplicación en tu navegador:
-
-http://localhost:8080
-
+```
+spring.jpa.hibernate.ddl-auto=update
+```
 
 ---
 
-🧪 Funcionalidades principales
-ABM de Clientes, Empleados, Servicios, Turnos y Sucursales
-Asignación de empleados a especialidades
-Alta de turnos con validación de disponibilidad horaria
-Envío de confirmación por email (simulado desde consola o real mediante SMTP)
-Manejo de errores con excepciones personalizadas
-Soporte para vistas HTML (Thymeleaf) y API REST JSON
-Autenticación y autorización con Spring Security
-Generación de JWT y protección de rutas
+## 🚀 Instalación
 
+1. Clonar el repositorio:
+
+```bash
+git clone https://github.com/lucadelavia/SistemaTurnos-OO2-G22.git
+cd SistemaTurnos-OO2-G22
+```
+
+2. Configurar las variables en `application.properties`.
+
+3. Compilar y ejecutar:
+
+```bash
+mvn spring-boot:run
+```
 
 ---
 
-## 📧 Configuración del envío de emails
+## 🖥️ Uso
 
-El sistema incluye una funcionalidad para enviar **emails de confirmación de turnos** al cliente, usando un servicio de mailing con plantilla HTML (`turnoConfirmado.html`).
+### Datos Iniciales  
+El sistema incluye un `DataSeeder` que carga datos de prueba al iniciar:
 
-### 🔹 ¿Cómo funciona?
+- 3 profesores (empleados)
+- 3 alumnos (clientes)
+- Especialidades y servicios básicos
+- 1 establecimiento (UNLa) con 2 sucursales
+- Turnos de prueba para cada alumno
 
-- Cuando se crea un turno correctamente, se ejecuta automáticamente un método que:
-  - Verifica si el cliente tiene un email válido.
-  - Carga la plantilla `turnoConfirmado.html`.
-  - Envía un correo electrónico con los datos del turno.
+### Usuarios de Prueba
 
-### 🔹 ¿Qué se necesita?
+| Rol      | Email                                      | Contraseña      |
+|----------|--------------------------------------------|------------------|
+| ADMIN    | admin@unla.edu.ar                          | admin123         |
+| EMPLEADO | alejandravranic@unla.edu.ar                | alejandra123     |
+| EMPLEADO | oscarruina@unla.edu.ar                     | oscar123         |
+| EMPLEADO | gustavosiciliano@unla.edu.ar               | gustavo123       |
+| CLIENTE  | mohamedvalentinab@alumno.unla.edu.ar       | valentina123     |
+| CLIENTE  | lucadelavia@alumno.unla.edu.ar             | luca123          |
+| CLIENTE  | svsdrubolini@alumno.unla.edu.ar            | sebastian123     |
 
-Para que el envío de mails funcione realmente, debés agregar la configuración SMTP en `application.properties`.
+---
 
-### 🔹 Ejemplo de configuración para Gmail
+## 🛠️ Funcionalidades
 
-spring.mail.host=smtp.gmail.com
-spring.mail.port=587
-spring.mail.username=tu_email@gmail.com
-spring.mail.password=tu_contraseña_de_aplicacion
-spring.mail.properties.mail.smtp.auth=true
-spring.mail.properties.mail.smtp.starttls.enable=true
+- ✅ ABM completo de todas las entidades  
+- 🗓️ Sistema de turnos con validación de disponibilidad  
+- 📧 Envío de confirmaciones por email  
+- 🔐 Autenticación JWT  
+- 👥 Roles y permisos (ADMIN, EMPLEADO, CLIENTE)  
+- 📊 Dashboard administrativo  
+- 📱 API REST completa  
 
-### 🔐 Crear una contraseña de aplicación en Gmail
+---
 
-Si usás una cuenta de Gmail y tenés la verificación en dos pasos activada, necesitás generar una contraseña de aplicación.
+## 📚 Documentación API
 
-📌 Guía oficial de Google:  
-👉 https://myaccount.google.com/apppasswords
-
-🔒 Seguridad
-Configuración con Spring Security y autenticación basada en formularios.
-
-Login (/login) y logout (/logout)
-
-JWT para endpoints protegidos
-
-Roles: ADMIN, EMPLEADO, CLIENTE
-
-📚 Swagger
-El proyecto incluye documentación automática con Swagger:
-
-📌 Cómo acceder
-Una vez iniciado el proyecto, ingresá a:
+La documentación Swagger está disponible en:  
 http://localhost:8080/swagger-ui/index.html
 
-🔧 Dependencia usada
-
-<dependency>
-  <groupId>org.springdoc</groupId>
-  <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-  <version>2.8.6</version>
-</dependency>
-
-## ⚠️ Excepciones personalizadas
-
-El sistema cuenta con una clase `GlobalExceptionHandler` anotada con `@ControllerAdvice`, que captura y gestiona los errores más comunes del negocio. Algunas de las excepciones definidas:
-
-- `ClienteNoEncontradoException`
-- `ClienteDuplicadoException`
-- `EmpleadoNoEncontradoException`
-- `TurnoNoEncontradoException`
-
-Estas excepciones pueden ser mostradas como:
-- **Vistas HTML** personalizadas (si usás `@Controller`)
-- **Respuestas JSON** (si usás `@RestController`), con estado HTTP correspondiente
-
 ---
 
-📂 Estructura del Proyecto
+## 📂 Estructura del Proyecto
 
-├── controller/           # Controladores REST
-├── entity/               # Entidades JPA
-├── service/              # Lógica de negocio
-├── repository/           # Acceso a base de datos
-├── exception/            # Excepciones personalizadas
-├── dtos/                 # DTOs con record class
-├── templates/            # Vistas Thymeleaf
-├── static/               # Archivos estáticos (JS, CSS)
-├── config/               # Seguridad, Swagger
-├── resources/
-│   ├── application.properties
-│   └── data.sql          # (opcional) carga inicial
-└── SistemaTurnosApplication.java
+```
+src/
+├── main/
+│   ├── java/
+│   │   └── com/sistematurnos/
+│   │       ├── config/          # Configuraciones
+│   │       ├── controller/      # Controladores
+│   │       ├── dto/             # Data Transfer Objects
+│   │       ├── entity/          # Entidades JPA
+│   │       ├── exception/       # Excepciones personalizadas
+│   │       ├── repository/      # Repositorios
+│   │       ├── service/         # Lógica de negocio
+│   │       └── SistemaTurnosApplication.java
+│   └── resources/
+│       ├── static/              # CSS/JS
+│       ├── templates/           # Vistas Thymeleaf
+│       └── application.properties
+```
+
