@@ -3,7 +3,6 @@ package com.sistematurnos.dtos.mapper;
 import com.sistematurnos.dtos.request.UsuarioRequest;
 import com.sistematurnos.dtos.response.UsuarioResponse;
 import com.sistematurnos.entity.Usuario;
-import com.sistematurnos.entity.enums.Rol;
 import java.time.LocalDateTime;
 
 public class UsuarioMapper {

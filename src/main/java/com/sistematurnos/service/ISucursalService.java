@@ -4,9 +4,7 @@ import com.sistematurnos.dtos.request.SucursalRequest;
 import com.sistematurnos.entity.Especialidad;
 import com.sistematurnos.entity.Sucursal;
 
-import java.time.LocalTime;
 import java.util.List;
-
 
 public interface ISucursalService {
 

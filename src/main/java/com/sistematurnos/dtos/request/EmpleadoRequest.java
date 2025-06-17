@@ -1,7 +1,6 @@
 package com.sistematurnos.dtos.request;
 
 import com.sistematurnos.entity.enums.Rol;
-import java.time.LocalDateTime;
 import java.util.Set;
 
 public record EmpleadoRequest(
