@@ -37,7 +37,7 @@ Configurar en `src/main/resources/application.properties` o como variables del s
 
 ```properties
 # Database
-DB_URL=jdbc:mysql://localhost:3306/sistematurnos
+mysql://localhost:3306/sistemaTurnos?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
 DB_USERNAME=root
 DB_PASSWORD=root
 
@@ -50,6 +50,8 @@ EMAIL_PASSWORD=zsls jfrs brre vdvm
 
 ### Base de Datos  
 Crear la base de datos ejecutando:
+
+DB_URL=jdbc:mysql://localhost:3306/sistemaTurnos?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC;DB_USERNAME=root;DB_PASSWORD=root;EMAIL_USER=unlaturnos@gmail.com;EMAIL_PASSWORD=zsls jfrs brre vdvm;JWT_SECRET=pEknuCzE+HPLvMdbKt3lgixHTfQkMPbczXYM6v8D76I= 
 
 ```sql
 CREATE DATABASE sistematurnos CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
