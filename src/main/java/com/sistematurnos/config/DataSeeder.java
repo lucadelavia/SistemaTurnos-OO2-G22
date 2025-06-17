@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -45,16 +46,18 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private boolean shouldSeedData() {
-        // Verificar si ya hay usuarios en la base de datos
-        List<Usuario> usuarios = usuarioService.obtenerUsuariosPorRangoFechas(
-                LocalDateTime.now().minusYears(1).toLocalDate(),
-                LocalDateTime.now().toLocalDate());
+        try {
+            List<Usuario> usuarios = usuarioService.obtenerUsuariosPorRangoFechas(
+                    LocalDateTime.now().minusYears(1).toLocalDate(),
+                    LocalDateTime.now().toLocalDate());
 
-        // Verificar si ya hay servicios en la base de datos
-        List<Servicio> servicios = servicioService.traerServicios();
+            List<Servicio> servicios = servicioService.traerServicios();
 
-        // Si no hay usuarios o servicios, podemos cargar datos iniciales
-        return usuarios.isEmpty() || servicios.isEmpty();
+            return usuarios.isEmpty() || servicios.isEmpty();
+        } catch (Exception e) {
+            System.out.println("⚠️ No se pudo verificar si existen usuarios. Se procederá con el seeding. Motivo: " + e.getMessage());
+            return true;
+        }
     }
 
     private void seedData() {
@@ -128,6 +131,8 @@ public class DataSeeder implements CommandLineRunner {
         aulaMagnus.setEstablecimiento(unla);
         aulaMagnus.setLstDiasDeAtencion(Set.of(lunes, martes, miercoles, jueves, viernes));
         aulaMagnus = sucursalService.guardar(aulaMagnus);
+
+        aulaMagnus.setLstEspecialidad(new HashSet<>(List.of(arquitectura, programacion, bd)));
 
         // Turnos
         turnoService.altaTurno(
