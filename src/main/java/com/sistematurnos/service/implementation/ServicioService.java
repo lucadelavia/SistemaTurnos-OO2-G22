@@ -62,9 +62,9 @@ public class ServicioService implements IServicioService{
         Servicio actual = obtenerServicioPorId(servicio.getId());
         actual.setNombreServicio(servicio.getNombreServicio());
         actual.setDuracion(servicio.getDuracion());
+        actual.setEstado(servicio.isEstado());
         return servicioRepository.save(actual);
     }
-
     @Override
     public List<Servicio> traerServicios() {
         return servicioRepository.findByEstadoTrue();

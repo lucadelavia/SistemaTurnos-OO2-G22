@@ -26,7 +26,6 @@ async function verificarRol() {
     const rol = await res.text();
     esAdmin = rol === "ADMIN";
 
-    // Si no es admin, ocultar el formulario
     if (!esAdmin && formCard) {
       formCard.style.display = "none";
     }
@@ -40,22 +39,44 @@ async function verificarRol() {
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  const pass1 = document.getElementById("password").value.trim();
+  const pass2 = document.getElementById("confirmPassword").value.trim();
+
+  if (pass1 || pass2) {
+    if (pass1 !== pass2) {
+      alert("Las contraseñas no coinciden.");
+      return;
+    }
+  }
+
+  const dni = parseInt(form.dni.value);
+  const cuil = parseInt(form.cuil.value);
+  if (isNaN(dni) || isNaN(cuil)) {
+    alert("DNI y CUIL deben ser números válidos.");
+    return;
+  }
+
   const especialidadesSeleccionadas = Array.from(
     document.querySelectorAll("input[name='especialidades']:checked")
   ).map((input) => ({ id: parseInt(input.value) }));
 
   const empleado = {
+    ...(editando && { id: idEditando }), // ✅ Se agrega el ID si estamos editando
     nombre: form.nombre.value,
     apellido: form.apellido.value,
     email: form.email.value,
     direccion: form.direccion.value,
-    dni: parseInt(form.dni.value),
-    cuil: parseInt(form.cuil.value),
+    dni,
+    cuil,
     matricula: form.matricula.value || null,
     estado: true,
     fechaAlta: new Date().toISOString(),
-    lstEspecialidades: especialidadesSeleccionadas
+    lstEspecialidades: especialidadesSeleccionadas,
   };
+
+  if (pass1) {
+    empleado.password = pass1;
+  }
 
   try {
     const url = editando
@@ -63,18 +84,24 @@ form.addEventListener("submit", async (e) => {
       : `${API_EMPLEADOS}/con-especialidades`;
     const method = editando ? "PUT" : "POST";
 
-    await fetch(url, {
+    const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(empleado),
     });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || "Error en el servidor");
+    }
 
     form.reset();
     editando = false;
     idEditando = null;
     await cargarEmpleados();
   } catch (err) {
-    console.error("Error al guardar:", err);
+    console.error("Error al guardar empleado:", err);
+    alert("Error al guardar empleado. Detalle en consola.");
   }
 });
 
@@ -115,24 +142,20 @@ async function cargarEmpleados() {
   }
 }
 
-// 🗑️ Baja lógica del empleado
 async function darBajaEmpleado(id) {
-  if (!confirm("¿Estás seguro de dar de baja este empleado?")) return;
+  if (!confirm("¿Estás seguro de eliminar este empleado? Esta acción no se puede deshacer.")) return;
 
   try {
-    const res = await fetch(`${API_EMPLEADOS}/${id}`);
-    const empleado = await res.json();
-    empleado.estado = false;
-
-    await fetch(`${API_EMPLEADOS}/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(empleado),
+    const res = await fetch(`${API_EMPLEADOS}/${id}`, {
+      method: "DELETE",
     });
+
+    if (!res.ok) throw new Error("Error al eliminar el empleado.");
 
     await cargarEmpleados();
   } catch (err) {
-    console.error("Error al dar de baja:", err);
+    console.error("Error al eliminar empleado:", err);
+    alert("No se pudo eliminar el empleado. Ver consola para más detalles.");
   }
 }
 
@@ -149,6 +172,8 @@ async function editarEmpleado(id) {
     form.dni.value = e.dni;
     form.cuil.value = e.cuil;
     form.matricula.value = e.matricula ?? "";
+    document.getElementById("password").value = "";
+    document.getElementById("confirmPassword").value = "";
 
     document.querySelectorAll("input[name='especialidades']").forEach((checkbox) => {
       checkbox.checked = e.lstEspecialidades?.some(es => es.id === parseInt(checkbox.value)) || false;
@@ -158,6 +183,7 @@ async function editarEmpleado(id) {
     idEditando = id;
   } catch (err) {
     console.error("Error al cargar empleado:", err);
+    alert("No se pudo cargar el empleado.");
   }
 }
 

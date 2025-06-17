@@ -1,5 +1,6 @@
 package com.sistematurnos.service;
 
+import com.sistematurnos.dtos.request.SucursalRequest;
 import com.sistematurnos.entity.Especialidad;
 import com.sistematurnos.entity.Sucursal;
 
@@ -8,11 +9,12 @@ import java.util.List;
 
 
 public interface ISucursalService {
-    public Sucursal altaSucursal(String direccion, String telefono, LocalTime horaApertura, LocalTime horaCierre, int espacio);
 
-    public Sucursal altaSucursal(Sucursal suc);
-    
+    Sucursal altaSucursal(SucursalRequest dto);
+
     public void bajaSucursal(int id);
+
+    Sucursal modificarSucursal(int id, SucursalRequest dto);
 
     public Sucursal modificarSucursal(Sucursal suc);
 

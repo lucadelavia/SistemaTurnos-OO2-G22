@@ -1,6 +1,7 @@
 package com.sistematurnos.dtos.request;
 
 import java.time.LocalTime;
+import java.util.Set;
 
 public record SucursalRequest(
         String direccion,
@@ -9,5 +10,7 @@ public record SucursalRequest(
         LocalTime horaCierre,
         int espacio,
         boolean estado,
-        int idEstablecimiento
+        int idEstablecimiento,
+        Set<Integer> idEspecialidades,
+        Set<Integer> idDiasDeAtencion
 ) {}

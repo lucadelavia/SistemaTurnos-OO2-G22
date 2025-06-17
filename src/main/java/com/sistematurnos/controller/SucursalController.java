@@ -1,6 +1,7 @@
 package com.sistematurnos.controller;
 
 import com.sistematurnos.dtos.mapper.SucursalMapper;
+import com.sistematurnos.dtos.request.SucursalRequest;
 import com.sistematurnos.dtos.response.SucursalResponse;
 import com.sistematurnos.entity.Especialidad;
 import com.sistematurnos.entity.Sucursal;
@@ -48,24 +49,49 @@ public class SucursalController {
 
     @Operation(summary = "Crear una nueva sucursal")
     @PostMapping
-    public ResponseEntity<SucursalResponse> crear(@RequestBody Sucursal sucursal) {
+    public ResponseEntity<SucursalResponse> crear(@RequestBody SucursalRequest request) {
         try {
-            Sucursal nueva = sucursalService.altaSucursal(sucursal);
+            // ✅ DEBUG
+            System.out.println(">>> [POST] SucursalRequest recibido:");
+            System.out.println("Direccion: " + request.direccion());
+            System.out.println("Telefono: " + request.telefono());
+            System.out.println("Hora apertura: " + request.horaApertura());
+            System.out.println("Hora cierre: " + request.horaCierre());
+            System.out.println("Espacio: " + request.espacio());
+            System.out.println("Estado: " + request.estado());
+            System.out.println("ID Establecimiento: " + request.idEstablecimiento());
+            System.out.println("IDs Especialidades: " + request.idEspecialidades());
+            System.out.println("IDs Días de Atención: " + request.idDiasDeAtencion());
+
+            Sucursal nueva = sucursalService.altaSucursal(request);
             return ResponseEntity.ok(SucursalMapper.toResponse(nueva));
         } catch (IllegalArgumentException e) {
+            e.printStackTrace(); // También mostrar el error en consola
             return ResponseEntity.badRequest().body(null);
         }
     }
 
     @Operation(summary = "Modificar una sucursal existente")
     @PutMapping("/{id}")
-    public ResponseEntity<SucursalResponse> modificar(@PathVariable int id, @RequestBody Sucursal sucursal) {
+    public ResponseEntity<SucursalResponse> modificar(@PathVariable int id, @RequestBody SucursalRequest request) {
         try {
-            sucursal.setId(id);
-            Sucursal modificada = sucursalService.modificarSucursal(sucursal);
+            // ✅ DEBUG
+            System.out.println(">>> [PUT] Modificando Sucursal ID " + id);
+            System.out.println("Direccion: " + request.direccion());
+            System.out.println("Telefono: " + request.telefono());
+            System.out.println("Hora apertura: " + request.horaApertura());
+            System.out.println("Hora cierre: " + request.horaCierre());
+            System.out.println("Espacio: " + request.espacio());
+            System.out.println("Estado: " + request.estado());
+            System.out.println("ID Establecimiento: " + request.idEstablecimiento());
+            System.out.println("IDs Especialidades: " + request.idEspecialidades());
+            System.out.println("IDs Días de Atención: " + request.idDiasDeAtencion());
+
+            Sucursal modificada = sucursalService.modificarSucursal(id, request);
             return ResponseEntity.ok(SucursalMapper.toResponse(modificada));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
         }
     }
 

@@ -12,6 +12,7 @@ public record SucursalResponse(
         int espacio,
         boolean estado,
         Integer idEstablecimiento,
+        String nombreEstablecimiento,
         Set<EspecialidadResponse> lstEspecialidad,
         Set<DiasDeAtencionResponse> lstDiasDeAtencion
 ) {}

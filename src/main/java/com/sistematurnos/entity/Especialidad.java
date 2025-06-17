@@ -6,7 +6,8 @@ import lombok.*;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter @Setter
+@Getter
+@Setter
 @ToString
 @EqualsAndHashCode
 
@@ -25,5 +26,4 @@ public class Especialidad {
     public Especialidad(String nombre) {
         this.nombre = nombre;
     }
-
 }

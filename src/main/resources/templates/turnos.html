@@ -32,6 +32,14 @@
       <form id="form-turno">
         <div class="row g-3">
           <div class="col-md-6">
+            <label class="form-label">Establecimiento</label>
+            <select id="establecimiento" class="form-select" required></select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Sucursal</label>
+            <select id="sucursal" class="form-select" required></select>
+          </div>
+          <div class="col-md-6">
             <label class="form-label">Especialidad</label>
             <select id="especialidad" class="form-select" required></select>
           </div>
@@ -45,23 +53,21 @@
           </div>
           <div class="col-md-6 d-none" id="cliente-group">
             <label class="form-label">Cliente (ID)</label>
-            <input type="number" id="cliente" class="form-control" required/>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Sucursal</label>
-            <select id="sucursal" class="form-select" required></select>
+            <input type="number" id="cliente" class="form-control" required />
           </div>
           <div class="col-md-6">
             <label class="form-label">Fecha</label>
-            <input type="date" id="fecha" class="form-control" required/>
+            <input type="date" id="fecha" class="form-control" required />
           </div>
           <div class="col-md-6">
             <label class="form-label">Horario Disponible</label>
             <select id="horario" class="form-select" required></select>
           </div>
         </div>
-        <div class="mt-4 text-end">
-          <button type="submit" class="btn btn-success">Reservar</button>
+
+        <div class="mt-4 d-flex justify-content-between">
+          <button type="button" class="btn btn-secondary" id="cancelar-edicion">Cancelar</button>
+          <button type="submit" class="btn btn-success">Guardar Turno</button>
         </div>
       </form>
     </div>
@@ -81,6 +87,7 @@
           <th>Empleado</th>
           <th>Sucursal</th>
           <th>Servicio</th>
+          <th id="th-acciones" class="d-none">Acciones</th>
         </tr>
         </thead>
         <tbody id="turnos-tbody"></tbody>

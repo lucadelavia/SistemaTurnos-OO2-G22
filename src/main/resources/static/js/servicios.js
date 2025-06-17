@@ -130,24 +130,28 @@ async function editarServicio(id) {
   }
 }
 
-// Baja lógica
 async function darBajaServicio(id) {
   if (!confirm("¿Estás seguro de que querés dar de baja este servicio?")) return;
 
   try {
     const res = await fetch(`${API_SERVICIOS}/${id}`);
     const servicio = await res.json();
-    servicio.estado = false;
+
+    // Necesitás recuperar la especialidad desde otro fetch
+    const espRes = await fetch(`${API_ESPECIALIDADES}/nombre/${servicio.nombreEspecialidad}`);
+    const especialidad = await espRes.json();
+
+    const updated = {
+      nombreServicio: servicio.nombreServicio,
+      duracion: servicio.duracion,
+      idEspecialidad: especialidad.id,
+      estado: false
+    };
 
     await fetch(`${API_SERVICIOS}/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        nombreServicio: servicio.nombreServicio,
-        duracion: servicio.duracion,
-        idEspecialidad: servicio.idEspecialidad,
-        estado: false
-      })
+      body: JSON.stringify(updated)
     });
 
     await cargarServicios();
