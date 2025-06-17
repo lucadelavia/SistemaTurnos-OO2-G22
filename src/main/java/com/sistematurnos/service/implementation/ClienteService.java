@@ -48,9 +48,11 @@ public class ClienteService implements IClienteService {
             throw new ClienteDuplicadoException("Ya existe un cliente con ese DNI.");
         }
 
+        cliente.setRol(Rol.CLIENTE);
         cliente.setPassword(passwordEncoder.encode(cliente.getPassword()));
         return clienteRepository.save(cliente);
     }
+
 
     @Override
     public Cliente obtenerClientePorId(int id) {
@@ -77,6 +79,10 @@ public class ClienteService implements IClienteService {
         actual.setDni(c.getDni());
         actual.setEstado(c.isEstado());
         actual.setNroCliente(c.getNroCliente());
+
+        if (c.getPassword() != null && !c.getPassword().isBlank()) {
+            actual.setPassword(passwordEncoder.encode(c.getPassword()));
+        }
 
         try {
             return clienteRepository.save(actual);

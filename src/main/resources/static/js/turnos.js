@@ -1,217 +1,263 @@
-const API_BASE = "/api";
-const API_USUARIO = `${API_BASE}/usuario/me`;
-const API_TURNOS = `${API_BASE}/turnos`;
-const API_SUCURSALES = `${API_BASE}/sucursales`;
-const API_SERVICIOS = `${API_BASE}/servicios`;
-const API_EMPLEADOS = `${API_BASE}/empleados`;
-const API_ESPECIALIDADES = `${API_BASE}/especialidades`;
+const apiBase = '/api';
 
 let usuarioActual = null;
+let editando = false;
+let idEditando = null;
 
-window.addEventListener("DOMContentLoaded", async () => {
+window.addEventListener('DOMContentLoaded', async () => {
   await cargarUsuario();
 
-  if (usuarioActual?.rol === "CLIENTE") {
-    document.getElementById("reserva-form").classList.remove("d-none");
-    document.getElementById("cliente").value = usuarioActual.id;
-  } else if (usuarioActual?.rol === "ADMIN") {
-    document.getElementById("reserva-form").classList.remove("d-none");
-    document.getElementById("cliente-group").classList.remove("d-none");
+  const rol = usuarioActual.rol?.toUpperCase();
+  const esAdmin = rol === 'ADMIN';
+  const esCliente = rol === 'CLIENTE';
+  const esEmpleado = rol === 'EMPLEADO';
+
+  if (esAdmin || esCliente) {
+    document.getElementById('reserva-form').classList.remove('d-none');
+    if (esAdmin) {
+      document.getElementById('cliente-group').classList.remove('d-none');
+    } else {
+      document.getElementById('cliente').value = usuarioActual.id;
+    }
   }
 
-  await cargarEspecialidades();
-  cargarSucursales();
-  cargarTurnos();
+  await cargarEstablecimientos();
+  await cargarTurnos();
 
-  document.getElementById("fecha").addEventListener("change", cargarHorarios);
-  document.getElementById("sucursal").addEventListener("change", cargarHorarios);
-  document.getElementById("servicio").addEventListener("change", async () => {
-    const idServicio = document.getElementById("servicio").value;
-    if (!idServicio) return;
-    await cargarEmpleadosPorServicio(idServicio);
-    await cargarHorarios();
+  document.getElementById('establecimiento').addEventListener('change', cargarSucursales);
+  document.getElementById('sucursal').addEventListener('change', cargarEspecialidades);
+  document.getElementById('especialidad').addEventListener('change', async () => {
+    await cargarServicios();
+    await cargarEmpleadosPorEspecialidad();
   });
-  document.getElementById("empleado").addEventListener("change", cargarHorarios);
-  document.getElementById("especialidad").addEventListener("change", async () => {
-    const id = document.getElementById("especialidad").value;
-    if (!id) return;
-    await cargarServiciosPorEspecialidad(id);
-    await cargarEmpleadosPorEspecialidad(id);
-  });
+  document.getElementById('servicio').addEventListener('change', cargarHorarios);
+  document.getElementById('empleado').addEventListener('change', cargarHorarios);
+  document.getElementById('fecha').addEventListener('change', cargarHorarios);
 
-  document.getElementById("form-turno").addEventListener("submit", reservarTurno);
+  document.getElementById('form-turno').addEventListener('submit', reservarTurno);
 });
 
 async function cargarUsuario() {
-  try {
-    const res = await fetch(API_USUARIO);
-    usuarioActual = await res.json();
-  } catch (err) {
-    console.error("Error al cargar usuario", err);
-  }
+  const res = await fetch('/api/usuario/me'); // CORREGIDO
+  usuarioActual = await res.json();
+  console.log('Usuario actual:', usuarioActual);
+}
+
+async function cargarEstablecimientos() {
+  const res = await fetch(`${apiBase}/establecimientos`);
+  const data = await res.json();
+  cargarOptions('establecimiento', data, 'nombre');
+}
+
+async function cargarSucursales() {
+  const idEstablecimiento = document.getElementById('establecimiento').value;
+  const res = await fetch(`${apiBase}/sucursales`);
+  const todas = await res.json();
+  const filtradas = todas.filter(s => s.idEstablecimiento === parseInt(idEstablecimiento));
+  cargarOptions('sucursal', filtradas, 'direccion');
+  resetSelects(['especialidad', 'servicio', 'empleado']);
 }
 
 async function cargarEspecialidades() {
-  try {
-    const res = await fetch(API_ESPECIALIDADES);
-    const data = await res.json();
-    cargarOptions("especialidad", data, "nombre");
-  } catch (err) {
-    console.error("Error al cargar especialidades", err);
-  }
+  const idSucursal = document.getElementById('sucursal').value;
+  if (!idSucursal) return;
+
+  const res = await fetch(`${apiBase}/sucursales/${idSucursal}`);
+  const sucursal = await res.json();
+  const especialidades = sucursal.lstEspecialidad || [];
+
+  cargarOptions('especialidad', especialidades, 'nombre');
+  resetSelects(['servicio', 'empleado']);
 }
 
-function cargarSucursales() {
-  fetch(API_SUCURSALES)
-    .then(res => res.json())
-    .then(data => cargarOptions("sucursal", data, "direccion"))
-    .catch(err => console.error("Error al cargar sucursales", err));
+async function cargarServicios() {
+  const idEspecialidad = document.getElementById('especialidad').value;
+  if (!idEspecialidad) return;
+
+  const res = await fetch(`${apiBase}/servicios/especialidad/${idEspecialidad}`);
+  const servicios = await res.json();
+
+  cargarOptions('servicio', servicios, 'nombreServicio');
 }
 
-async function cargarServiciosPorEspecialidad(idEspecialidad) {
-  try {
-    const res = await fetch(`${API_SERVICIOS}/especialidad/${idEspecialidad}`);
-    const data = await res.json();
-    cargarOptions("servicio", data, "nombreServicio");
-  } catch (err) {
-    console.error("Error al cargar servicios por especialidad", err);
-  }
+async function cargarEmpleadosPorEspecialidad() {
+  const idEspecialidad = document.getElementById('especialidad').value;
+  if (!idEspecialidad) return;
+
+  const res = await fetch(`${apiBase}/empleados/especialidad/${idEspecialidad}`);
+  const empleados = await res.json();
+
+  cargarOptions('empleado', empleados, 'nombre');
 }
 
-async function cargarEmpleadosPorEspecialidad(idEspecialidad) {
-  try {
-    const res = await fetch(`${API_EMPLEADOS}/especialidad/${idEspecialidad}`);
-    const data = await res.json();
-    cargarOptions("empleado", data, "nombre");
-  } catch (err) {
-    console.error("Error al cargar empleados por especialidad", err);
-  }
-}
-
-async function cargarEmpleadosPorServicio(idServicio) {
-  try {
-    const res = await fetch(`${API_EMPLEADOS}/servicio/${idServicio}`);
-    const data = await res.json();
-    cargarOptions("empleado", data, "nombre");
-  } catch (err) {
-    console.error("Error al cargar empleados por servicio", err);
-  }
-}
-
-function cargarOptions(selectId, lista, fieldName) {
+function cargarOptions(selectId, lista, prop) {
   const select = document.getElementById(selectId);
   select.innerHTML = '<option value="">Seleccione</option>';
-  if (!Array.isArray(lista)) return;
   lista.forEach(item => {
-    const option = document.createElement("option");
+    const option = document.createElement('option');
     option.value = item.id;
-    option.textContent = item[fieldName] || `#${item.id}`;
+    option.textContent = item[prop] || `#${item.id}`;
     select.appendChild(option);
   });
 }
 
-function cargarHorarios() {
-  const idSucursal = document.getElementById("sucursal").value;
-  const idServicio = document.getElementById("servicio").value;
-  const idEmpleado = document.getElementById("empleado").value;
-  const fecha = document.getElementById("fecha").value;
+function resetSelects(ids) {
+  ids.forEach(id => {
+    const select = document.getElementById(id);
+    if (select) select.innerHTML = '<option value="">Seleccione</option>';
+  });
+}
 
+async function cargarHorarios() {
+  const idSucursal = document.getElementById('sucursal').value;
+  const idServicio = document.getElementById('servicio').value;
+  const idEmpleado = document.getElementById('empleado').value;
+  const fecha = document.getElementById('fecha').value;
   if (!idSucursal || !idServicio || !idEmpleado || !fecha) return;
 
-  const url = `${API_TURNOS}/disponibilidad?idSucursal=${idSucursal}&idServicio=${idServicio}&idEmpleado=${idEmpleado}&fecha=${fecha}`;
+  const res = await fetch(`${apiBase}/turnos/disponibilidad?idSucursal=${idSucursal}&idServicio=${idServicio}&idEmpleado=${idEmpleado}&fecha=${fecha}`);
+  const horarios = await res.json();
 
-  fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      const select = document.getElementById("horario");
-      select.innerHTML = '<option value="">Seleccione</option>';
+  const select = document.getElementById('horario');
+  select.innerHTML = '<option value="">Seleccione</option>';
 
-      const mensaje = document.getElementById("mensaje-horarios");
-      if (mensaje) mensaje.remove();
+  horarios.forEach(horaStr => {
+    const dt = new Date(horaStr);
+    const localDateTime = dt.getFullYear() + '-' +
+      String(dt.getMonth() + 1).padStart(2, '0') + '-' +
+      String(dt.getDate()).padStart(2, '0') + 'T' +
+      String(dt.getHours()).padStart(2, '0') + ':' +
+      String(dt.getMinutes()).padStart(2, '0');
 
-      if (data.length === 0) {
-        const aviso = document.createElement("div");
-        aviso.id = "mensaje-horarios";
-        aviso.className = "alert alert-warning mt-3";
-        aviso.textContent = "La sucursal no atiende el día seleccionado.";
-        select.parentElement.appendChild(aviso);
-        return;
-      }
+    const option = document.createElement('option');
+    option.value = localDateTime;
+    option.textContent = dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-      data.forEach(hora => {
-        const dt = new Date(hora);
-        const option = document.createElement("option");
-        option.value = dt.toISOString();
-        option.textContent = dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-        select.appendChild(option);
-      });
-    })
-    .catch(err => console.error("Error al cargar horarios:", err));
+    select.appendChild(option);
+  });
 }
 
-function reservarTurno(e) {
+async function reservarTurno(e) {
   e.preventDefault();
 
-  const horario = document.getElementById("horario").value;
   const turno = {
-    fechaHora: new Date(horario).toISOString(),
+    fechaHora: document.getElementById('horario').value,
     estado: true,
     codigo: generarCodigo(),
-    idCliente: parseInt(document.getElementById("cliente").value),
-    idEmpleado: parseInt(document.getElementById("empleado").value),
-    idSucursal: parseInt(document.getElementById("sucursal").value),
-    idServicio: parseInt(document.getElementById("servicio").value)
+    cliente: { id: parseInt(document.getElementById('cliente').value || usuarioActual.id) },
+    empleado: { id: parseInt(document.getElementById('empleado').value) },
+    sucursal: { id: parseInt(document.getElementById('sucursal').value) },
+    servicio: { id: parseInt(document.getElementById('servicio').value) }
   };
 
-  fetch(API_TURNOS, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+  const url = `${apiBase}/turnos${editando ? `/${idEditando}` : ''}`;
+  const method = editando ? 'PUT' : 'POST';
+
+  const res = await fetch(url, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(turno)
-  })
-    .then(res => {
-      if (!res.ok) throw new Error("Error al reservar el turno");
-      return res.json();
-    })
-    .then(() => {
-      alert("Turno reservado con éxito");
-      document.getElementById("form-turno").reset();
-      document.getElementById("horario").innerHTML = "";
-      const mensaje = document.getElementById("mensaje-horarios");
-      if (mensaje) mensaje.remove();
-      cargarTurnos();
-    })
-    .catch(err => alert(err.message));
+  });
+
+  if (!res.ok) {
+    alert('Error al guardar turno');
+    return;
+  }
+
+  alert(editando ? 'Turno actualizado' : 'Turno reservado');
+  cancelarEdicion();
+  cargarTurnos();
 }
 
-function cargarTurnos() {
-  fetch(API_TURNOS)
-    .then(res => res.json())
-    .then(data => {
-      const tbody = document.getElementById("turnos-tbody");
-      tbody.innerHTML = "";
+function cancelarEdicion() {
+  editando = false;
+  idEditando = null;
+  document.getElementById('form-turno').reset();
+  document.getElementById('horario').innerHTML = '';
+}
 
-      const turnosFiltrados =
-        usuarioActual?.rol === "EMPLEADO"
-          ? data.filter(t => t.empleadoId === usuarioActual.id)
-          : usuarioActual?.rol === "CLIENTE"
-          ? data.filter(t => t.clienteId === usuarioActual.id)
-          : data;
+async function cargarTurnos() {
+  const rol = usuarioActual.rol?.toUpperCase();
+  let url = `${apiBase}/turnos`;
 
-      turnosFiltrados.forEach(t => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${t.id}</td>
-          <td>${new Date(t.fechaHora).toLocaleString()}</td>
-          <td>${t.codigo}</td>
-          <td>${t.clienteNombre || t.clienteId || "-"}</td>
-          <td>${t.empleadoNombre || t.empleadoId || "-"}</td>
-          <td>${t.sucursalDireccion || t.sucursalId || "-"}</td>
-          <td>${t.servicioNombre || t.servicioId || "-"}</td>
-        `;
-        tbody.appendChild(row);
-      });
-    })
-    .catch(err => console.error("Error al cargar turnos:", err));
+  if (rol === 'CLIENTE') {
+    url = `${apiBase}/turnos/cliente/${usuarioActual.id}`;
+  } else if (rol === 'EMPLEADO') {
+    url = `${apiBase}/turnos/empleado/${usuarioActual.id}`;
+  }
+
+  console.log('Cargando turnos desde:', url);
+
+  const res = await fetch(url);
+  const data = await res.json();
+
+  const tbody = document.getElementById('turnos-tbody');
+  tbody.innerHTML = '';
+
+  data.forEach(t => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${t.id}</td>
+      <td>${new Date(t.fechaHora).toLocaleString()}</td>
+      <td>${t.codigo}</td>
+      <td>${t.cliente?.nombre || '-'}</td>
+      <td>${t.empleado?.nombre || '-'}</td>
+      <td>${t.sucursal?.direccion || '-'}</td>
+      <td>${t.servicio?.nombreServicio || '-'}</td>
+      ${
+        rol !== 'EMPLEADO'
+          ? `<td>
+              <button class="btn btn-sm btn-warning me-2" onclick="editarTurno(${t.id})">✏️</button>
+              <button class="btn btn-sm btn-danger" onclick="eliminarTurno(${t.id})">🗑️</button>
+            </td>`
+          : ''
+      }
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+async function editarTurno(id) {
+  const res = await fetch(`${apiBase}/turnos/${id}`);
+  const t = await res.json();
+
+  document.getElementById('cliente').value = t.cliente.id;
+
+  const sucursalRes = await fetch(`${apiBase}/sucursales/${t.sucursal.id}`);
+  const sucursal = await sucursalRes.json();
+  document.getElementById('establecimiento').value = sucursal.idEstablecimiento;
+  await cargarSucursales();
+
+  document.getElementById('sucursal').value = t.sucursal.id;
+  await cargarEspecialidades();
+
+  const especialidadId = t.servicio.especialidad.id;
+  document.getElementById('especialidad').value = especialidadId;
+
+  await cargarServicios();
+  document.getElementById('servicio').value = t.servicio.id;
+
+  await cargarEmpleadosPorEspecialidad();
+  document.getElementById('empleado').value = t.empleado.id;
+
+  const fechaStr = t.fechaHora.split('T')[0];
+  document.getElementById('fecha').value = fechaStr;
+  await cargarHorarios();
+
+  const horarioStr = t.fechaHora.slice(0, 16);
+  document.getElementById('horario').value = horarioStr;
+
+  editando = true;
+  idEditando = id;
+}
+
+async function eliminarTurno(id) {
+  if (!confirm('¿Seguro que deseas eliminar el turno?')) return;
+
+  const res = await fetch(`${apiBase}/turnos/${id}`, { method: 'DELETE' });
+  if (!res.ok) return alert('Error al eliminar turno');
+
+  cargarTurnos();
 }
 
 function generarCodigo() {

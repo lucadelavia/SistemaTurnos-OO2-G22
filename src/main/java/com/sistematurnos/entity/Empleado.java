@@ -6,29 +6,30 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
-
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter @Setter
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
 
 @Entity
 @Table(name = "empleados")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class Empleado extends Usuario {
 
     private long cuil;
     private String matricula;
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "empleado_especialidad",
             joinColumns = @JoinColumn(name = "empleado_id"),
             inverseJoinColumns = @JoinColumn(name = "especialidad_id")
     )
-    private Set<Especialidad> lstEspecialidades;
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Set<Especialidad> lstEspecialidades = new HashSet<>();
 
     public Empleado(String nombre, String apellido, String email, String password, String direccion,
                     int dni, boolean estado, LocalDateTime fechaAlta, Rol rol,

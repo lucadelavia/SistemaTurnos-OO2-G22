@@ -1,6 +1,7 @@
 const API_SUCURSALES = "/api/sucursales";
 const API_ESPECIALIDADES = "/api/especialidades";
 const API_DIAS = "/api/dias-atencion";
+const API_ESTABLECIMIENTOS = "/api/establecimientos";
 const API_ROL = "/auth/rol";
 
 const form = document.getElementById("sucursal-form");
@@ -18,6 +19,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await verificarRol();
   await cargarEspecialidades();
   await cargarDias();
+  await cargarEstablecimientos();
   await cargarSucursales();
 });
 
@@ -39,11 +41,11 @@ async function verificarRol() {
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const especialidades = Array.from(document.querySelectorAll("input[name='especialidades']:checked"))
-    .map(chk => ({ id: parseInt(chk.value) }));
-
-  const dias = Array.from(document.querySelectorAll("input[name='dias']:checked"))
-    .map(chk => ({ id: parseInt(chk.value) }));
+  const establecimientoId = parseInt(document.getElementById("establecimiento").value);
+  if (isNaN(establecimientoId)) {
+    alert("Debe seleccionar un establecimiento.");
+    return;
+  }
 
   const sucursal = {
     direccion: form.direccion.value,
@@ -51,23 +53,32 @@ form.addEventListener("submit", async (e) => {
     horaApertura: form.horaApertura.value,
     horaCierre: form.horaCierre.value,
     espacio: parseInt(form.espacio.value),
-    lstEspecialidad: especialidades,
-    lstDiasDeAtencion: dias
+    estado: true,
+    idEstablecimiento: establecimientoId,
+    idEspecialidades: Array.from(document.querySelectorAll("input[name='especialidades']:checked")).map(chk => parseInt(chk.value)),
+    idDiasDeAtencion: Array.from(document.querySelectorAll("input[name='dias']:checked")).map(chk => parseInt(chk.value))
   };
 
   const method = editando ? "PUT" : "POST";
   const url = editando ? `${API_SUCURSALES}/${idEditando}` : API_SUCURSALES;
 
-  await fetch(url, {
-    method,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(sucursal)
-  });
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(sucursal)
+    });
 
-  form.reset();
-  editando = false;
-  idEditando = null;
-  await cargarSucursales();
+    if (!res.ok) throw new Error("Error al guardar sucursal");
+
+    form.reset();
+    editando = false;
+    idEditando = null;
+    await cargarSucursales();
+  } catch (err) {
+    console.error("Error al guardar sucursal", err);
+    alert("No se pudo guardar la sucursal.");
+  }
 });
 
 async function cargarSucursales() {
@@ -77,26 +88,28 @@ async function cargarSucursales() {
 
     tbody.innerHTML = "";
 
-    sucursales
-      .filter(s => s.activo !== false) // excluir inactivos si hay
-      .forEach(s => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${s.id}</td>
-          <td>${s.direccion}</td>
-          <td>${s.telefono}</td>
-          <td>${s.horaApertura} - ${s.horaCierre}</td>
-          <td>${s.espacio}</td>
-          <td>${s.lstEspecialidad?.map(e => e.nombre).join(", ") || "-"}</td>
-          <td>${s.lstDiasDeAtencion?.map(d => d.nombre).join(", ") || "-"}</td>
-          <td>
-            ${esAdmin
-              ? `<button class="btn btn-sm btn-warning" onclick="editarSucursal(${s.id})">✏️</button>`
-              : ""}
-          </td>
-        `;
-        tbody.appendChild(row);
-      });
+    sucursales.forEach(s => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${s.id}</td>
+        <td>${s.direccion}</td>
+        <td>${s.telefono}</td>
+        <td>${s.horaApertura} - ${s.horaCierre}</td>
+        <td>${s.espacio}</td>
+        <td>${s.lstEspecialidad?.map(e => e.nombre).join(", ") || "-"}</td>
+        <td>${s.lstDiasDeAtencion?.map(d => d.nombre).join(", ") || "-"}</td>
+        <td>${s.nombreEstablecimiento || "-"}</td>
+        <td>
+          ${esAdmin
+            ? `
+              <button class="btn btn-sm btn-warning" onclick="editarSucursal(${s.id})">✏️</button>
+              <button class="btn btn-sm btn-danger" onclick="eliminarSucursal(${s.id})">🗑️</button>
+            `
+            : ""}
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
   } catch (err) {
     console.error("Error al cargar sucursales", err);
   }
@@ -112,6 +125,7 @@ async function editarSucursal(id) {
     form.horaApertura.value = s.horaApertura;
     form.horaCierre.value = s.horaCierre;
     form.espacio.value = s.espacio;
+    document.getElementById("establecimiento").value = s.establecimiento?.id || "";
 
     document.querySelectorAll("input[name='especialidades']").forEach(input => {
       input.checked = s.lstEspecialidad?.some(e => e.id === parseInt(input.value)) || false;
@@ -125,6 +139,23 @@ async function editarSucursal(id) {
     idEditando = id;
   } catch (err) {
     console.error("Error al editar sucursal", err);
+  }
+}
+
+async function eliminarSucursal(id) {
+  if (!confirm("¿Estás seguro de eliminar esta sucursal?")) return;
+
+  try {
+    const res = await fetch(`${API_SUCURSALES}/${id}`, {
+      method: "DELETE"
+    });
+
+    if (!res.ok) throw new Error("Error al eliminar sucursal");
+
+    await cargarSucursales();
+  } catch (err) {
+    console.error("Error al eliminar sucursal", err);
+    alert("No se pudo eliminar la sucursal.");
   }
 }
 
@@ -158,6 +189,25 @@ async function cargarDias() {
         </div>
       `).join("");
   } catch (err) {
-    console.error("Error al cargar días", err);
+    console.error("Error al cargar días de atención", err);
+  }
+}
+
+async function cargarEstablecimientos() {
+  try {
+    const res = await fetch(API_ESTABLECIMIENTOS);
+    const data = await res.json();
+
+    const select = document.getElementById("establecimiento");
+    select.innerHTML = `<option value="">Seleccionar establecimiento</option>`;
+
+    data.forEach(est => {
+      const option = document.createElement("option");
+      option.value = est.id;
+      option.textContent = est.nombre;
+      select.appendChild(option);
+    });
+  } catch (err) {
+    console.error("Error al cargar establecimientos", err);
   }
 }

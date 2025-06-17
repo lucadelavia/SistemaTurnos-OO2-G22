@@ -23,7 +23,7 @@ public class ServicioMapper {
         servicio.setNombreServicio(request.nombreServicio());
         servicio.setDuracion(request.duracion());
         servicio.setEspecialidad(especialidad);
-        servicio.setEstado(true);
+        servicio.setEstado(request.estado());
         return servicio;
     }
 }

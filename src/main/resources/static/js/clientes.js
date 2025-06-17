@@ -2,8 +2,6 @@ const API_URL = "/api/clientes";
 const ROL_URL = "/auth/rol";
 const form = document.getElementById("cliente-form");
 const tbody = document.getElementById("clientes-tbody");
-const passwordGroup = document.getElementById("password-group");
-const passwordInput = document.getElementById("password");
 
 let editando = false;
 let idEditando = null;
@@ -11,14 +9,11 @@ let rolUsuario = null;
 
 window.addEventListener("DOMContentLoaded", async () => {
   rolUsuario = await obtenerRol();
-
-  if (rolUsuario === "ADMIN") {
-    form.style.display = "block";
-    passwordGroup.classList.remove("d-none");
-  } else {
+  if (rolUsuario !== "ADMIN") {
     form.style.display = "none";
+  } else {
+    togglePasswordFields(true); // Mostrar campos de contraseña desde el inicio
   }
-
   await cargarClientes();
 });
 
@@ -36,6 +31,16 @@ async function obtenerRol() {
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  const pass1 = form.password.value.trim();
+  const pass2 = form.confirmPassword.value.trim();
+
+  if (pass1 || pass2) {
+    if (pass1 !== pass2) {
+      alert("Las contraseñas no coinciden.");
+      return;
+    }
+  }
+
   const cliente = {
     nombre: form.nombre.value,
     apellido: form.apellido.value,
@@ -47,8 +52,8 @@ form.addEventListener("submit", async (e) => {
     fechaAlta: new Date().toISOString()
   };
 
-  if (rolUsuario === "ADMIN") {
-    cliente.password = passwordInput.value || "123456";
+  if (pass1) {
+    cliente.password = pass1; // Solo enviar si fue completado
   }
 
   try {
@@ -64,6 +69,7 @@ form.addEventListener("submit", async (e) => {
     form.reset();
     editando = false;
     idEditando = null;
+    togglePasswordFields(true);
     await cargarClientes();
   } catch (err) {
     console.error("Error al guardar:", err);
@@ -88,8 +94,8 @@ async function cargarClientes() {
       <td>${c.fechaAlta ? c.fechaAlta.split("T")[0] : ""}</td>
       <td>
         ${rolUsuario === "ADMIN" ? `
-          <button class="btn btn-sm btn-warning" onclick="editarCliente(${c.id})"><i class="bi bi-pencil-fill"></i></button>
-          <button class="btn btn-sm btn-danger" onclick="eliminarCliente(${c.id})"><i class="bi bi-trash-fill"></i></button>
+          <button class="btn btn-sm btn-warning" onclick="editarCliente(${c.id})">✏️</button>
+          <button class="btn btn-sm btn-danger" onclick="eliminarCliente(${c.id})">🗑️</button>
         ` : "-"}
       </td>
     `;
@@ -114,8 +120,26 @@ async function editarCliente(id) {
   form.direccion.value = c.direccion;
   form.dni.value = c.dni;
   form.nroCliente.value = c.nroCliente;
-  passwordInput.value = "";
+
+  form.password.value = "";
+  form.confirmPassword.value = "";
 
   editando = true;
   idEditando = id;
+  togglePasswordFields(true);
+}
+
+function togglePasswordFields(show) {
+  const passwordGroup = document.getElementById("password-group");
+  const confirmGroup = document.getElementById("confirm-password-group");
+
+  if (show) {
+    passwordGroup.classList.remove("d-none");
+    confirmGroup.classList.remove("d-none");
+  } else {
+    passwordGroup.classList.add("d-none");
+    confirmGroup.classList.add("d-none");
+    form.password.value = "";
+    form.confirmPassword.value = "";
+  }
 }

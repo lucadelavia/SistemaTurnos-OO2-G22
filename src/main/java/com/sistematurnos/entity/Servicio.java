@@ -39,4 +39,10 @@ public class Servicio {
         this.especialidad = especialidad;
         this.estado = true;
     }
+
+    @Transient
+    public int getIdEspecialidad() {
+        return especialidad != null ? especialidad.getId() : 0;
+    }
+
 }

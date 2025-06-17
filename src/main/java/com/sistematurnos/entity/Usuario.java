@@ -1,9 +1,10 @@
 package com.sistematurnos.entity;
 
+import com.sistematurnos.entity.enums.Rol;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
-import com.sistematurnos.entity.enums.Rol;
 
 @Entity
 @Table(name = "usuarios")
@@ -19,7 +20,7 @@ public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idUsuario")
-    private int id;
+    private Integer id;
 
     private String nombre;
     private String apellido;
@@ -45,8 +46,7 @@ public class Usuario {
     private Rol rol;
 
     public Usuario(String nombre, String apellido, String email, String password,
-                   String direccion, int dni, boolean estado,
-                   LocalDateTime fechaAlta, Rol rol) {
+                   String direccion, int dni, boolean estado, LocalDateTime fechaAlta, Rol rol) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;
@@ -57,5 +57,4 @@ public class Usuario {
         this.fechaAlta = fechaAlta;
         this.rol = rol;
     }
-
 }

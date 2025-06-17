@@ -3,13 +3,12 @@ package com.sistematurnos.service.implementation;
 import com.sistematurnos.entity.Empleado;
 import com.sistematurnos.entity.Especialidad;
 import com.sistematurnos.entity.Servicio;
-import com.sistematurnos.entity.enums.Rol; 
+import com.sistematurnos.entity.enums.Rol;
 import com.sistematurnos.exception.EmpleadoNoEncontradoException;
 import com.sistematurnos.repository.IEmpleadoRepository;
 import com.sistematurnos.repository.IEspecialidadRepository;
 import com.sistematurnos.service.IEmpleadoService;
 import com.sistematurnos.service.IServicioService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -64,67 +63,42 @@ public class EmpleadoService implements IEmpleadoService {
 
     @Override
     public Empleado altaEmpleado(Empleado empleado) {
-        if (empleadoRepository.findByDni(empleado.getDni()).isPresent()) {
-            throw new EmpleadoNoEncontradoException("ERROR: Ya existe un empleado con ese DNI");
-        }
-
-        if (empleadoRepository.findByCuil(empleado.getCuil()).isPresent()) {
-            throw new EmpleadoNoEncontradoException("ERROR: Ya existe un empleado con ese CUIL");
-        }
-
+        empleado.setRol(Rol.EMPLEADO);
+        empleado.setPassword(passwordEncoder.encode(empleado.getPassword()));
+        empleado.setFechaAlta(LocalDateTime.now());
+        empleado.setEstado(true);
         return empleadoRepository.save(empleado);
     }
 
     @Override
     public Empleado altaEmpleadoConEspecialidades(Empleado empleado) {
+        if (empleado.getPassword() == null || empleado.getPassword().isBlank()) {
+            throw new IllegalArgumentException("La contraseña es obligatoria para crear un empleado.");
+        }
+
+        empleado.setPassword(passwordEncoder.encode(empleado.getPassword()));
         empleado.setEstado(true);
         empleado.setFechaAlta(LocalDateTime.now());
+        empleado.setRol(Rol.EMPLEADO);
+
+        Set<Especialidad> especialidades = null;
 
         if (empleado.getLstEspecialidades() != null && !empleado.getLstEspecialidades().isEmpty()) {
-            Set<Especialidad> especialidadesExistentes = empleado.getLstEspecialidades().stream()
-                    .map(espec -> especialidadRepository.findById(espec.getId())
-                            .orElseThrow(() -> new EmpleadoNoEncontradoException("Especialidad no encontrada: " + espec.getId())))
+            especialidades = empleado.getLstEspecialidades().stream()
+                    .map(e -> especialidadRepository.findById(e.getId())
+                            .orElseThrow(() -> new EmpleadoNoEncontradoException("Especialidad no encontrada: " + e.getId())))
                     .collect(Collectors.toSet());
-
-            empleado.setLstEspecialidades(especialidadesExistentes);
         }
 
-        return empleadoRepository.save(empleado);
-    }
+        empleado.setLstEspecialidades(null);
+        Empleado guardado = empleadoRepository.save(empleado);
 
-    @Override
-    public Empleado obtenerEmpleadoPorId(int id) {
-        return empleadoRepository.findById(id)
-                .orElseThrow(() -> new EmpleadoNoEncontradoException("ERROR: No existe el empleado solicitado con ID " + id));
-    }
-
-    @Override
-    public Empleado obtenerEmpleadoPorCuil(long cuil) {
-        return empleadoRepository.findByCuil(cuil)
-                .orElseThrow(() -> new EmpleadoNoEncontradoException("ERROR: No existe el empleado solicitado con CUIL " + cuil));
-    }
-
-    @Override
-    public Empleado obtenerEmpleadoPorMatricula(String matricula) {
-        return empleadoRepository.findByMatricula(matricula)
-                .orElseThrow(() -> new EmpleadoNoEncontradoException("No existe un empleado con la matrícula: " + matricula));
-    }
-    
-    public List<Empleado> buscarPorServicio(int idServicio) {
-        Servicio servicio = servicioService.obtenerServicioPorId(idServicio);
-
-        Especialidad especialidad = servicio.getEspecialidad();
-        if (especialidad == null) {
-            throw new IllegalArgumentException("ERROR: El servicio no tiene especialidad asignada.");
+        if (especialidades != null) {
+            guardado.setLstEspecialidades(especialidades);
+            guardado = empleadoRepository.save(guardado);
         }
 
-        return empleadoRepository.findByLstEspecialidadesContaining(especialidad);
-    }
-    
-    public List<Empleado> buscarPorEspecialidad(int idEspecialidad) {
-        Especialidad especialidad = especialidadRepository.findById(idEspecialidad)
-                .orElseThrow(() -> new IllegalArgumentException("Especialidad no encontrada con ID " + idEspecialidad));
-        return empleadoRepository.findByLstEspecialidadesContaining(especialidad);
+        return guardado;
     }
 
     @Override
@@ -138,24 +112,77 @@ public class EmpleadoService implements IEmpleadoService {
         actual.setCuil(e.getCuil());
         actual.setMatricula(e.getMatricula());
 
-        if (e.getLstEspecialidades() != null) {
+        if (e.getPassword() != null && !e.getPassword().isBlank()) {
+            actual.setPassword(passwordEncoder.encode(e.getPassword()));
+        }
+
+        actual.setRol(Rol.EMPLEADO);
+
+        if (e.getLstEspecialidades() != null && !e.getLstEspecialidades().isEmpty()) {
+            actual.getLstEspecialidades().clear();
+            empleadoRepository.save(actual);
+
             Set<Especialidad> especialidadesActualizadas = e.getLstEspecialidades().stream()
                     .map(es -> especialidadRepository.findById(es.getId())
                             .orElseThrow(() -> new EmpleadoNoEncontradoException("Especialidad no encontrada: " + es.getId())))
                     .collect(Collectors.toSet());
-            actual.setLstEspecialidades(especialidadesActualizadas);
+
+            actual.getLstEspecialidades().addAll(especialidadesActualizadas);
+        } else {
+            actual.getLstEspecialidades().clear();
         }
 
         return empleadoRepository.save(actual);
     }
 
     @Override
-    public void bajaEmpleado(int id) {
-        Empleado empleado = empleadoRepository.findById(id)
-                .orElseThrow(() -> new EmpleadoNoEncontradoException("Empleado no encontrado con ID " + id));
-        empleado.setEstado(false);
-        empleadoRepository.save(empleado);
+    public Empleado obtenerEmpleadoPorId(int id) {
+        return empleadoRepository.findById(id)
+                .orElseThrow(() -> new EmpleadoNoEncontradoException("ERROR: No existe el empleado con ID " + id));
     }
+
+    @Override
+    public Empleado obtenerEmpleadoPorCuil(long cuil) {
+        return empleadoRepository.findByCuil(cuil)
+                .orElseThrow(() -> new EmpleadoNoEncontradoException("ERROR: No existe el empleado con CUIL " + cuil));
+    }
+
+    @Override
+    public Empleado obtenerEmpleadoPorMatricula(String matricula) {
+        return empleadoRepository.findByMatricula(matricula)
+                .orElseThrow(() -> new EmpleadoNoEncontradoException("No existe un empleado con la matrícula: " + matricula));
+    }
+
+    @Override
+    public List<Empleado> buscarPorServicio(int idServicio) {
+        Servicio servicio = servicioService.obtenerServicioPorId(idServicio);
+        Especialidad especialidad = servicio.getEspecialidad();
+
+        if (especialidad == null) {
+            throw new IllegalArgumentException("ERROR: El servicio no tiene especialidad asignada.");
+        }
+
+        return empleadoRepository.findByLstEspecialidadesContaining(especialidad);
+    }
+
+    @Override
+    public List<Empleado> buscarPorEspecialidad(int idEspecialidad) {
+        Especialidad especialidad = especialidadRepository.findById(idEspecialidad)
+                .orElseThrow(() -> new IllegalArgumentException("Especialidad no encontrada con ID " + idEspecialidad));
+
+        return empleadoRepository.findByLstEspecialidadesContaining(especialidad);
+    }
+
+    @Override
+    public void bajaEmpleado(int id) {
+        Empleado empleado = obtenerEmpleadoPorId(id);
+
+        empleado.getLstEspecialidades().clear();
+        empleadoRepository.save(empleado);
+
+        empleadoRepository.delete(empleado);
+    }
+
 
     @Override
     public void asignarEspecialidad(int idEmpleado, Especialidad esp) {

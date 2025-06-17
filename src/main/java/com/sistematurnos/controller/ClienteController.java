@@ -1,8 +1,5 @@
 package com.sistematurnos.controller;
 
-import com.sistematurnos.dtos.request.ClienteRequest;
-import com.sistematurnos.dtos.response.ClienteResponse;
-import com.sistematurnos.dtos.mapper.ClienteMapper;
 import com.sistematurnos.entity.Cliente;
 import com.sistematurnos.service.IClienteService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,50 +20,46 @@ public class ClienteController {
 
     @Operation(summary = "Listar todos los clientes activos")
     @GetMapping
-    public List<ClienteResponse> listarClientes() {
-        return clienteService.traerClientes().stream()
+    public List<Cliente> listarClientes() {
+        return clienteService.traerClientes()
+                .stream()
                 .filter(Cliente::isEstado)
-                .map(ClienteMapper::toResponse)
                 .toList();
     }
 
     @Operation(summary = "Obtener un cliente por su ID")
     @GetMapping("/{id}")
-    public ResponseEntity<ClienteResponse> obtenerClientePorId(@PathVariable int id) {
+    public ResponseEntity<Cliente> obtenerClientePorId(@PathVariable int id) {
         Cliente cliente = clienteService.obtenerClientePorId(id);
-        return ResponseEntity.ok(ClienteMapper.toResponse(cliente));
+        return ResponseEntity.ok(cliente);
     }
 
     @Operation(summary = "Obtener un cliente por su número de cliente")
-    @GetMapping("/numero/{nro}")
-    public ResponseEntity<ClienteResponse> obtenerPorNroCliente(@PathVariable int nro) {
+    @GetMapping("/nroCliente/{nro}")
+    public ResponseEntity<Cliente> obtenerPorNroCliente(@PathVariable int nro) {
         Cliente cliente = clienteService.traerClientePorNroCliente(nro);
-        return ResponseEntity.ok(ClienteMapper.toResponse(cliente));
+        return ResponseEntity.ok(cliente);
     }
 
-    @Operation(summary = "Listar clientes con número mayor a un valor dado")
-    @GetMapping("/numero-mayor-a/{limite}")
-    public List<ClienteResponse> clientesConNroClienteMayorA(@PathVariable int limite) {
-        return clienteService.findByNroClienteGreaterThan(limite).stream()
-                .map(ClienteMapper::toResponse)
-                .toList();
+    @Operation(summary = "Listar clientes con número de cliente mayor a un valor dado")
+    @GetMapping("/mayorNroCliente/{limite}")
+    public List<Cliente> clientesConNroClienteMayorA(@PathVariable int limite) {
+        return clienteService.findByNroClienteGreaterThan(limite);
     }
 
     @Operation(summary = "Crear un nuevo cliente")
     @PostMapping
-    public ResponseEntity<ClienteResponse> crearCliente(@RequestBody ClienteRequest request) {
-        Cliente nuevo = clienteService.altaCliente(ClienteMapper.toEntity(request));
-        return ResponseEntity.ok(ClienteMapper.toResponse(nuevo));
+    public ResponseEntity<Cliente> crearCliente(@RequestBody Cliente cliente) {
+        Cliente nuevo = clienteService.altaCliente(cliente);
+        return ResponseEntity.ok(nuevo);
     }
 
     @Operation(summary = "Modificar un cliente existente")
     @PutMapping("/{id}")
-    public ResponseEntity<ClienteResponse> modificarCliente(@PathVariable int id,
-                                                            @RequestBody ClienteRequest request) {
-        Cliente cliente = ClienteMapper.toEntity(request);
+    public ResponseEntity<Cliente> modificarCliente(@PathVariable int id, @RequestBody Cliente cliente) {
         cliente.setId(id);
         Cliente actualizado = clienteService.modificarCliente(cliente);
-        return ResponseEntity.ok(ClienteMapper.toResponse(actualizado));
+        return ResponseEntity.ok(actualizado);
     }
 
     @Operation(summary = "Dar de baja (eliminar lógicamente) a un cliente")
